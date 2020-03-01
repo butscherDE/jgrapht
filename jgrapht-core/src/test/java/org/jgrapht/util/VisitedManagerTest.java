@@ -2,6 +2,8 @@ package org.jgrapht.util;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -33,6 +35,16 @@ public class VisitedManagerTest {
         assertFalse(visitedManager.isVisited(0));
 
         visitedManager.visited(1);
+        assertTrue(visitedManager.isVisited(2));
+        assertTrue(visitedManager.isVisited(1));
+        assertFalse(visitedManager.isVisited(0));
+    }
+
+    @Test
+    public void testVisitedSecondElementList() {
+        final VisitedManager<Integer> visitedManager = new VisitedManager<>();
+
+        visitedManager.visited(Arrays.asList(2,1));
         assertTrue(visitedManager.isVisited(2));
         assertTrue(visitedManager.isVisited(1));
         assertFalse(visitedManager.isVisited(0));

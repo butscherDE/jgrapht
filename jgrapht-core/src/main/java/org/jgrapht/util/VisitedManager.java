@@ -1,5 +1,6 @@
 package org.jgrapht.util;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +9,12 @@ public class VisitedManager<T> {
 
     public void visited(T element) {
         visited.put(element, true);
+    }
+
+    public void visited(Collection<T> elements) {
+        for (final T element : elements) {
+            visited(element);
+        }
     }
 
     public boolean isVisited(T element) {
