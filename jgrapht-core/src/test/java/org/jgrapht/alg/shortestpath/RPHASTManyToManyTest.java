@@ -11,8 +11,7 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class RPHASTManyToManyTest {
     private final static Graph<Integer, DefaultWeightedEdge> graph = getGraph();
@@ -175,14 +174,14 @@ public class RPHASTManyToManyTest {
     public void sourceDoesntExist() {
         List<Integer> sources = Collections.singletonList(15);
         List<Integer> targets = Arrays.asList(3, 5, 8, 10, 11, 13);
-        run(sources, targets);
+        assertThrows(IllegalArgumentException.class, () -> {run(sources, targets);});
     }
 
     @Test
     public void targetDoesntExist() {
         List<Integer> sources = Arrays.asList(3, 5, 8, 10, 11, 13);
         List<Integer> targets = Collections.singletonList(15);
-        run(sources, targets);
+        assertThrows(IllegalArgumentException.class, () -> {run(sources, targets);});
     }
 
     private void run(final List<Integer> sources, final List<Integer> targets) {
