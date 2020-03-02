@@ -266,6 +266,8 @@
 		<module>jgrapht-demo</module>
 		<module>jgrapht-bundle</module>
 		<module>jgrapht-dist</module>
+        <module>ButschMaster</module>
+		<module>ButschMaster</module>
 	</modules>
 
 	<profiles>
