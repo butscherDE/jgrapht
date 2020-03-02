@@ -48,15 +48,12 @@ public class RPHASTManyToMany<V, E> {
         final Stack<V> verticesToExplore = new Stack<>();
         verticesToExplore.addAll(startSet);
         visitedManager.visited(startSet);
-        System.out.println("---------------------------------------------------------------");
+
         while (!verticesToExplore.empty()) {
             V vertex = verticesToExplore.pop();
             ContractionVertex<V> chVertex = getChVertex(vertex);
 
             for (final ContractionEdge<E> chEdge : comparator.getIncidentEdges(chVertex)) {
-                System.out.println("############# " + chEdge.isUpward + " ###########");
-                System.out.println(chGraph.getEdgeSource(chEdge).vertex + "->" + chGraph.getEdgeTarget(chEdge).vertex);
-                System.out.println(chGraph.getEdgeSource(chEdge).contractionLevel + "->" + chGraph.getEdgeTarget(chEdge).contractionLevel);
                 if (comparator.isEdgeCorrectlyOriented(chEdge)) {
                     edges.add(chEdge);
                     V vertexToAdd = comparator.getNodeToExploreNext(chEdge);
@@ -69,7 +66,7 @@ public class RPHASTManyToMany<V, E> {
             visitedManager.visited(vertex);
         }
 
-        Collections.sort(downwardsGraphEdges, comparator);
+        Collections.sort(edges, comparator);
     }
 
     private ContractionVertex<V> getChVertex(final V vertex) {
@@ -84,7 +81,7 @@ public class RPHASTManyToMany<V, E> {
         final LinkedList<GraphPath<V, E>> paths = new LinkedList<>();
 
         for (final V source : sources) {
-            findUpwardsEdges(Collections.singletonList(source));
+            findUpwardsEdges(source);
             cost.put(ch.getContractionMapping().get(source), 0d);
 
             exploreGraph(upwardsGraphEdges);
@@ -98,8 +95,8 @@ public class RPHASTManyToMany<V, E> {
         return paths;
     }
 
-    private void findUpwardsEdges(final Collection<V> sources) {
-        Set<V> sourcesSet = new LinkedHashSet<>(sources);
+    private void findUpwardsEdges(final V source) {
+        Set<V> sourcesSet = new LinkedHashSet<>(Collections.singletonList(source));
         upwardsGraphEdges = new LinkedList<>();
         upwardsVisitedManager = new VisitedManager<>();
         UpwardsEdgeComparator comparator = new UpwardsEdgeComparator();
@@ -109,20 +106,34 @@ public class RPHASTManyToMany<V, E> {
 
     private void exploreGraph(final List<ContractionEdge<E>> edges) {
         for (final ContractionEdge<E> edge : edges) {
-            final ContractionVertex<V> baseVertex = chGraph.getEdgeSource(edge);
-            final ContractionVertex<V> adjVertex = chGraph.getEdgeTarget(edge);
-
-            if (cost.get(adjVertex) == null) {
-                cost.put(adjVertex, Double.MAX_VALUE);
-            }
-
-            final double currentCostOfAdjVertex = cost.get(adjVertex);
-            double costWithCurrentEdge = cost.get(baseVertex) + chGraph.getEdgeWeight(edge);
-            if (costWithCurrentEdge < currentCostOfAdjVertex) {
-                cost.put(adjVertex, costWithCurrentEdge);
-                predecessors.put(adjVertex, edge);
+            try {
+                updateCostsAndPredecessor(edge);
+            } catch (NullPointerException noPredecessor) {
+                updateCostsAndPredecessorIfNoPath(edge);
             }
         }
+    }
+
+    private void updateCostsAndPredecessor(final ContractionEdge<E> edge) {
+        final ContractionVertex<V> baseVertex = chGraph.getEdgeSource(edge);
+        final ContractionVertex<V> adjVertex = chGraph.getEdgeTarget(edge);
+
+        if (cost.get(adjVertex) == null) {
+            cost.put(adjVertex, Double.MAX_VALUE);
+        }
+
+        final double currentCostOfAdjVertex = cost.get(adjVertex);
+        double costWithCurrentEdge = cost.get(baseVertex) + chGraph.getEdgeWeight(edge);
+        if (costWithCurrentEdge < currentCostOfAdjVertex) {
+            cost.put(adjVertex, costWithCurrentEdge);
+            predecessors.put(adjVertex, edge);
+        }
+    }
+
+    private void updateCostsAndPredecessorIfNoPath(final ContractionEdge<E> edge) {
+        final ContractionVertex<V> adjVertex = chGraph.getEdgeTarget(edge);
+
+        cost.put(adjVertex, Double.POSITIVE_INFINITY);
     }
 
     private List<GraphPath<V, E>> backtrackPathForEachTarget(final ContractionVertex<V> source) {
@@ -136,16 +147,31 @@ public class RPHASTManyToMany<V, E> {
     }
 
     private GraphPath<V, E> backtrackPath(final ContractionVertex<V> source, final V target) {
+        if (noValidPathFound(target)) {
+            return null;
+        } else {
+            return buildPath(source, target);
+        }
+    }
+
+    private boolean noValidPathFound(final V target) {
+        final ContractionVertex<V> chTarget = ch.getContractionMapping().get(target);
+        return cost.get(chTarget) == null || cost.get(chTarget).equals(Double.POSITIVE_INFINITY);
+    }
+
+    private GraphPath<V, E> buildPath(final ContractionVertex<V> source, final V target) {
         ContractionVertex<V> chTarget = getChVertex(target);
-        final LinkedList<V> vertices = new LinkedList<>();
+        final LinkedList<V> vertices = new LinkedList<>(Collections.singletonList(target));
         final LinkedList<E> edges = new LinkedList<>();
 
         ContractionEdge<E> currentPredecessor = predecessors.get(chTarget);
         while (currentPredecessor != null) {
             ch.unpackBackward(currentPredecessor, vertices, edges);
+            ContractionVertex<V> chSourceVertex = ch.getContractionMapping().get(vertices.getFirst());
+            currentPredecessor = predecessors.get(chSourceVertex);
         }
 
-        return new GraphWalk<>(graph, source.vertex, target, vertices, edges, cost.get(chTarget));
+        return new GraphWalk<>(graph, source.vertex, target, edges, cost.get(chTarget));
     }
 
     private abstract class EdgeComparator implements Comparator<ContractionEdge<E>> {
@@ -186,7 +212,8 @@ public class RPHASTManyToMany<V, E> {
 
         @Override
         public int compare(final ContractionEdge<E> edge1, final ContractionEdge<E> edge2) {
-            return upwardsEdgeComparator.compare(edge1, edge2) * -1;
+            int i = upwardsEdgeComparator.compare(edge1, edge2) * -1;
+            return i;
         }
 
         @Override
