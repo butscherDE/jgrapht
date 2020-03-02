@@ -146,6 +146,7 @@ public class RPHASTManyToManyTest {
     public void manyToManyPartiallyDisconnected() {
         List<Integer> sources = Arrays.asList(1, 10);
         List<Integer> targets = Arrays.asList(3, 11);
+        learningTestAreThereUpwardsEdges();
         run(sources, targets);
     }
 
@@ -190,6 +191,12 @@ public class RPHASTManyToManyTest {
 
         List<GraphPath<Integer, DefaultWeightedEdge>> dijkstraPaths = getDijkstraPaths(sources, targets);
         List<GraphPath<Integer, DefaultWeightedEdge>> rphastPath = getRphastPaths(sourceSet, targetSet);
+
+        for (final GraphPath<Integer, DefaultWeightedEdge> path : rphastPath) {
+            if (path != null && path.getEdgeList().size() == 0) {
+                System.out.println("lala");
+            }
+        }
         assertPaths(dijkstraPaths, rphastPath);
     }
 

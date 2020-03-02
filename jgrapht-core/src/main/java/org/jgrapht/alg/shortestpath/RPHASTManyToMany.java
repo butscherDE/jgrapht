@@ -119,7 +119,7 @@ public class RPHASTManyToMany<V, E> {
         final ContractionVertex<V> adjVertex = chGraph.getEdgeTarget(edge);
 
         if (cost.get(adjVertex) == null) {
-            cost.put(adjVertex, Double.MAX_VALUE);
+            cost.put(adjVertex, Double.POSITIVE_INFINITY);
         }
 
         final double currentCostOfAdjVertex = cost.get(adjVertex);
@@ -171,7 +171,12 @@ public class RPHASTManyToMany<V, E> {
             currentPredecessor = predecessors.get(chSourceVertex);
         }
 
-        return new GraphWalk<>(graph, source.vertex, target, edges, cost.get(chTarget));
+        boolean isPathLongerThanZero = edges.size() > 0;
+        if (isPathLongerThanZero) {
+            return new GraphWalk<>(graph, source.vertex, target, edges, cost.get(chTarget));
+        } else {
+            return new GraphWalk<>(graph, source.vertex, target, vertices, edges, cost.get(chTarget));
+        }
     }
 
     private abstract class EdgeComparator implements Comparator<ContractionEdge<E>> {
