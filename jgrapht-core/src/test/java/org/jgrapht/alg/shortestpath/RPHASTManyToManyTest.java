@@ -146,7 +146,6 @@ public class RPHASTManyToManyTest {
     public void manyToManyPartiallyDisconnected() {
         List<Integer> sources = Arrays.asList(1, 10);
         List<Integer> targets = Arrays.asList(3, 11);
-        learningTestAreThereUpwardsEdges();
         run(sources, targets);
     }
 
@@ -192,11 +191,6 @@ public class RPHASTManyToManyTest {
         List<GraphPath<Integer, DefaultWeightedEdge>> dijkstraPaths = getDijkstraPaths(sources, targets);
         List<GraphPath<Integer, DefaultWeightedEdge>> rphastPath = getRphastPaths(sourceSet, targetSet);
 
-        for (final GraphPath<Integer, DefaultWeightedEdge> path : rphastPath) {
-            if (path != null && path.getEdgeList().size() == 0) {
-                System.out.println("lala");
-            }
-        }
         assertPaths(dijkstraPaths, rphastPath);
     }
 
@@ -249,32 +243,24 @@ public class RPHASTManyToManyTest {
         if (assertNoPathFound(expected, actual)) {
             return;
         }
-        assertPathLengthAndWeight(expected, actual);
 
-        final Iterator<DefaultWeightedEdge> expectedIt = expected.getEdgeList().iterator();
-        final Iterator<DefaultWeightedEdge> actualIt = actual.getEdgeList().iterator();
+        assertPathWeight(expected, actual);
 
-        while (expectedIt.hasNext() && actualIt.hasNext()) {
-            final DefaultWeightedEdge expectedEdge = expectedIt.next();
-            final DefaultWeightedEdge actualEdge = actualIt.next();
-
-            assertEdge(expectedEdge, actualEdge);
-        }
+        assertStartEnd(expected, actual);
     }
 
-    private void assertPathLengthAndWeight(final GraphPath<Integer, DefaultWeightedEdge> expected,
-                                           final GraphPath<Integer, DefaultWeightedEdge> actual) {
-        assertEquals(expected.getEdgeList().size(), actual.getEdgeList().size());
+    private void assertPathWeight(final GraphPath<Integer, DefaultWeightedEdge> expected,
+                                  final GraphPath<Integer, DefaultWeightedEdge> actual) {
         assertEquals(expected.getWeight(), actual.getWeight(), 0);
     }
 
-    private void assertEdge(final DefaultWeightedEdge expectedEdge, final DefaultWeightedEdge actualEdge) {
-        assertEquals(graph.getEdgeSource(expectedEdge), graph.getEdgeSource(actualEdge));
-        assertEquals(graph.getEdgeTarget(expectedEdge), graph.getEdgeTarget(actualEdge));
-        assertEquals(graph.getEdgeWeight(expectedEdge), graph.getEdgeWeight(actualEdge), 0);
+    private void assertStartEnd(final GraphPath<Integer, DefaultWeightedEdge> expected,
+                                final GraphPath<Integer, DefaultWeightedEdge> actual) {
+        assertEquals(expected.getStartVertex(), actual.getStartVertex());
+        assertEquals(expected.getEndVertex(), actual.getEndVertex());
     }
 
-    @Test
+//    @Test
     public void learningTestAreThereUpwardsEdges() {
         Graph<ContractionVertex<Integer>, ContractionEdge<DefaultWeightedEdge>> chGraph = ch.getContractionGraph();
 
