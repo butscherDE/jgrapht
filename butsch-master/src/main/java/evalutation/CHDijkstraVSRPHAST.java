@@ -6,7 +6,7 @@ import data.RoadGraph;
 import evalutation.utils.MeasureSuite;
 import evalutation.utils.Result;
 import routing.DijkstraCHFactory;
-import routing.DijkstraFactorySimple;
+import routing.RPHASTFactory;
 import routing.RoutingAlgorithmFactory;
 import storage.ImportERPGraph;
 import storage.Importer;
@@ -16,8 +16,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
-public class DijkstraVSCHDijkstra {
-    private final static int NUM_RUNS = 100;
+public class CHDijkstraVSRPHAST {
+    private final static int NUM_RUNS = 10;
+    private final static int NUM_SOURCES = 100;
+    private final static int NUM_TARGETS = 100;
     private static RoutingAlgorithmFactory[] algorithms;
     private static int[][] startNodes;
     private static int[][] endNodes;
@@ -35,10 +37,10 @@ public class DijkstraVSCHDijkstra {
         final RoadGraph graph = importer.createGraph();
         final RoadCH ch = new CHPreprocessing(graph).createCHGraph();
 
-        algorithms = new RoutingAlgorithmFactory[]{new DijkstraFactorySimple(graph), new DijkstraCHFactory(ch)};
+        algorithms = new RoutingAlgorithmFactory[]{new DijkstraCHFactory(ch), new RPHASTFactory(ch)};
 
-        startNodes = new int[NUM_RUNS][1];
-        endNodes = new int[NUM_RUNS][1];
+        startNodes = new int[NUM_RUNS][NUM_SOURCES];
+        endNodes = new int[NUM_RUNS][NUM_TARGETS];
         createRandomStartEndNodes(graph.getNumNodes());
 
         measure(graph);
@@ -48,8 +50,12 @@ public class DijkstraVSCHDijkstra {
         final Random randomNodeIDs = new Random(1337);
 
         for (int i = 0; i < NUM_RUNS; i++) {
-            startNodes[i] = new int[] {randomNodeIDs.nextInt(numNodes)};
-            endNodes[i] = new int[] {randomNodeIDs.nextInt(numNodes)};
+            for (int j = 0; j < NUM_SOURCES; j++) {
+                startNodes[i][j] = randomNodeIDs.nextInt(numNodes);
+            }
+            for (int j = 0; j < NUM_TARGETS; j++) {
+                endNodes[i][j] = randomNodeIDs.nextInt(numNodes);
+            }
         }
     }
 

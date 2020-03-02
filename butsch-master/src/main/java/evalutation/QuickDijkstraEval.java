@@ -30,24 +30,24 @@ public class QuickDijkstraEval {
 
         final SimpleRoutingAlgorithmFactory[] algorithms = new SimpleRoutingAlgorithmFactory[]{new DijkstraFactorySimple(graph)};
 
-        final int[] startNodes = new int[NUM_RUNS];
-        final int[] endNodes = new int[NUM_RUNS];
+        final int[][] startNodes = new int[NUM_RUNS][1];
+        final int[][] endNodes = new int[NUM_RUNS][1];
         createRandomStartEndNodes(graph.getNumNodes(), startNodes, endNodes);
 
         measure(graph, algorithms, startNodes, endNodes);
     }
 
-    private static void createRandomStartEndNodes(int numNodes, int[] startNodes, int[] endNodes) {
+    private static void createRandomStartEndNodes(int numNodes, int[][] startNodes, int[][] endNodes) {
         final Random randomNodeIDs = new Random(1337);
 
         for (int i = 0; i < NUM_RUNS; i++) {
-            startNodes[i] = randomNodeIDs.nextInt(numNodes);
-            endNodes[i] = randomNodeIDs.nextInt(numNodes);
+            startNodes[i] = new int[] {randomNodeIDs.nextInt(numNodes)};
+            endNodes[i] = new int[] {randomNodeIDs.nextInt(numNodes)};
         }
     }
 
-    private static Result[][] measure(final RoadGraph graph, SimpleRoutingAlgorithmFactory[] algorithms, int[] startNodes,
-                                      int[] endNodes) {
+    private static Result[][] measure(final RoadGraph graph, SimpleRoutingAlgorithmFactory[] algorithms, int[][] startNodes,
+                                      int[][] endNodes) {
         final MeasureSuite ms = new MeasureSuite(graph, algorithms, startNodes, endNodes);
         ms.measure();
         for (SimpleRoutingAlgorithmFactory algorithm : algorithms) {

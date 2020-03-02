@@ -141,6 +141,7 @@ public class RPHASTManyToMany<V, E> {
 
         for (final V target : targets) {
             paths.add(backtrackPath(source, target));
+            paths.add(null);
         }
 
         return paths;

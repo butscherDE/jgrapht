@@ -8,10 +8,7 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.RPHASTManyToMany;
 import org.jgrapht.graph.GraphWalk;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class RPHAST implements RoutingAlgorithm {
     private final RoadCH ch;
@@ -29,33 +26,40 @@ public class RPHAST implements RoutingAlgorithm {
     public List<Path> findPaths(final Set<Node> sources, final Set<Node> targets) {
         final RPHASTManyToMany<Node, Edge> rphast = new RPHASTManyToMany<Node, Edge>(ch.getCh(), targets);
 
-        List<Path> pathPaths = getPaths(sources, rphast);
+        List<Path> pathPaths = getPaths(sources, targets, rphast);
 
         return pathPaths;
     }
 
-    private List<Path> getPaths(final Set<Node> sources, final RPHASTManyToMany<Node, Edge> rphast) {
+    private List<Path> getPaths(final Set<Node> sources, final Set<Node> targets,
+                                final RPHASTManyToMany<Node, Edge> rphast) {
         List<GraphPath<Node, Edge>> paths = rphast.getPaths(sources);
 
-        List<Path> pathPaths = convertToPaths(paths);
+        List<Path> pathPaths = convertToPaths(paths, sources, targets);
         return pathPaths;
     }
 
-    private List<Path> convertToPaths(final List<GraphPath<Node, Edge>> paths) {
+    private List<Path> convertToPaths(final List<GraphPath<Node, Edge>> paths, final Set<Node> sources,
+                                      final Set<Node> targets) {
         List<Path> pathPaths = new ArrayList<>(paths.size());
+        final Iterator<GraphPath<Node, Edge>> pathsIterator = paths.iterator();
 
-        for (final GraphPath<Node, Edge> path : paths) {
-            GraphPath<Node, Edge> replacedPath = replaceWithEmptyPathIfPathNotFound(path);
+        for (final Node source : sources) {
+            for (final Node target : targets) {
+                final GraphPath<Node, Edge> path = pathsIterator.next();
+                GraphPath<Node, Edge> replacedPath = replaceWithEmptyPathIfPathNotFound(path, source, target);
 
-            pathPaths.add(new Path(replacedPath));
+                pathPaths.add(new Path(replacedPath));
+            }
         }
 
         return pathPaths;
     }
 
-    private GraphPath<Node, Edge> replaceWithEmptyPathIfPathNotFound(GraphPath<Node, Edge> graphPath) {
-        graphPath = graphPath != null ? graphPath : new GraphWalk<>(ch.getGraph(), graphPath.getStartVertex(), graphPath.getEndVertex(), Collections.emptyList(),
-                                                                    Double.MAX_VALUE);
+    private GraphPath<Node, Edge> replaceWithEmptyPathIfPathNotFound(GraphPath<Node, Edge> graphPath,
+                                                                     final Node startNode, final Node endNode) {
+        graphPath = graphPath != null ? graphPath : new GraphWalk<>(ch.getGraph(), startNode, endNode,
+                                                                    Collections.emptyList(), Double.MAX_VALUE);
         return graphPath;
     }
 

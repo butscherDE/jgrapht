@@ -1,17 +1,23 @@
 package evalutation.utils;
 
+import data.Node;
 import data.RoadGraph;
 import routing.RoutingAlgorithm;
 import routing.RoutingAlgorithmFactory;
+import util.StopWatch;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class MeasureSuite {
     private final RoadGraph graph;
     private final RoutingAlgorithmFactory[] routingAlgorithms;
-    private final int[] startNodes;
-    private final int[] endNodes;
+    private final int[][] startNodes;
+    private final int[][] endNodes;
     private final Result[][] results;
 
-    public MeasureSuite(final RoadGraph graph, RoutingAlgorithmFactory[] routingAlgorithms, int[] startNodes, int[] endNodes) {
+    public MeasureSuite(final RoadGraph graph, RoutingAlgorithmFactory[] routingAlgorithms, int[][] startNodes,
+                        int[][] endNodes) {
         this.graph = graph;
         this.routingAlgorithms = routingAlgorithms;
         this.startNodes = startNodes;
@@ -20,7 +26,11 @@ public class MeasureSuite {
     }
 
     public void measure() {
+        final StopWatch swMeasure = new StopWatch("Measure " + startNodes.length +
+                                                  " runs with " + startNodes[0].length +
+                                                  " sources and " + endNodes[0].length).start();
         createAndStartAllTasks();
+        System.out.println(swMeasure.stop().toString());
     }
 
     private void createAndStartAllTasks() {
@@ -39,14 +49,25 @@ public class MeasureSuite {
 
     private Task createTask(int algorithmId, int vertexPairId) {
         final RoutingAlgorithm routingAlgorithm = routingAlgorithms[algorithmId].createRoutingAlgorithm();
-        final int startNode = startNodes[vertexPairId];
-        final int endNode = endNodes[vertexPairId];
 
-        createResultObjectForTask(algorithmId, vertexPairId, routingAlgorithm, startNode, endNode);
-        return new Task(graph.getVertex(startNode), graph.getVertex(endNode), routingAlgorithm, results[algorithmId][vertexPairId]);
+        final int[] startNodeIds = startNodes[vertexPairId];
+        final Set<Node> startNodeSet = new LinkedHashSet<>();
+        for (final int startNodeId : startNodeIds) {
+            startNodeSet.add(graph.getVertex(startNodeId));
+        }
+
+        final int[] endNodeIds = endNodes[vertexPairId];
+        final Set<Node> endNodeSet = new LinkedHashSet<>();
+        for (final int endNodeId : endNodeIds) {
+            endNodeSet.add(graph.getVertex(endNodeId));
+        }
+
+        createResultObjectForTask(algorithmId, vertexPairId, routingAlgorithm, startNodeIds, endNodeIds);
+        return new Task(startNodeSet, endNodeSet, routingAlgorithm, results[algorithmId][vertexPairId]);
     }
 
-    private void createResultObjectForTask(int i, int j, RoutingAlgorithm routingAlgorithm, int startNode, int endNode) {
+    private void createResultObjectForTask(int i, int j, RoutingAlgorithm routingAlgorithm, int[] startNode,
+                                           int[] endNode) {
         final String routingAlgorithmName = routingAlgorithm.getClass().getSimpleName();
         results[i][j] = new Result(routingAlgorithmName, startNode, endNode);
     }
@@ -76,7 +97,7 @@ public class MeasureSuite {
         for (int i = 0; i < results.length; i++) {
             final Result[] algorithmResults = results[i];
             for (Result algorithmResult : algorithmResults) {
-                averages [i] += algorithmResult.numSettledNodes;
+                averages[i] += algorithmResult.numSettledNodes;
             }
 
             averages[i] /= algorithmResults.length;
@@ -91,7 +112,7 @@ public class MeasureSuite {
         for (int i = 0; i < results.length; i++) {
             final Result[] algorithmResults = results[i];
             for (Result algorithmResult : algorithmResults) {
-                averages [i] += algorithmResult.numCheckedNeighbors;
+                averages[i] += algorithmResult.numCheckedNeighbors;
             }
 
             averages[i] /= algorithmResults.length;
