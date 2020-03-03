@@ -6,6 +6,7 @@ import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation.Contracti
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation.ContractionHierarchy;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation.ContractionVertex;
 import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.util.StopWatch;
 import org.jgrapht.util.VisitedManager;
 
 import java.util.*;
@@ -40,11 +41,14 @@ public class RPHASTManyToMany<V, E> {
         this.chGraph = ch.getContractionGraph();
         this.targets = targets;
 
+        StopWatch sw = new StopWatch("Downward Edges").start();
         prepareCHEdges(targets, downwardsGraphEdges, downwardsVisitedManager, new DownwardEdgeComparator());
+        //        System.out.println(sw.stop());
     }
 
     private void prepareCHEdges(final Set<V> startSet, final List<ContractionEdge<E>> edges,
                                 final VisitedManager visitedManager, final EdgeComparator comparator) {
+        StopWatch sw = new StopWatch("exploration").start();
         final Stack<V> verticesToExplore = new Stack<>();
         verticesToExplore.addAll(startSet);
         visitedManager.visited(startSet);
@@ -65,8 +69,11 @@ public class RPHASTManyToMany<V, E> {
 
             visitedManager.visited(vertex);
         }
+        System.out.println(sw.stop());
 
+        StopWatch sw2 = new StopWatch("sorting").start();
         Collections.sort(edges, comparator);
+        System.out.println(sw2.stop());
     }
 
     private ContractionVertex<V> getChVertex(final V vertex) {
@@ -84,10 +91,17 @@ public class RPHASTManyToMany<V, E> {
             findUpwardsEdges(source);
             cost.put(ch.getContractionMapping().get(source), 0d);
 
+            StopWatch sw = new StopWatch("Explore upwards").start();
             exploreGraph(upwardsGraphEdges);
+            //            System.out.println(sw.stop());
+            StopWatch sw2 = new StopWatch("Explore downwards").start();
             exploreGraph(downwardsGraphEdges);
+            //            System.out.println(sw2.stop());
 
+            StopWatch sw3 = new StopWatch("Backtracking").start();
             paths.addAll(backtrackPathForEachTarget(getChVertex(source)));
+            //            System.out.println(sw3.stop());
+
             cost.clear();
             predecessors.clear();
         }
@@ -101,7 +115,9 @@ public class RPHASTManyToMany<V, E> {
         upwardsVisitedManager = new VisitedManager<>();
         UpwardsEdgeComparator comparator = new UpwardsEdgeComparator();
 
+        StopWatch sw = new StopWatch("upwards Edges").start();
         prepareCHEdges(sourcesSet, upwardsGraphEdges, upwardsVisitedManager, comparator);
+        //        System.out.println(sw.stop());
     }
 
     private void exploreGraph(final List<ContractionEdge<E>> edges) {

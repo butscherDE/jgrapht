@@ -6,6 +6,7 @@ import data.RoadGraph;
 import evalutation.utils.MeasureSuite;
 import evalutation.utils.Result;
 import routing.DijkstraCHFactory;
+import routing.DijkstraFactorySimple;
 import routing.RPHASTFactory;
 import routing.RoutingAlgorithmFactory;
 import storage.ImportERPGraph;
@@ -17,9 +18,9 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class CHDijkstraVSRPHAST {
-    private final static int NUM_RUNS = 10;
-    private final static int NUM_SOURCES = 100;
-    private final static int NUM_TARGETS = 100;
+    private final static int NUM_RUNS = 1;
+    private final static int NUM_SOURCES = 5;
+    private final static int NUM_TARGETS = 5;
     private static RoutingAlgorithmFactory[] algorithms;
     private static int[][] startNodes;
     private static int[][] endNodes;
@@ -37,7 +38,7 @@ public class CHDijkstraVSRPHAST {
         final RoadGraph graph = importer.createGraph();
         final RoadCH ch = new CHPreprocessing(graph).createCHGraph();
 
-        algorithms = new RoutingAlgorithmFactory[]{new DijkstraCHFactory(ch), new RPHASTFactory(ch)};
+        algorithms = new RoutingAlgorithmFactory[]{new DijkstraFactorySimple(graph), new DijkstraCHFactory(ch), new RPHASTFactory(ch)};
 
         startNodes = new int[NUM_RUNS][NUM_SOURCES];
         endNodes = new int[NUM_RUNS][NUM_TARGETS];

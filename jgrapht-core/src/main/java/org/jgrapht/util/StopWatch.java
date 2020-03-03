@@ -1,4 +1,4 @@
-package util;
+package org.jgrapht.util;
 
 /**
  * Make simple speed measurements possible.
@@ -35,6 +35,6 @@ public class StopWatch {
 
     @Override
     public String toString() {
-        return name + "time:" + getSeconds();
+        return name + " time:" + getSeconds();
     }
 }
