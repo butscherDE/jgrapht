@@ -25,7 +25,7 @@ public class QuickDijkstraEval {
     }
 
     private static void performanceMeasurement() throws FileNotFoundException {
-        final Importer importer = new ImportERPGraph(Config.ERP_PATH);
+        final Importer importer = new ImportERPGraph(Config.GER_PATH);
         final RoadGraph graph = importer.createGraph();
 
         final SimpleRoutingAlgorithmFactory[] algorithms = new SimpleRoutingAlgorithmFactory[]{new DijkstraFactorySimple(graph)};

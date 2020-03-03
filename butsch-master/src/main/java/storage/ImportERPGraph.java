@@ -3,6 +3,7 @@ package storage;
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import evalutation.StopWatchVerbose;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -28,11 +29,13 @@ public class ImportERPGraph implements Importer{
     @Override
     public RoadGraph createGraph() {
 
+        final StopWatchVerbose sw = new StopWatchVerbose("Import time");
         try {
             parseDataAndCreateGraph();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        sw.printTimingIfVerbose();
 
         return graph;
     }
@@ -51,10 +54,18 @@ public class ImportERPGraph implements Importer{
         final List<Node> nodeList = new ArrayList<>(numNodes);
         for (int i = 0; i < numNodes; i++) {
             parseNextNode(nodeList);
+
+            if (i % 1_000_000 == 0) {
+                System.out.println("node " + i);
+            }
         }
 
         for (int i = 0; i < numEdges; i++) {
             parseNextEdge(nodeList);
+
+            if (i % 1_000_000 == 0) {
+                System.out.println("edge " + i);
+            }
         }
     }
     private int getNumNodes() throws IOException {
@@ -83,25 +94,8 @@ public class ImportERPGraph implements Importer{
         final double longitude = Double.parseDouble(currentNodeTokens[0]);
         final double latitude = Double.parseDouble(currentNodeTokens[1]);
         final double elevation = Double.parseDouble(currentNodeTokens[2]);
-        final int rank = getRank(currentNodeTokens);
 
-        return new Node(autoId++, longitude, latitude, elevation, rank);
-    }
-
-    private int getRank(String[] currentNodeTokens) {
-        final int rank;
-
-        if (isRankPresentInData(currentNodeTokens)) {
-            rank = 0;
-        } else {
-            rank = Integer.parseInt(currentNodeTokens[3]);
-        }
-
-        return rank;
-    }
-
-    private boolean isRankPresentInData(String[] currentNodeTokens) {
-        return currentNodeTokens.length <= 3;
+        return new Node(autoId++, longitude, latitude, elevation);
     }
 
     private void parseNextEdge(List<Node> nodes) throws IOException {

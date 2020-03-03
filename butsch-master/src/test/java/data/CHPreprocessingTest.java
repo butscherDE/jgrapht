@@ -19,7 +19,7 @@ public class CHPreprocessingTest {
     @BeforeAll
     public static void  importERPGraph() {
         try {
-            graph = new ImportERPGraph(Config.ERP_PATH).createGraph();
+            graph = new ImportERPGraph(Config.GER_PATH).createGraph();
             final CHPreprocessing chProcessor = new CHPreprocessing(graph);
             roadCH = chProcessor.createCHGraph();
         } catch (IOException e) {

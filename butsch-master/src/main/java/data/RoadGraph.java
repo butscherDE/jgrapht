@@ -28,17 +28,6 @@ public class RoadGraph extends DefaultDirectedWeightedGraph<Node, Edge> {
         return isAdded;
     }
 
-    public Node queryNode(final double longitude, final double latitude, final double elevation) {
-        for (Map.Entry<Integer, Node> integerNodeEntry : nodes.entrySet()) {
-            Node node = integerNodeEntry.getValue();
-            if (node.longitude == longitude && node.latitude == latitude && node.elevation == elevation) {
-                return node;
-            }
-        }
-
-        throw new IllegalArgumentException("There does not exist a node at " + longitude + ", " + latitude + ", " + elevation);
-    }
-
     public Node getVertex(final int id) {
         return nodes.get(id);
     }

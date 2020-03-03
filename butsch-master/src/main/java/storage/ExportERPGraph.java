@@ -33,7 +33,7 @@ public class ExportERPGraph implements Exporter {
         final StringBuilder sb = new StringBuilder();
 
         for (Node node : graphToExport.vertexSet()) {
-            sb.append(node.longitude).append(" ").append(node.latitude).append(" ").append(node.elevation).append(" ").append(node.rank).append("\n");
+            sb.append(node.longitude).append(" ").append(node.latitude).append(" ").append(node.elevation).append(" ").append("\n");
         }
 
         fileWriter.write(sb.toString());

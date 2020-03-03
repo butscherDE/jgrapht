@@ -17,7 +17,6 @@ class ExportERPGraphTest {
     void exAndImport() {
         try {
             final RoadGraph graph = GeneralTestGraph.createTestGraph();
-            graph.getVertex(0).updateRank(1);
             final Exporter exporter = new ExportERPGraph(graph, "exp.txt");
             exporter.export();
             final Importer importer = new ImportERPGraph("exp.txt");

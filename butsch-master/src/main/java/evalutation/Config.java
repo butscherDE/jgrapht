@@ -1,7 +1,8 @@
 package evalutation;
 
 public class Config {
-    public final static String ERP_PATH = "C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d.txt";
+    public final static boolean VERBOSE = true;
+    public final static String GER_PATH = "C:\\Users\\Daniel\\Documents\\ger.txt";
     public final static String ERP_PATH_REVERSED = "C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_r.txt";
     public final static String ERP_PATH_CH = "C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_ch.txt";
     public final static String ERP_PATH_CH_REVERSED = "C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_ch_r.txt";

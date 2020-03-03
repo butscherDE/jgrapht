@@ -20,7 +20,7 @@ public class DijkstraCHTest {
     @BeforeAll
     public static void prepareRealRoadNetwork() {
         try {
-            erpGraph = new ImportERPGraph(Config.ERP_PATH).createGraph();
+            erpGraph = new ImportERPGraph(Config.GER_PATH).createGraph();
             erpCh = getChGraph(erpGraph);
         } catch (IOException e) {
             e.printStackTrace();

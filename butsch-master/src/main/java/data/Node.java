@@ -4,19 +4,13 @@ import java.util.Objects;
 
 public class Node {
     public final int id;
-    public int rank;
 
     public final double longitude;
     public final double latitude;
     public final double elevation;
 
     public Node(int id, double longitude, double latitude, double elevation) {
-        this(id, longitude, latitude, elevation, 0);
-    }
-
-    public Node(int id, double longitude, double latitude, double elevation, int rank) {
         this.id = id;
-        this.rank = rank;
         this.longitude = longitude;
         this.latitude = latitude;
         this.elevation = elevation;
@@ -47,10 +41,6 @@ public class Node {
 
     @Override
     public String toString() {
-        return id + ", " + longitude + ", " + latitude + ", " + elevation + ", " + rank;
-    }
-
-    public void updateRank(final int rank) {
-        this.rank = rank;
+        return id + ", " + longitude + ", " + latitude + ", " + elevation;
     }
 }
