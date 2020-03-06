@@ -2,6 +2,6 @@ package storage;
 
 import java.io.IOException;
 
-public interface Exporter {
+public interface GraphExporter {
     void export() throws IOException;
 }

@@ -17,8 +17,8 @@ class ExportERPGraphTest {
     void exAndImport() {
         try {
             final RoadGraph graph = GeneralTestGraph.createTestGraph();
-            final Exporter exporter = new ExportERPGraph(graph, "exp.txt");
-            exporter.export();
+            final GraphExporter graphExporter = new ExportERPGraph(graph, "exp.txt");
+            graphExporter.export();
             final Importer importer = new ImportERPGraph("exp.txt");
             final RoadGraph graphReImp = importer.createGraph();
 

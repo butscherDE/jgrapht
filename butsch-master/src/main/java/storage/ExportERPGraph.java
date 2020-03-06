@@ -7,7 +7,7 @@ import data.RoadGraph;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class ExportERPGraph implements Exporter {
+public class ExportERPGraph implements GraphExporter {
     private final RoadGraph graphToExport;
     private final FileWriter fileWriter;
 
