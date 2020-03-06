@@ -17,7 +17,7 @@ class ImportERPGraphTest {
     @Test
     void verifyImportedGraphBySampleNodesAndEdges() {
         try {
-            final Importer importer = new ImportERPGraph(Config.GER_PATH);
+            final Importer importer = new ImportERPGraph(Config.ERP_PATH);
             final RoadGraph graph = importer.createGraph();
 
             assertNode(new Node(2923, 48.978, 9.80345, 339), graph);

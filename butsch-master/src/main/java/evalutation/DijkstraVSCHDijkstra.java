@@ -31,11 +31,11 @@ public class DijkstraVSCHDijkstra {
     }
 
     private static void performanceMeasurement() throws FileNotFoundException {
-        final Importer importer = new ImportERPGraph(Config.GER_PATH);
+        final Importer importer = new ImportERPGraph(Config.ERP_PATH);
         final RoadGraph graph = importer.createGraph();
         final RoadCH ch = new CHPreprocessing(graph).createCHGraph();
 
-        algorithms = new RoutingAlgorithmFactory[]{new DijkstraFactorySimple(graph), new DijkstraCHFactory(ch)};
+        algorithms = new RoutingAlgorithmFactory[]{new DijkstraFactorySimple(graph), new DijkstraCHFactory(ch, true)};
 
         startNodes = new int[NUM_RUNS][1];
         endNodes = new int[NUM_RUNS][1];

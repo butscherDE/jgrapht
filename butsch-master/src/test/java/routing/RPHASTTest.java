@@ -22,7 +22,7 @@ public class RPHASTTest {
         final RoadCH roadCH = new CHPreprocessing(graph).createCHGraph();
 
         final Dijkstra dijkstra = new Dijkstra(graph);
-        final RPHAST rphast = new RPHAST(roadCH);
+        final RPHAST rphast = new RPHAST(roadCH, true);
 
         final List<Path> dijkstraPaths = dijkstra.findPaths(sources, targets);
         final List<Path> rphastPaths = rphast.findPaths(sources, targets);

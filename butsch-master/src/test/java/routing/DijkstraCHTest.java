@@ -20,7 +20,7 @@ public class DijkstraCHTest {
     @BeforeAll
     public static void prepareRealRoadNetwork() {
         try {
-            erpGraph = new ImportERPGraph(Config.GER_PATH).createGraph();
+            erpGraph = new ImportERPGraph(Config.ERP_PATH).createGraph();
             erpCh = getChGraph(erpGraph);
         } catch (IOException e) {
             e.printStackTrace();
@@ -70,7 +70,7 @@ public class DijkstraCHTest {
         final Node startNode = testGraph.getVertex(startNodeId);
         final Node endNode = testGraph.getVertex(endNodeId);
 
-        final DijkstraCH dijkstra = new DijkstraCH(chGraph);
+        final DijkstraCH dijkstra = new DijkstraCH(chGraph, true);
         final double cost = dijkstra.getWeight(startNode, endNode);
 
         assertEquals(expected, cost);
@@ -78,7 +78,7 @@ public class DijkstraCHTest {
 
     @Test
     void multipleRuns() {
-        final DijkstraCH dijkstra = new DijkstraCH(getChGraph(GeneralTestGraph.createTestGraph()));
+        final DijkstraCH dijkstra = new DijkstraCH(getChGraph(GeneralTestGraph.createTestGraph()), true);
         final RoadGraph graph = dijkstra.graph;
 
         final Node node0 = graph.getVertex(0);
@@ -115,7 +115,7 @@ public class DijkstraCHTest {
         final RoadGraph graph = getDirectedGraph(node1, node2);
         final RoadCH ch = getChGraph(graph);
 
-        final DijkstraCH dijkstra = new DijkstraCH(ch);
+        final DijkstraCH dijkstra = new DijkstraCH(ch, true);
         assertEquals(10, dijkstra.getWeight(node1, node2));
         assertEquals(20, dijkstra.getWeight(node2, node1));
     }
@@ -150,7 +150,7 @@ public class DijkstraCHTest {
         final RoadCH ch = getChGraph(graph);
 
 
-        final DijkstraCH dijkstra = new DijkstraCH(ch);
+        final DijkstraCH dijkstra = new DijkstraCH(ch, true);
         assertEquals(30, dijkstra.getWeight(nodes[0], nodes[3]));
         assertEquals(40, dijkstra.getWeight(nodes[3], nodes[0]));
     }
@@ -192,7 +192,7 @@ public class DijkstraCHTest {
         final RoadGraph graph = getDirectedDisconnectedGraph(node1, node2);
         final RoadCH ch = getChGraph(graph);
 
-        final DijkstraCH dijkstra = new DijkstraCH(ch);
+        final DijkstraCH dijkstra = new DijkstraCH(ch, true);
         assertEquals(10, dijkstra.getWeight(node1, node2));
         assertEquals(Double.MAX_VALUE, dijkstra.getWeight(node2, node1));
     }
@@ -219,7 +219,7 @@ public class DijkstraCHTest {
     @Test
     void compareCostToTraditionalDijkstra() {
         final Dijkstra dijkstra = new Dijkstra(erpGraph);
-        final DijkstraCH dijkstraCH = new DijkstraCH(erpCh);
+        final DijkstraCH dijkstraCH = new DijkstraCH(erpCh, true);
 
         final Random random = new Random();
         final int numNodes = erpGraph.getNumNodes();
@@ -248,7 +248,7 @@ public class DijkstraCHTest {
             Node startNode = erpGraph.getVertex(5699);
             Node endNode = erpGraph.getVertex(91369);
 
-            final DijkstraCH dch = new DijkstraCH(erpCh);
+            final DijkstraCH dch = new DijkstraCH(erpCh, true);
             dch.getWeight(startNode, endNode);
         } catch (Exception e) {
             e.printStackTrace();

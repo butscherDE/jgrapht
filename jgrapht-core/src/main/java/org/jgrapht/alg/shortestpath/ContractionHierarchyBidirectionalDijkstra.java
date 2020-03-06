@@ -17,14 +17,18 @@
  */
 package org.jgrapht.alg.shortestpath;
 
-import org.jgrapht.*;
-import org.jgrapht.alg.util.*;
-import org.jgrapht.graph.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import org.jgrapht.Graph;
+import org.jgrapht.GraphPath;
+import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.EdgeReversedGraph;
+import org.jgrapht.graph.GraphWalk;
+import org.jgrapht.graph.MaskSubgraph;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.PairingHeap;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import static org.jgrapht.alg.shortestpath.BidirectionalDijkstraShortestPath.DijkstraSearchFrontier;
 import static org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation.*;
@@ -101,6 +105,8 @@ public class ContractionHierarchyBidirectionalDijkstra<V, E>
      */
     private double radius;
 
+    private final boolean enableBacktrack;
+
     /**
      * Constructs a new instance of the algorithm for a given {@code graph}.
      *
@@ -118,7 +124,17 @@ public class ContractionHierarchyBidirectionalDijkstra<V, E>
      */
     public ContractionHierarchyBidirectionalDijkstra(ContractionHierarchy<V, E> hierarchy)
     {
-        this(hierarchy, Double.POSITIVE_INFINITY, PairingHeap::new);
+        this(hierarchy, Double.POSITIVE_INFINITY, PairingHeap::new, true);
+    }
+
+    /**
+     * Constructs a new instance of the algorithm for a given {@code hierarchy}.
+     *
+     * @param hierarchy contraction of the {@code graph}
+     */
+    public ContractionHierarchyBidirectionalDijkstra(ContractionHierarchy<V, E> hierarchy, final boolean enableBacktrack)
+    {
+        this(hierarchy, Double.POSITIVE_INFINITY, PairingHeap::new, enableBacktrack);
     }
 
     /**
@@ -133,12 +149,29 @@ public class ContractionHierarchyBidirectionalDijkstra<V, E>
         ContractionHierarchy<V, E> hierarchy, double radius, Supplier<
             AddressableHeap<Double, Pair<ContractionVertex<V>, ContractionEdge<E>>>> heapSupplier)
     {
+        this(hierarchy, radius, heapSupplier, true);
+    }
+
+    /**
+     * Constructs a new instance of the algorithm for the given {@code hierarchy}, {@code radius}
+     * and {@code heapSupplier}.
+     *
+     * @param hierarchy contraction of the {@code graph}
+     * @param radius search radius
+     * @param heapSupplier supplier of the preferable heap implementation
+     * @param enableBacktrack enables or disabled the backtracking of paths
+     */
+    public ContractionHierarchyBidirectionalDijkstra(
+            ContractionHierarchy<V, E> hierarchy, double radius, Supplier<
+            AddressableHeap<Double, Pair<ContractionVertex<V>, ContractionEdge<E>>>> heapSupplier, boolean enableBacktrack)
+    {
         super(hierarchy.getGraph());
         this.contractionHierarchy = hierarchy;
         this.contractionGraph = hierarchy.getContractionGraph();
         this.contractionMapping = hierarchy.getContractionMapping();
         this.radius = radius;
         this.heapSupplier = heapSupplier;
+        this.enableBacktrack = enableBacktrack;
     }
 
     /**
@@ -238,7 +271,7 @@ public class ContractionHierarchyBidirectionalDijkstra<V, E>
         }
 
         // create path if found
-        if (Double.isFinite(bestPath) && bestPath <= radius) {
+        if (Double.isFinite(bestPath) && bestPath <= radius && enableBacktrack) {
             return createPath(
                 forwardFrontier, backwardFrontier, bestPath, contractedSource, bestPathCommonVertex,
                 contractedSink);

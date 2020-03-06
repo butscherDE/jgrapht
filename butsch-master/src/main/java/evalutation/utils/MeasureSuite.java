@@ -28,7 +28,7 @@ public class MeasureSuite {
     public void measure() {
         final StopWatch swMeasure = new StopWatch("Measure " + startNodes.length +
                                                   " runs with " + startNodes[0].length +
-                                                  " sources and " + endNodes[0].length).start();
+                                                  " sources and " + endNodes[0].length + " targets").start();
         createAndStartAllTasks();
         System.out.println(swMeasure.stop().toString());
     }

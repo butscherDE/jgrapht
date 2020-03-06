@@ -12,9 +12,11 @@ import java.util.*;
 
 public class RPHAST implements RoutingAlgorithm {
     private final RoadCH ch;
+    private final boolean enableBacktrack;
 
-    public RPHAST(final RoadCH ch) {
+    public RPHAST(final RoadCH ch, final boolean enableBacktrack) {
         this.ch = ch;
+        this.enableBacktrack = enableBacktrack;
     }
 
     @Override
@@ -24,7 +26,7 @@ public class RPHAST implements RoutingAlgorithm {
 
     @Override
     public List<Path> findPaths(final Set<Node> sources, final Set<Node> targets) {
-        final RPHASTManyToMany<Node, Edge> rphast = new RPHASTManyToMany<Node, Edge>(ch.getCh(), targets);
+        final RPHASTManyToMany<Node, Edge> rphast = new RPHASTManyToMany<Node, Edge>(ch.getCh(), targets, enableBacktrack);
 
         List<Path> pathPaths = getPaths(sources, targets, rphast);
 
@@ -35,8 +37,12 @@ public class RPHAST implements RoutingAlgorithm {
                                 final RPHASTManyToMany<Node, Edge> rphast) {
         List<GraphPath<Node, Edge>> paths = rphast.getPaths(sources);
 
-        List<Path> pathPaths = convertToPaths(paths, sources, targets);
-        return pathPaths;
+        if (enableBacktrack) {
+            List<Path> pathPaths = convertToPaths(paths, sources, targets);
+            return pathPaths;
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private List<Path> convertToPaths(final List<GraphPath<Node, Edge>> paths, final Set<Node> sources,

@@ -14,7 +14,7 @@ public class LearningTests {
     @Test
     public void noNegativeEdgeWeights() {
         try {
-            final RoadGraph graph = new ImportERPGraph(Config.GER_PATH).createGraph();
+            final RoadGraph graph = new ImportERPGraph(Config.ERP_PATH).createGraph();
             for (final Edge edge : graph.edgeSet()) {
                 assertTrue(graph.getEdgeWeight(edge) >= 0);
             }

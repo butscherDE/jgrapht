@@ -1,5 +1,6 @@
 package data;
 
+import evalutation.StopWatchVerbose;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation.ContractionHierarchy;
 
@@ -14,7 +15,9 @@ public class CHPreprocessing {
     }
 
     public RoadCH createCHGraph() {
+        final StopWatchVerbose sw = new StopWatchVerbose("CH Preprocessing");
         final ContractionHierarchy<Node, Edge> ch = chPreprocessor.computeContractionHierarchy();
+        sw.printTimingIfVerbose();
 
         return new RoadCH(ch);
     }

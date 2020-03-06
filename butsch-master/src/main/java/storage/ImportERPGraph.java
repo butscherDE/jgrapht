@@ -3,6 +3,7 @@ package storage;
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import evalutation.Config;
 import evalutation.StopWatchVerbose;
 
 import java.io.BufferedReader;
@@ -12,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImportERPGraph implements Importer{
+public class ImportERPGraph implements Importer {
     private final FileReader fileReader;
     private BufferedReader reader;
     private int autoId = 0;
@@ -54,20 +55,46 @@ public class ImportERPGraph implements Importer{
         final List<Node> nodeList = new ArrayList<>(numNodes);
         for (int i = 0; i < numNodes; i++) {
             parseNextNode(nodeList);
+        }
 
-            if (i % 1_000_000 == 0) {
-                System.out.println("node " + i);
-            }
+        final List<Node> filteredNodeList = nodeList;
+//        final List<Node> filteredNodeList = getFilteredNodeList(numNodes, nodeList);
+
+        if (Config.VERBOSE) {
+            System.out.println(filteredNodeList.size() + " Nodes");
         }
 
         for (int i = 0; i < numEdges; i++) {
-            parseNextEdge(nodeList);
-
-            if (i % 1_000_000 == 0) {
-                System.out.println("edge " + i);
-            }
+            parseNextEdge(filteredNodeList);
         }
     }
+
+    private List<Node> getFilteredNodeList(final int numNodes, final List<Node> nodeList) {
+        double maxLatitude = Double.NEGATIVE_INFINITY;
+        double minLatitude = Double.POSITIVE_INFINITY;
+        double maxLongitude = Double.NEGATIVE_INFINITY;
+        double minLongitude = Double.POSITIVE_INFINITY;
+        for (final Node node : nodeList) {
+            maxLatitude = Math.max(maxLatitude, node.latitude);
+            minLatitude = Math.min(minLatitude, node.latitude);
+            maxLongitude = Math.max(maxLongitude, node.longitude);
+            minLongitude = Math.min(minLongitude, node.longitude);
+        }
+        double latDivisionLine = minLatitude + (maxLatitude - minLatitude) / 3;
+        double lonDivisionLine = minLongitude + (maxLongitude - minLongitude) / 3;
+
+        int newId = 0;
+        final List<Node> filteredNodeList = new ArrayList<>(numNodes);
+        for (final Node node : nodeList) {
+            if (node.latitude < latDivisionLine && node.longitude < lonDivisionLine) {
+                final Node newNode = new Node(newId++, node.longitude, node.latitude, node.elevation);
+                graph.addVertex(newNode);
+                filteredNodeList.add(newNode);
+            }
+        }
+        return filteredNodeList;
+    }
+
     private int getNumNodes() throws IOException {
         return getNextMetadataLine();
     }
@@ -109,9 +136,13 @@ public class ImportERPGraph implements Importer{
         final int adjNode = Integer.parseInt(currentEdgeTokens[1]);
         final double cost = Double.parseDouble(currentEdgeTokens[2]);
 
-        final Edge edge = graph.addEdge(nodes.get(baseNode), nodes.get(adjNode));
-        if (edge != null) {
-            graph.setEdgeWeight(edge, cost);
+        try {
+            final Edge edge = graph.addEdge(nodes.get(baseNode), nodes.get(adjNode));
+            if (edge != null) {
+                graph.setEdgeWeight(edge, cost);
+            }
+        } catch (Exception e) {
+
         }
     }
 

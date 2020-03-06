@@ -13,10 +13,12 @@ import java.util.Set;
 public class DijkstraCH implements RoutingAlgorithm{
     final RoadGraph graph;
     private final ContractionHierarchyBidirectionalDijkstra<Node, Edge> dijkstraCH;
+    private final boolean enableBacktrack;
 
-    public DijkstraCH(final RoadCH roadCH) {
+    public DijkstraCH(final RoadCH roadCH, final boolean enableBacktrack) {
         this.graph = roadCH.getGraph();
-        dijkstraCH = new ContractionHierarchyBidirectionalDijkstra<>(roadCH.getCh());
+        this.dijkstraCH = new ContractionHierarchyBidirectionalDijkstra<>(roadCH.getCh(), enableBacktrack);
+        this.enableBacktrack = enableBacktrack;
     }
 
 
@@ -35,7 +37,10 @@ public class DijkstraCH implements RoutingAlgorithm{
 
         for (final Node source : sources) {
             for (final Node target : targets) {
-                paths.add(findPath(source, target));
+                Path path = findPath(source, target);
+                if (enableBacktrack) {
+                    paths.add(path);
+                }
             }
         }
 

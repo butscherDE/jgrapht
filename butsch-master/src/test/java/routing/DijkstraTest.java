@@ -155,7 +155,7 @@ class DijkstraTest {
         final int endNodeId = 37710;
 
         try {
-            final RoadGraph graph = new ImportERPGraph(Config.GER_PATH).createGraph();
+            final RoadGraph graph = new ImportERPGraph(Config.ERP_PATH).createGraph();
             final RoutingAlgorithm dijkstra = new DijkstraFactorySimple(graph).createRoutingAlgorithm();
 
             Node startNode = graph.getVertex(startNodeId);

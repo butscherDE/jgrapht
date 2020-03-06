@@ -18,7 +18,7 @@ import java.util.Random;
 
 public class CHDijkstraVSRPHAST {
     private final static int NUM_RUNS = 1;
-    private final static int NUM_SOURCES = 1;
+    private final static int NUM_SOURCES = 10000;
     private final static int NUM_TARGETS = 10000;
     private static RoutingAlgorithmFactory[] algorithms;
     private static int[][] startNodes;
@@ -26,28 +26,36 @@ public class CHDijkstraVSRPHAST {
 
     public static void main(String[] args) {
         try {
+
             performanceMeasurement();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private static void printTestParameters() {
+        System.out.println("Starting measurement with " + NUM_RUNS + " runs, " + NUM_SOURCES + " sources, " + NUM_TARGETS + " targets.");
+        System.out.println("Algorithms: " + Arrays.toString(algorithms));
+    }
+
     private static void performanceMeasurement() throws FileNotFoundException {
-        final Importer importer = new ImportERPGraph(Config.GER_PATH);
+        final Importer importer = new ImportERPGraph(Config.ERP_PATH);
         final RoadGraph graph = importer.createGraph();
         final RoadCH ch = new CHPreprocessing(graph).createCHGraph();
 
-        algorithms = new RoutingAlgorithmFactory[]{new DijkstraCHFactory(ch), new RPHASTFactory(ch)};
+        algorithms = new RoutingAlgorithmFactory[]{new DijkstraCHFactory(ch, false), new RPHASTFactory(ch, false)};
 
-        startNodes = new int[NUM_RUNS][NUM_SOURCES];
-        endNodes = new int[NUM_RUNS][NUM_TARGETS];
         createRandomStartEndNodes(graph.getNumNodes());
+
+        printTestParameters();
 
         measure(graph);
     }
 
     private static void createRandomStartEndNodes(int numNodes) {
         final Random randomNodeIDs = new Random(1337);
+        startNodes = new int[NUM_RUNS][NUM_SOURCES];
+        endNodes = new int[NUM_RUNS][NUM_TARGETS];
 
         for (int i = 0; i < NUM_RUNS; i++) {
             for (int j = 0; j < NUM_SOURCES; j++) {
