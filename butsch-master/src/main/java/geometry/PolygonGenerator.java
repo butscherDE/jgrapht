@@ -60,14 +60,12 @@ public class PolygonGenerator {
 
         int tries = 0;
         while (!polygon.isSimple()) {
-//            System.out.println(tries);
             saveCurrentPolygon(polygon, tries++);
             linearIntersectionSweep(coordinates);
             polygon = createPolygon(coordinates);
         }
 
         saveCurrentPolygon(polygon, tries);
-        System.out.println("Generated " + coordinates.length + " coordinate polygon with " + tries + "tries");
         return polygon;
     }
 

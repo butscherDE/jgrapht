@@ -46,14 +46,15 @@ public class CircularPolygonImporter implements PolygonImporter{
     private Polygon readPolygon() throws IOException {
         String line = fileReader.readLine();
 
-        final int numPolygonPoints = getNumPolygonPoints(line);
-
-        String[] strCoordinates = getCoordinateSubstrings(line);
-
-        final Coordinate[] coordinates = fillCoordinates(strCoordinates, numPolygonPoints);
-
+        final Coordinate[] coordinates = extractPolygonCoordinates(line);
 
         return geometryFactory.createPolygon(coordinates);
+    }
+
+    private Coordinate[] extractPolygonCoordinates(final String line) {
+        final int numPolygonPoints = getNumPolygonPoints(line);
+        String[] strCoordinates = getCoordinateSubstrings(line);
+        return fillCoordinates(strCoordinates, numPolygonPoints);
     }
 
     private int getNumPolygonPoints(final String line) {
