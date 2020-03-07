@@ -7,7 +7,7 @@ public class StopWatchVerbose {
     final StopWatchGraphhopper sw;
 
     public StopWatchVerbose(final String name) {
-        sw = new StopWatchGraphhopper(name);
+        sw = new StopWatchGraphhopper(name).start();
     }
 
     public void printTimingIfVerbose() {
