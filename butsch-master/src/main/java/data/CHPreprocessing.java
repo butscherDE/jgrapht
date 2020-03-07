@@ -1,6 +1,6 @@
 package data;
 
-import evalutation.StopWatchVerbose;
+import evalutation.utils.StopWatchVerbose;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation.ContractionHierarchy;
 

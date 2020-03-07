@@ -2,7 +2,7 @@ package evalutation.utils;
 
 import data.Node;
 import data.RoadGraph;
-import org.jgrapht.util.StopWatch;
+import org.jgrapht.util.StopWatchGraphhopper;
 import routing.RoutingAlgorithm;
 import routing.RoutingAlgorithmFactory;
 
@@ -26,9 +26,9 @@ public class MeasureSuite {
     }
 
     public void measure() {
-        final StopWatch swMeasure = new StopWatch("Measure " + startNodes.length +
-                                                  " runs with " + startNodes[0].length +
-                                                  " sources and " + endNodes[0].length + " targets").start();
+        final StopWatchGraphhopper swMeasure = new StopWatchGraphhopper("Measure " + startNodes.length +
+                                                                        " runs with " + startNodes[0].length +
+                                                                        " sources and " + endNodes[0].length + " targets").start();
         createAndStartAllTasks();
         System.out.println(swMeasure.stop().toString());
     }

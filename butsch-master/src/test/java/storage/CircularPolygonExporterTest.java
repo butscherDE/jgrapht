@@ -2,7 +2,7 @@ package storage;
 
 import evalutation.Config;
 import geometry.PolygonGenerator;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Polygon;
 
 import java.io.File;

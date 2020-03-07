@@ -1,6 +1,7 @@
-package evalutation;
+package evalutation.measurements;
 
 import data.RoadGraph;
+import evalutation.Config;
 import evalutation.utils.MeasureSuite;
 import evalutation.utils.Result;
 import routing.DijkstraFactorySimple;

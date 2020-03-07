@@ -6,21 +6,21 @@ package org.jgrapht.util;
  *
  * @author Peter Karich
  */
-public class StopWatch {
+public class StopWatchGraphhopper {
     private long lastTime;
     private long elapsedNanos;
     private final String name;
 
-    public StopWatch(String name) {
+    public StopWatchGraphhopper(String name) {
         this.name = name;
     }
 
-    public StopWatch start() {
+    public StopWatchGraphhopper start() {
         lastTime = System.nanoTime();
         return this;
     }
 
-    public StopWatch stop() {
+    public StopWatchGraphhopper stop() {
         if (lastTime < 0)
             return this;
 
