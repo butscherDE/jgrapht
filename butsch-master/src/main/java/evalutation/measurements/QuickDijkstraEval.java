@@ -49,15 +49,29 @@ public class QuickDijkstraEval {
 
     private static Result[][] measure(final RoadGraph graph, SimpleRoutingAlgorithmFactory[] algorithms, int[][] startNodes,
                                       int[][] endNodes) {
+        final MeasureSuite ms = execMeasurement(graph, algorithms, startNodes, endNodes);
+        printAlgorithms(algorithms);
+        printRunningTimes(ms);
+
+        return ms.getResults();
+    }
+
+    private static MeasureSuite execMeasurement(final RoadGraph graph, final SimpleRoutingAlgorithmFactory[] algorithms,
+                                                final int[][] startNodes, final int[][] endNodes) {
         final MeasureSuite ms = new MeasureSuite(graph, algorithms, startNodes, endNodes);
         ms.measure();
+        return ms;
+    }
+
+    private static void printAlgorithms(final SimpleRoutingAlgorithmFactory[] algorithms) {
         for (SimpleRoutingAlgorithmFactory algorithm : algorithms) {
             System.out.print(algorithm.getClass().getSimpleName() + ", ");
         }
         System.out.println();
+    }
+
+    private static void printRunningTimes(final MeasureSuite ms) {
         double[] avgRunningTime = ms.getAverageRunningTimePerAlgorithm();
         System.out.println("Running times in seconds: " + Arrays.toString(avgRunningTime));
-
-        return ms.getResults();
     }
 }
