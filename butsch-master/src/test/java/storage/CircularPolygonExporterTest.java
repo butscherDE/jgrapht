@@ -5,12 +5,12 @@ import geometry.PolygonGenerator;
 import org.junit.Test;
 import org.locationtech.jts.geom.Polygon;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CircularPolygonExporterTest {
     @Test
@@ -22,7 +22,6 @@ public class CircularPolygonExporterTest {
         }
 
         final List<Polygon> exportData = Arrays.asList(polygons);
-
         final List<Polygon> reimportedPolygons = exAndReimportPolygons(exportData);
 
         assertEquals(Arrays.asList(polygons), reimportedPolygons);
@@ -30,12 +29,13 @@ public class CircularPolygonExporterTest {
 
     private List<Polygon> exAndReimportPolygons(final List<Polygon> exportData) {
         final String path = exportPolygons(exportData);
-        return reimportExportedPolygons(path);
+        final List<Polygon> polygons = reimportExportedPolygons(path);
+        cleanUp(path);
+        return polygons;
     }
 
     private String exportPolygons(final List<Polygon> exportData) {
-        String path = Config.POLYGON_PATH;
-        path = path.substring(0, path.length() - 4) + "test.txt";
+        String path = Config.POLYGON_PATH + "polygonstest.txt";
         try {
             CircularPolygonExporter circularPolygonExporter = new CircularPolygonExporter(path);
             circularPolygonExporter.export(exportData);
@@ -57,5 +57,10 @@ public class CircularPolygonExporterTest {
             throw new IllegalStateException();
         }
         return reimportedPolygons;
+    }
+
+    private void cleanUp(final String path) {
+        File file = new File(path);
+        assertTrue(file.delete());
     }
 }

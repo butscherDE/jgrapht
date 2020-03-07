@@ -10,5 +10,5 @@ public class Config {
     public final static String ERP_RESULTS = "C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\results.csv";
 
     public final static String IMG_PATH = "C:\\Users\\Daniel\\Documents\\jpanelimg\\";
-    public final static String POLYGON_PATH = "C:\\Users\\Daniel\\Documents\\masterpolygons\\polygons.txt";
+    public final static String POLYGON_PATH = "C:\\Users\\Daniel\\Documents\\masterpolygons\\";
 }

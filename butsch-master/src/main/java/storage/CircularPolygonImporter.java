@@ -22,6 +22,14 @@ public class CircularPolygonImporter implements PolygonImporter{
 
     @Override
     public List<Polygon> importPolygons() throws IOException {
+        List<Polygon> polygons = readPolygonsIn();
+
+        fileReader.close();
+
+        return polygons;
+    }
+
+    private List<Polygon> readPolygonsIn() throws IOException {
         final List<Polygon> polygons = new LinkedList<>();
 
         skipHaeder();

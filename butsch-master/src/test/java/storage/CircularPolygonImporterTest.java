@@ -14,8 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CircularPolygonImporterTest {
     @Test
     public void testImport() {
-        String path = Config.POLYGON_PATH;
-        path = path.substring(0, path.length() - 4) + "importtest.txt";
+        String path = Config.POLYGON_PATH + "importtest.txt";
 
         final GeometryFactory geometryFactory = new GeometryFactory();
 
