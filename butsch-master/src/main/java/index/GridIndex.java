@@ -91,13 +91,6 @@ public class GridIndex implements Index {
         return cellBlock;
     }
 
-    private GridCell getCell(final int longitudeStartIndex, final int latitudeStartIndex, final int x, final int y) {
-        int longitudeIndex = (longitudeStartIndex + x) % (cells.length - 1);
-        int latitudeIndex = (latitudeStartIndex + y) % (cells[0].length - 1);
-
-        return getCell(longitudeIndex, latitudeIndex);
-    }
-
     private GridCell getCell(final Coordinate coordinate) {
         return getCell(coordinate.getX(), coordinate.getY());
     }
