@@ -6,7 +6,7 @@ import evalutation.polygonGenerator.utils.PolygonGeneratorStarter;
 import java.io.IOException;
 
 public class PolygonsUpTo500 {
-    private final static int NUM_POLYGONS = 1000;
+    private final static int NUM_POLYGONS = 100;
     private final static int MAX_POINTS = 500;
     private final static String PATH = Config.POLYGON_PATH;
 
