@@ -66,20 +66,26 @@ public class GridIndexTest {
         for (int i = 0; i < 1000; i++) {
             final Coordinate randomCoordinate = getRandomCoordinate(random);
 
-            double minDistance = Double.POSITIVE_INFINITY;
-            Node closestNode = null;
+            Node closestNode = getClosestNodeSequentially(nodeList, randomCoordinate);
+            Node closestNodeByIndex = gridIndex.getClosestNode(randomCoordinate.getX(), randomCoordinate.getY());
 
-            for (final Node node : nodeList) {
-                final double distance = getDistance(node, randomCoordinate);
-
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestNode = node;
-                }
-            }
-
-            assertEquals(closestNode, gridIndex.getClosestNode(randomCoordinate.getX(), randomCoordinate.getY()));
+            assertEquals(closestNode, closestNodeByIndex);
         }
+    }
+
+    private Node getClosestNodeSequentially(final List<Node> nodeList, final Coordinate randomCoordinate) {
+        double minDistance = Double.POSITIVE_INFINITY;
+        Node closestNode = null;
+
+        for (final Node node : nodeList) {
+            final double distance = getDistance(node, randomCoordinate);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestNode = node;
+            }
+        }
+        return closestNode;
     }
 
     private Coordinate getRandomCoordinate(final Random random) {
