@@ -1,4 +1,4 @@
-package evalutation.utils;
+package evalutation.measurements.utils;
 
 import evalutation.Config;
 import org.jgrapht.util.StopWatchGraphhopper;

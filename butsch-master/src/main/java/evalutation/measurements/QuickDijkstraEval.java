@@ -2,8 +2,8 @@ package evalutation.measurements;
 
 import data.RoadGraph;
 import evalutation.Config;
-import evalutation.utils.MeasureSuite;
-import evalutation.utils.Result;
+import evalutation.measurements.utils.MeasureSuite;
+import evalutation.measurements.utils.Result;
 import routing.DijkstraFactorySimple;
 import routing.SimpleRoutingAlgorithmFactory;
 import storage.ImportERPGraph;

@@ -1,4 +1,4 @@
-package evalutation.utils;
+package evalutation.measurements.utils;
 
 import data.Node;
 import data.Path;

@@ -4,7 +4,7 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import evalutation.Config;
-import evalutation.utils.StopWatchVerbose;
+import evalutation.measurements.utils.StopWatchVerbose;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
