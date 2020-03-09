@@ -70,14 +70,28 @@ public class GridIndex implements Index {
     private GridCell[][] getCellAndSurroundingCells(final double longitude, final double latitude) {
         final GridCell[][] cellBlock = new GridCell[3][3];
 
+        fillCellBlock(longitude, latitude, cellBlock);
+
+        return cellBlock;
+    }
+
+    private void fillCellBlock(final double longitude, final double latitude, final GridCell[][] cellBlock) {
         final int longitudeStartIndex = getLongitudeIndex(longitude) - 1;
         final int latitudeStartIndex = getLatitudeIndex(latitude) - 1;
 
-        System.arraycopy(cells[longitudeStartIndex], latitudeStartIndex, cellBlock[0], 0, 3);
-        System.arraycopy(cells[longitudeStartIndex + 1], latitudeStartIndex, cellBlock[1], 0, 3);
-        System.arraycopy(cells[longitudeStartIndex + 2], latitudeStartIndex, cellBlock[2], 0, 3);
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                GridCell gridCell = getCell(longitudeStartIndex, latitudeStartIndex, x, y);
 
-        return cellBlock;
+                cellBlock[x][y] = gridCell;
+            }
+        }
+    }
+
+    private GridCell getCell(final int longitudeStartIndex, final int latitudeStartIndex, final int x, final int y) {
+        int longitudeIndex = (longitudeStartIndex + x) % (cells.length - 1);
+        int latitudeIndex = (latitudeStartIndex + y) % (cells[0].length - 1);
+        return cells[longitudeIndex][latitudeIndex];
     }
 
     private GridCell getCell(final Coordinate coordinate) {
