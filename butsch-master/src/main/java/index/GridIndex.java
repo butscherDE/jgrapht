@@ -22,9 +22,9 @@ public class GridIndex implements Index {
     public GridIndex(final RoadGraph graph, final int longitudalGranularity, final int latitudalGranularity) {
         this.graph = graph;
         this.longitudalGranularity = longitudalGranularity;
-        this.longitudeCellSize = 360 / longitudalGranularity;
+        this.longitudeCellSize = 360d / longitudalGranularity;
         this.latitudalGranularity = latitudalGranularity;
-        this.latitudeCellSize = 180 / latitudalGranularity;
+        this.latitudeCellSize = 180d / latitudalGranularity;
 
         this.cells = new GridCell[longitudalGranularity][latitudalGranularity];
 
@@ -76,16 +76,38 @@ public class GridIndex implements Index {
         final int longitudeEndIndex = getLongitudeIndex(longitude) + (layer + 1);
         final int latitudeEndIndex = getLatitudeIndex(latitude) + (layer + 1);
 
+        /*
+         * Center node
+         * °°°
+         * °*°
+         * °°°
+         */
         if (layer == 0) {
             cellBlock.add(getCell(longitude, latitude));
         }
-        for (int x = longitudeStartIndex; x < longitudeEndIndex + 1; x++) {
-            cellBlock.add(getCell(x, latitudeStartIndex));
-            cellBlock.add(getCell(x, latitudeEndIndex));
+        /*
+         * Top and bottom row
+         * *****
+         * °   °
+         * °   °
+         * °   °
+         * *****
+         */
+        for (int x = longitudeStartIndex; x < longitudeEndIndex + 1; x = (x+1) % cells.length) {
+            cellBlock.add(getCellByIndex(x, latitudeStartIndex));
+            cellBlock.add(getCellByIndex(x, latitudeEndIndex));
         }
-        for (int y = latitudeStartIndex + 1; y < latitudeEndIndex; y++) {
-            cellBlock.add(getCell(longitudeStartIndex, y));
-            cellBlock.add(getCell(longitudeEndIndex, y));
+        /*
+         * Side columns except parts of top and bottom row.
+         * °°°°°
+         * *   *
+         * *   *
+         * *   *
+         * °°°°°
+         */
+        for (int y = latitudeStartIndex + 1; y < latitudeEndIndex; y = (y+1) % cells[0].length) {
+            cellBlock.add(getCellByIndex(longitudeStartIndex, y));
+            cellBlock.add(getCellByIndex(longitudeEndIndex, y));
         }
 
         return cellBlock;
@@ -99,19 +121,21 @@ public class GridIndex implements Index {
         final int longitudeIndex = getLongitudeIndex(longitude);
         final int latitudeIndex = getLatitudeIndex(latitude);
 
-        return getGridCell(longitudeIndex, latitudeIndex);
+        return getCellByIndex(longitudeIndex, latitudeIndex);
     }
 
-    private GridCell getGridCell(final int longitudeIndex, final int latitudeIndex) {
+    private GridCell getCellByIndex(final int longitudeIndex, final int latitudeIndex) {
         return cells[longitudeIndex][latitudeIndex];
     }
 
     private int getLongitudeIndex(final double longitude) {
-        return (int) ((longitude + 180) / longitudeCellSize);
+        double longitudeNonNegative = longitude + 180;
+        return (int) (longitudeNonNegative / longitudeCellSize);
     }
 
     private int getLatitudeIndex(final double latitude) {
-        return (int) ((latitude + 90) / latitudeCellSize);
+        double latitudeNonNegative = latitude + 90;
+        return (int) (latitudeNonNegative / latitudeCellSize);
     }
 
     private void addToIntersectingCells(final Edge edge) {
