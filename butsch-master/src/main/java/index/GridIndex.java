@@ -3,11 +3,13 @@ package index;
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import evalutation.StopWatchVerbose;
 import org.jgrapht.Graph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,7 +30,9 @@ public class GridIndex implements Index {
 
         this.cells = new GridCell[longitudalGranularity][latitudalGranularity];
 
+        StopWatchVerbose sw = new StopWatchVerbose("Index creation");
         initCells();
+        sw.printTimingIfVerbose();
     }
 
     private void initCells() {
@@ -111,10 +115,31 @@ public class GridIndex implements Index {
     }
 
     private List<GridCell> getIntersectingCells(final LineSegment edgeRepresentingLine) {
-        final List<GridCell> intersectingCells = new LinkedList<>();
-
         final Coordinate startCoordinate = edgeRepresentingLine.getCoordinate(0);
         final Coordinate endCoordinate = edgeRepresentingLine.getCoordinate(1);
+
+        if (isEdgeCompletelyContainedInOneCell(startCoordinate, endCoordinate)) {
+            return Collections.singletonList(getCell(startCoordinate));
+        } else {
+            return getAllIntersectingCells(edgeRepresentingLine, startCoordinate, endCoordinate);
+        }
+    }
+
+    private boolean isEdgeCompletelyContainedInOneCell(final Coordinate startCoordinate, final Coordinate endCoordinate) {
+        final int startCoordinateLongitudeIndex = getLongitudeIndex(startCoordinate.getX());
+        final int endCoordinateLongitudeIndex = getLongitudeIndex(endCoordinate.getX());
+        final int startCoordinateLatitudeIndex = getLatitudeIndex(startCoordinate.getY());
+        final int endCoordinateLatitudeIndex = getLongitudeIndex(endCoordinate.getY());
+
+        final boolean longitudeIndexEqual = startCoordinateLongitudeIndex == endCoordinateLongitudeIndex;
+        final boolean latitudeIndexEqual = startCoordinateLatitudeIndex == endCoordinateLatitudeIndex;
+
+        return longitudeIndexEqual && latitudeIndexEqual;
+    }
+
+    private List<GridCell> getAllIntersectingCells(final LineSegment edgeRepresentingLine,
+                                                   final Coordinate startCoordinate, final Coordinate endCoordinate) {
+        final List<GridCell> intersectingCells = new LinkedList<>();
 
         final int startIndexLongitude = getLongitudeIndex(startCoordinate.getX());
         final int startIndexLatitude = getLatitudeIndex(startCoordinate.getY());
@@ -139,13 +164,13 @@ public class GridIndex implements Index {
     private LineSegment[] getBoundingBoxLineSegments(final int gridCellLongitudeIndex, final int gridCellLatitudeIndex) {
         final LineSegment[] boundingBoxLineSegments = new LineSegment[4];
 
-        double cellLowerLeftLongitude = gridCellLongitudeIndex * longitudeCellSize;
-        double cellLowerLeftLatitude = gridCellLatitudeIndex * latitudeCellSize;
+        double cellLowerLeftLongitude = gridCellLongitudeIndex * longitudeCellSize - 180;
+        double cellLowerLeftLatitude = gridCellLatitudeIndex * latitudeCellSize - 90;
 
         double cellUpperLeftLongitude = cellLowerLeftLongitude;
-        double cellUpperLeftLatitude = (gridCellLatitudeIndex + 1) * latitudeCellSize;
+        double cellUpperLeftLatitude = (gridCellLatitudeIndex + 1) * latitudeCellSize - 90;
 
-        double cellLowerRightLongitude = (gridCellLongitudeIndex + 1) * longitudeCellSize;
+        double cellLowerRightLongitude = (gridCellLongitudeIndex + 1) * longitudeCellSize -180;
         double cellLowerRightLatitude = cellLowerLeftLatitude;
 
         double cellUpperRightLongitude = cellLowerRightLongitude;
@@ -201,15 +226,16 @@ public class GridIndex implements Index {
     private Edge getClosestEdge(final Coordinate coordinate) {
         final CellHullCreator hullCreator = new CellHullCreator(coordinate);
 
+        double minDistance = Double.POSITIVE_INFINITY;
         Edge minEdge = null;
-        Double minDistance = Double.POSITIVE_INFINITY;
         while (minEdge == null) {
             final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
-            for (final GridCell cell : cellBlock) {
-                for (final Edge edge : cell.edges) {
+            for (final GridCell gridCell : cellBlock) {
+                for (final Edge edge : gridCell.edges) {
                     final double distance = getDistance(coordinate, edge);
-                    if (isDistanceSmaller(minDistance, distance)) {
+
+                    if (distance < minDistance) {
                         minDistance = distance;
                         minEdge = edge;
                     }
@@ -230,10 +256,18 @@ public class GridIndex implements Index {
         return distance < minDistance;
     }
 
+    private Coordinate getCoordinate(final Node node) {
+        return new Coordinate(node.longitude, node.latitude);
+    }
+
     private LineSegment getLineSegment(final Edge edge) {
         final Node baseNode = (Node) graph.getEdgeSource(edge);
         final Node adjNode = (Node) graph.getEdgeTarget(edge);
-        return new LineSegment(baseNode.longitude, baseNode.latitude, adjNode.longitude, adjNode.latitude);
+
+        final Coordinate baseCoordinate = getCoordinate(baseNode);
+        final Coordinate adjCoordinate = getCoordinate(adjNode);
+
+        return new LineSegment(baseCoordinate, adjCoordinate);
     }
 
     @Override
@@ -280,6 +314,7 @@ public class GridIndex implements Index {
         private int latitudeStartIndex;
         private int longitudeEndIndex;
         private int latitudeEndIndex;
+        private List<GridCell> cellBlock;
 
         public CellHullCreator(final double longitude, final double latitude) {
             this.longitude = longitude;
@@ -291,13 +326,13 @@ public class GridIndex implements Index {
         }
 
         private List<GridCell> getSurroundingCells() {
-            final List<GridCell> cellBlock = new ArrayList<>();
+            cellBlock = new ArrayList<>();
 
             updateBoundingIndicesBasedOnLayer();
 
-            addCenterNode(cellBlock);
-            getTopAndBottomRows(cellBlock);
-            getSideColumns(cellBlock);
+            addCenterNode();
+            getTopAndBottomRows();
+            getSideColumns();
 
             return cellBlock;
         }
@@ -309,7 +344,7 @@ public class GridIndex implements Index {
             latitudeEndIndex = getLatitudeIndex(latitude) + (layer);
         }
 
-        private void addCenterNode(final List<GridCell> cellBlock) {
+        private void addCenterNode() {
             if (layer == 0) {
                 cellBlock.add(getCell(longitude, latitude));
                 layer++;
@@ -317,33 +352,33 @@ public class GridIndex implements Index {
             }
         }
 
-        private void getTopAndBottomRows(final List<GridCell> cellBlock) {
+        private void getTopAndBottomRows() {
             for (int x = longitudeStartIndex; x < longitudeEndIndex + 1; x = (x + 1) % cells.length) {
-                addTopRow(cellBlock, x);
-                addBottomRow(cellBlock, x);
+                addTopRow(x);
+                addBottomRow(x);
             }
         }
 
-        private void addTopRow(final List<GridCell> cellBlock, final int x) {
+        private void addTopRow(final int x) {
             cellBlock.add(getCellByIndex(x, latitudeStartIndex));
         }
 
-        private void addBottomRow(final List<GridCell> cellBlock, final int x) {
+        private void addBottomRow(final int x) {
             cellBlock.add(getCellByIndex(x, latitudeEndIndex));
         }
 
-        private void getSideColumns(final List<GridCell> cellBlock) {
+        private void getSideColumns() {
             for (int y = latitudeStartIndex + 1; y < latitudeEndIndex; y = (y + 1) % cells[0].length) {
-                addLeftColumn(cellBlock, y);
-                addRightColumn(cellBlock, y);
+                addLeftColumn(y);
+                addRightColumn(y);
             }
         }
 
-        private void addLeftColumn(final List<GridCell> cellBlock, final int y) {
+        private void addLeftColumn(final int y) {
             cellBlock.add(getCellByIndex(longitudeStartIndex, y));
         }
 
-        private void addRightColumn(final List<GridCell> cellBlock, final int y) {
+        private void addRightColumn(final int y) {
             cellBlock.add(getCellByIndex(longitudeEndIndex, y));
         }
     }

@@ -1,22 +1,24 @@
 package index;
 
+import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import evalutation.Config;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineSegment;
 import storage.ImportERPGraph;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class GridIndexTest {
+    private final static int INTENSITY = 1000;
+    private final static int RND_SEED = 42;
+
     private final GridIndex gridIndex;
     private final RoadGraph graph;
 
@@ -59,14 +61,12 @@ public class GridIndexTest {
 
     @Test
     public void testRandomClosestNodes() {
-        final Random random = new Random(42);
-        final Set<Node> nodeSet = graph.vertexSet();
-        final List<Node> nodeList = new ArrayList<>(nodeSet);
+        final Random random = new Random(RND_SEED);
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < INTENSITY; i++) {
             final Coordinate randomCoordinate = getRandomCoordinate(random);
 
-            Node closestNode = getClosestNodeSequentially(nodeList, randomCoordinate);
+            Node closestNode = getClosestNodeSequentially(randomCoordinate);
             Node closestNodeByIndex = gridIndex.getClosestNode(randomCoordinate.getX(), randomCoordinate.getY());
 
             assertEquals(closestNode, closestNodeByIndex);
@@ -84,19 +84,26 @@ public class GridIndexTest {
         assertEquals(expectedNode, indexNode);
     }
 
-    private Node getClosestNodeSequentially(final List<Node> nodeList, final Coordinate randomCoordinate) {
-        double minDistance = Double.POSITIVE_INFINITY;
-        Node closestNode = null;
+    private Node getClosestNodeSequentially(final Coordinate randomCoordinate) {
+        final List<Node> nodeList = getNodes();
 
-        for (final Node node : nodeList) {
-            final double distance = getDistance(node, randomCoordinate);
+        return Collections.min(nodeList, new Comparator<Node>() {
+            @Override
+            public int compare(final Node node1, final Node node2) {
+                final Coordinate coordinate1 = createCoordinate(node1);
+                final Coordinate coordinate2 = createCoordinate(node2);
 
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestNode = node;
+                final double distance1 = coordinate1.distance(randomCoordinate);
+                final double distance2 = coordinate2.distance(randomCoordinate);
+
+                return Double.compare(distance1, distance2);
             }
-        }
-        return closestNode;
+        });
+    }
+
+    private List<Node> getNodes() {
+        final Set<Node> nodeSet = graph.vertexSet();
+        return new ArrayList<>(nodeSet);
     }
 
     private Coordinate getRandomCoordinate(final Random random) {
@@ -119,5 +126,51 @@ public class GridIndexTest {
 
     private Coordinate createCoordinate(final Node node) {
         return new Coordinate(node.longitude, node.latitude);
+    }
+
+
+    @Test
+    public void testRandomClosestEdges() {
+        final Random random = new Random(RND_SEED);
+
+        for (int i = 0; i < INTENSITY; i++) {
+            final Coordinate randomCoordinate = getRandomCoordinate(random);
+
+            Edge closestEdge = getClosestEdgeSequentially(randomCoordinate);
+            Edge closestEdgeByIndex = gridIndex.getClosestEdge(randomCoordinate.getX(), randomCoordinate.getY());
+
+            assertEquals(closestEdge, closestEdgeByIndex);
+        }
+    }
+
+    private Edge getClosestEdgeSequentially(final Coordinate coordinate) {
+        final List<Edge> edges = getEdges();
+
+        return Collections.min(edges, new Comparator<Edge>() {
+            @Override
+            public int compare(final Edge edge1, final Edge edge2) {
+                final LineSegment lineSegment1 = getLineSegment(edge1);
+                final LineSegment lineSegment2 = getLineSegment(edge2);
+
+                final double distance1 = lineSegment1.distance(coordinate);
+                final double distance2 = lineSegment2.distance(coordinate);
+
+                return Double.compare(distance1, distance2);
+            }
+        });
+    }
+
+    private List<Edge> getEdges() {
+        return new ArrayList<>(graph.edgeSet());
+    }
+
+    private LineSegment getLineSegment(final Edge edge) {
+        final Node baseNode = graph.getEdgeSource(edge);
+        final Node adjNode = graph.getEdgeTarget(edge);
+
+        final Coordinate baseCoordinate = createCoordinate(baseNode);
+        final Coordinate adjCoordinate = createCoordinate(adjNode);
+
+        return new LineSegment(baseCoordinate, adjCoordinate);
     }
 }
