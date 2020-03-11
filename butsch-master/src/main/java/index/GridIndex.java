@@ -319,16 +319,32 @@ public class GridIndex implements Index {
 
         private void getTopAndBottomRows(final List<GridCell> cellBlock) {
             for (int x = longitudeStartIndex; x < longitudeEndIndex + 1; x = (x + 1) % cells.length) {
-                cellBlock.add(getCellByIndex(x, latitudeStartIndex));
-                cellBlock.add(getCellByIndex(x, latitudeEndIndex));
+                addTopRow(cellBlock, x);
+                addBottomRow(cellBlock, x);
             }
+        }
+
+        private void addTopRow(final List<GridCell> cellBlock, final int x) {
+            cellBlock.add(getCellByIndex(x, latitudeStartIndex));
+        }
+
+        private void addBottomRow(final List<GridCell> cellBlock, final int x) {
+            cellBlock.add(getCellByIndex(x, latitudeEndIndex));
         }
 
         private void getSideColumns(final List<GridCell> cellBlock) {
             for (int y = latitudeStartIndex + 1; y < latitudeEndIndex; y = (y + 1) % cells[0].length) {
-                cellBlock.add(getCellByIndex(longitudeStartIndex, y));
-                cellBlock.add(getCellByIndex(longitudeEndIndex, y));
+                addLeftColumn(cellBlock, y);
+                addRightColumn(cellBlock, y);
             }
+        }
+
+        private void addLeftColumn(final List<GridCell> cellBlock, final int y) {
+            cellBlock.add(getCellByIndex(longitudeStartIndex, y));
+        }
+
+        private void addRightColumn(final List<GridCell> cellBlock, final int y) {
+            cellBlock.add(getCellByIndex(longitudeEndIndex, y));
         }
     }
 }
