@@ -64,55 +64,6 @@ public class GridIndex implements Index {
         }
     }
 
-    private List<GridCell> getSurroundingCells(final Coordinate coordinate, final int layer) {
-        return getSurroundingCells(coordinate.getX(), coordinate.getY(), layer);
-    }
-
-    private List<GridCell> getSurroundingCells(final double longitude, final double latitude, final int layer) {
-        final List<GridCell> cellBlock = new ArrayList<>();
-
-        final int longitudeStartIndex = getLongitudeIndex(longitude) - (layer + 1);
-        final int latitudeStartIndex = getLatitudeIndex(latitude) - (layer + 1);;
-        final int longitudeEndIndex = getLongitudeIndex(longitude) + (layer + 1);
-        final int latitudeEndIndex = getLatitudeIndex(latitude) + (layer + 1);
-
-        /*
-         * Center node
-         * °°°
-         * °*°
-         * °°°
-         */
-        if (layer == 0) {
-            cellBlock.add(getCell(longitude, latitude));
-        }
-        /*
-         * Top and bottom row
-         * *****
-         * °   °
-         * °   °
-         * °   °
-         * *****
-         */
-        for (int x = longitudeStartIndex; x < longitudeEndIndex + 1; x = (x+1) % cells.length) {
-            cellBlock.add(getCellByIndex(x, latitudeStartIndex));
-            cellBlock.add(getCellByIndex(x, latitudeEndIndex));
-        }
-        /*
-         * Side columns except parts of top and bottom row.
-         * °°°°°
-         * *   *
-         * *   *
-         * *   *
-         * °°°°°
-         */
-        for (int y = latitudeStartIndex + 1; y < latitudeEndIndex; y = (y+1) % cells[0].length) {
-            cellBlock.add(getCellByIndex(longitudeStartIndex, y));
-            cellBlock.add(getCellByIndex(longitudeEndIndex, y));
-        }
-
-        return cellBlock;
-    }
-
     private GridCell getCell(final Coordinate coordinate) {
         return getCell(coordinate.getX(), coordinate.getY());
     }
@@ -214,12 +165,12 @@ public class GridIndex implements Index {
     }
 
     private Node getClosestNode(final Coordinate coordinate) {
-        int layer = 0;
+        final CellHullCreator hullCreator = new CellHullCreator(coordinate);
 
         Node minNode = null;
         Double minDistance = Double.POSITIVE_INFINITY;
         while (minNode == null) {
-            final List<GridCell> cellBlock = getSurroundingCells(coordinate, layer);
+            final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
             for (final GridCell cell : cellBlock) {
                 for (final Node node : cell.nodes) {
@@ -231,8 +182,6 @@ public class GridIndex implements Index {
                     }
                 }
             }
-
-            layer++;
         }
 
         return minNode;
@@ -250,12 +199,12 @@ public class GridIndex implements Index {
     }
 
     private Edge getClosestEdge(final Coordinate coordinate) {
-        int layer = 0;
+        final CellHullCreator hullCreator = new CellHullCreator(coordinate);
 
         Edge minEdge = null;
         Double minDistance = Double.POSITIVE_INFINITY;
         while (minEdge == null) {
-            final List<GridCell> cellBlock = getSurroundingCells(coordinate, layer);
+            final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
             for (final GridCell cell : cellBlock) {
                 for (final Edge edge : cell.edges) {
@@ -266,8 +215,6 @@ public class GridIndex implements Index {
                     }
                 }
             }
-
-            layer++;
         }
 
         return minEdge;
@@ -323,5 +270,65 @@ public class GridIndex implements Index {
     private class GridCell {
         final List<Node> nodes = new LinkedList<>();
         final List<Edge> edges = new LinkedList<>();
+    }
+
+    private class CellHullCreator {
+        private int layer = 0;
+        private final double longitude;
+        private final double latitude;
+        private int longitudeStartIndex;
+        private int latitudeStartIndex;
+        private int longitudeEndIndex;
+        private int latitudeEndIndex;
+
+        public CellHullCreator(final double longitude, final double latitude) {
+            this.longitude = longitude;
+            this.latitude = latitude;
+        }
+
+        public CellHullCreator(final Coordinate coordinate) {
+            this(coordinate.getX(), coordinate.getY());
+        }
+
+        private List<GridCell> getSurroundingCells() {
+            final List<GridCell> cellBlock = new ArrayList<>();
+
+            updateBoundingIndicesBasedOnLayer();
+
+            addCenterNode(cellBlock);
+            getTopAndBottomRows(cellBlock);
+            getSideColumns(cellBlock);
+
+            return cellBlock;
+        }
+
+        private void updateBoundingIndicesBasedOnLayer() {
+            longitudeStartIndex = getLongitudeIndex(longitude) - (layer);
+            latitudeStartIndex = getLatitudeIndex(latitude) - (layer);
+            longitudeEndIndex = getLongitudeIndex(longitude) + (layer);
+            latitudeEndIndex = getLatitudeIndex(latitude) + (layer);
+        }
+
+        private void addCenterNode(final List<GridCell> cellBlock) {
+            if (layer == 0) {
+                cellBlock.add(getCell(longitude, latitude));
+                layer++;
+                updateBoundingIndicesBasedOnLayer();
+            }
+        }
+
+        private void getTopAndBottomRows(final List<GridCell> cellBlock) {
+            for (int x = longitudeStartIndex; x < longitudeEndIndex + 1; x = (x + 1) % cells.length) {
+                cellBlock.add(getCellByIndex(x, latitudeStartIndex));
+                cellBlock.add(getCellByIndex(x, latitudeEndIndex));
+            }
+        }
+
+        private void getSideColumns(final List<GridCell> cellBlock) {
+            for (int y = latitudeStartIndex + 1; y < latitudeEndIndex; y = (y + 1) % cells[0].length) {
+                cellBlock.add(getCellByIndex(longitudeStartIndex, y));
+                cellBlock.add(getCellByIndex(longitudeEndIndex, y));
+            }
+        }
     }
 }

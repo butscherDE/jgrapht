@@ -73,6 +73,17 @@ public class GridIndexTest {
         }
     }
 
+    @Test
+    public void testSpecificCoordinates() {
+        final double x = 48.7163;
+        final double y = 9.63076;
+        final int z = 313;
+
+        final Node expectedNode = new Node(0, x, y, z);
+        final Node indexNode = gridIndex.getClosestNode(x, y);
+        assertEquals(expectedNode, indexNode);
+    }
+
     private Node getClosestNodeSequentially(final List<Node> nodeList, final Coordinate randomCoordinate) {
         double minDistance = Double.POSITIVE_INFINITY;
         Node closestNode = null;
