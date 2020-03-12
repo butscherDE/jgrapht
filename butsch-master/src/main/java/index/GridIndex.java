@@ -7,32 +7,56 @@ import evalutation.StopWatchVerbose;
 import org.jgrapht.Graph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
+import visualizations.GeometryVisualizer;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class GridIndex implements Index {
     private final Graph graph;
     private final int longitudalGranularity;
     private final double longitudeCellSize;
+    private final int longitudePrecision;
     private final int latitudalGranularity;
     private final double latitudeCellSize;
+    private final int latitudePrecision;
     private final GridCell[][] cells;
 
     public GridIndex(final RoadGraph graph, final int longitudalGranularity, final int latitudalGranularity) {
         this.graph = graph;
         this.longitudalGranularity = longitudalGranularity;
         this.longitudeCellSize = 360d / longitudalGranularity;
+        this.longitudePrecision = (int) Math.pow(10, precision(longitudalGranularity));
         this.latitudalGranularity = latitudalGranularity;
         this.latitudeCellSize = 180d / latitudalGranularity;
+        this.latitudePrecision = (int) Math.pow(10, precision(latitudalGranularity));
+
+        System.out.println(longitudalGranularity);
+        System.out.println(longitudeCellSize);
+        System.out.println(latitudalGranularity);
+        System.out.println(latitudeCellSize);
 
         this.cells = new GridCell[longitudalGranularity][latitudalGranularity];
 
         StopWatchVerbose sw = new StopWatchVerbose("Index creation");
         initCells();
         sw.printTimingIfVerbose();
+
+        int c = 0;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        for (final GridCell[] cell : cells) {
+            for (final GridCell gridCell : cell) {
+                final int numEdges = gridCell.edges.size();
+                c += numEdges;
+                min = Math.min(min, numEdges);
+                max = Math.max(max, numEdges);
+            }
+        }
+        System.out.println("Num edges in index: " + c);
+        System.out.println("Smallest cell: " + min);
+        System.out.println("Largest cell: " + max);
+
+        while (true) ;
     }
 
     private void initCells() {
@@ -121,7 +145,7 @@ public class GridIndex implements Index {
         if (isEdgeCompletelyContainedInOneCell(startCoordinate, endCoordinate)) {
             return Collections.singletonList(getCell(startCoordinate));
         } else {
-            return getAllIntersectingCells(edgeRepresentingLine, startCoordinate, endCoordinate);
+            return getAllIntersectingCells(edgeRepresentingLine);
         }
     }
 
@@ -129,7 +153,7 @@ public class GridIndex implements Index {
         final int startCoordinateLongitudeIndex = getLongitudeIndex(startCoordinate.getX());
         final int endCoordinateLongitudeIndex = getLongitudeIndex(endCoordinate.getX());
         final int startCoordinateLatitudeIndex = getLatitudeIndex(startCoordinate.getY());
-        final int endCoordinateLatitudeIndex = getLongitudeIndex(endCoordinate.getY());
+        final int endCoordinateLatitudeIndex = getLatitudeIndex(endCoordinate.getY());
 
         final boolean longitudeIndexEqual = startCoordinateLongitudeIndex == endCoordinateLongitudeIndex;
         final boolean latitudeIndexEqual = startCoordinateLatitudeIndex == endCoordinateLatitudeIndex;
@@ -137,25 +161,53 @@ public class GridIndex implements Index {
         return longitudeIndexEqual && latitudeIndexEqual;
     }
 
-    private List<GridCell> getAllIntersectingCells(final LineSegment edgeRepresentingLine,
-                                                   final Coordinate startCoordinate, final Coordinate endCoordinate) {
+    private List<GridCell> getAllIntersectingCells(final LineSegment edgeRepresentingLine) {
         final List<GridCell> intersectingCells = new LinkedList<>();
+
+        final Coordinate startCoordinate = edgeRepresentingLine.getCoordinate(0);
+        final Coordinate endCoordinate = edgeRepresentingLine.getCoordinate(1);
 
         final int startIndexLongitude = getLongitudeIndex(startCoordinate.getX());
         final int startIndexLatitude = getLatitudeIndex(startCoordinate.getY());
         final int endIndexLongitude = getLongitudeIndex(endCoordinate.getX());
         final int endIndexLatitude = getLatitudeIndex(endCoordinate.getY());
 
-        for (int x = startIndexLongitude; x < endIndexLongitude + 1; x++) {
-            for (int y = startIndexLatitude; y < endIndexLatitude + 1; y++) {
+        final int minIndexLongitude = Math.min(startIndexLongitude, endIndexLongitude);
+        final int maxIndexLongitude = Math.max(startIndexLongitude, endIndexLongitude);
+        final int minIndexLatitude = Math.min(startIndexLatitude, endIndexLatitude);
+        final int maxIndexLatitude = Math.max(startIndexLatitude, endIndexLatitude);
+
+        boolean addedToAtLeastOneCell = false;
+        List<LineSegment[]> boxes = new LinkedList<>();
+
+        for (int x = minIndexLongitude; x < maxIndexLongitude + 1; x++) {
+            for (int y = minIndexLatitude; y < maxIndexLatitude + 1; y++) {
                 final LineSegment[] boundingBoxLineSegments = getBoundingBoxLineSegments(x, y);
+                boxes.add(boundingBoxLineSegments);
                 for (final LineSegment boundingBoxLineSegment : boundingBoxLineSegments) {
                     if (isIntersecting(edgeRepresentingLine, boundingBoxLineSegment)) {
                         intersectingCells.add(cells[x][y]);
+                        addedToAtLeastOneCell = true;
                         break;
                     }
                 }
             }
+        }
+
+        if (!addedToAtLeastOneCell) {
+            System.out.println(edgeRepresentingLine);
+            System.out.println("minIndexLongitude: " + minIndexLongitude);
+            System.out.println("maxIndexLongitude: " + maxIndexLongitude);
+            System.out.println("minIndexLatitude: " + minIndexLatitude);
+            System.out.println("maxIndexLatitude: " + maxIndexLatitude);
+            System.out.println();
+
+            final List<LineSegment> segments = new LinkedList<>();
+            for (final LineSegment[] box : boxes) {
+                segments.addAll(Arrays.asList(box));
+            }
+            final GeometryVisualizer geometryVisualizer = new GeometryVisualizer(Collections.EMPTY_LIST, segments, Collections.singletonList(edgeRepresentingLine));
+//            geometryVisualizer.visualizeGraph();
         }
 
         return intersectingCells;
@@ -164,22 +216,22 @@ public class GridIndex implements Index {
     private LineSegment[] getBoundingBoxLineSegments(final int gridCellLongitudeIndex, final int gridCellLatitudeIndex) {
         final LineSegment[] boundingBoxLineSegments = new LineSegment[4];
 
-        double cellLowerLeftLongitude = gridCellLongitudeIndex * longitudeCellSize - 180;
-        double cellLowerLeftLatitude = gridCellLatitudeIndex * latitudeCellSize - 90;
+        double cellLowerLeftLongitude = roundLongitude(gridCellLongitudeIndex * longitudeCellSize - 180);
+        double cellLowerLeftLatitude = roundLatitude(gridCellLatitudeIndex * latitudeCellSize - 90);
 
         double cellUpperLeftLongitude = cellLowerLeftLongitude;
-        double cellUpperLeftLatitude = (gridCellLatitudeIndex + 1) * latitudeCellSize - 90;
+        double cellUpperLeftLatitude = roundLatitude((gridCellLatitudeIndex + 1) * latitudeCellSize - 90);
 
-        double cellLowerRightLongitude = (gridCellLongitudeIndex + 1) * longitudeCellSize -180;
+        double cellLowerRightLongitude = roundLongitude((gridCellLongitudeIndex + 1) * longitudeCellSize -180);
         double cellLowerRightLatitude = cellLowerLeftLatitude;
 
         double cellUpperRightLongitude = cellLowerRightLongitude;
         double cellUpperRightLatitude = cellUpperLeftLatitude;
 
         boundingBoxLineSegments[0] = new LineSegment(cellLowerLeftLongitude, cellLowerLeftLatitude, cellUpperLeftLongitude, cellUpperLeftLatitude);
-        boundingBoxLineSegments[1] = new LineSegment(cellUpperLeftLongitude, cellUpperLeftLatitude, cellLowerRightLongitude, cellLowerRightLatitude);
-        boundingBoxLineSegments[2] = new LineSegment(cellLowerRightLongitude, cellLowerLeftLatitude, cellUpperRightLongitude, cellUpperRightLatitude);
-        boundingBoxLineSegments[3] = new LineSegment(cellUpperRightLongitude, cellUpperRightLatitude, cellLowerLeftLongitude, cellLowerLeftLatitude);
+        boundingBoxLineSegments[1] = new LineSegment(cellUpperLeftLongitude, cellUpperLeftLatitude, cellUpperRightLongitude, cellUpperRightLatitude);
+        boundingBoxLineSegments[2] = new LineSegment(cellUpperRightLongitude, cellUpperRightLatitude, cellLowerRightLongitude, cellLowerRightLatitude);
+        boundingBoxLineSegments[3] = new LineSegment(cellLowerRightLongitude, cellLowerRightLatitude, cellLowerLeftLongitude, cellLowerLeftLatitude);
 
         return boundingBoxLineSegments;
     }
@@ -299,6 +351,24 @@ public class GridIndex implements Index {
 
     private boolean isIntersecting(final LineSegment lineSegment, final LineSegment lineSegment2) {
         return lineSegment2.intersection(lineSegment) != null;
+    }
+
+    private double roundLongitude(final double longitude) {
+        final double leftShiftedLongitude = longitude * longitudePrecision;
+        final double roundedLongitude = Math.round(leftShiftedLongitude);
+        final double rightShiftedLongitude = roundedLongitude / longitudePrecision;
+        return rightShiftedLongitude;
+    }
+
+    private double roundLatitude(final double latitude) {
+        final double leftShiftedLatitude = latitude * latitudePrecision;
+        final double roundedLatitude = Math.round(leftShiftedLatitude);
+        final double rightShiftedLatitude = roundedLatitude / latitudePrecision;
+        return rightShiftedLatitude;
+    }
+
+    private int precision(final int integer) {
+        return (int) (Math.log10(integer) + 1);
     }
 
     private class GridCell {

@@ -38,6 +38,10 @@ public class ImportERPGraph implements Importer {
         }
         sw.printTimingIfVerbose();
 
+        if (Config.VERBOSE) {
+            System.out.println("Imported " + graph.vertexSet().size() + " Nodes and " + graph.edgeSet().size() + " edges.");
+        }
+
         return graph;
     }
 
@@ -60,9 +64,6 @@ public class ImportERPGraph implements Importer {
         final List<Node> filteredNodeList = nodeList;
 //        final List<Node> filteredNodeList = getFilteredNodeList(numNodes, nodeList);
 
-        if (Config.VERBOSE) {
-            System.out.println(filteredNodeList.size() + " Nodes");
-        }
 
         for (int i = 0; i < numEdges; i++) {
             parseNextEdge(filteredNodeList);
