@@ -1,7 +1,7 @@
 package storage;
 
 import evalutation.Config;
-import geometry.PolygonGenerator;
+import geometry.TwoOptPolygonGenerator;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Polygon;
 
@@ -15,10 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CircularPolygonExporterTest {
     @Test
     public void test() {
-        final PolygonGenerator polygonGenerator = new PolygonGenerator(10);
+        final TwoOptPolygonGenerator twoOptPolygonGenerator = new TwoOptPolygonGenerator(10);
         final Polygon[] polygons = new Polygon[10];
         for (int i = 0; i < polygons.length; i++) {
-            polygons[i] = polygonGenerator.createRandomSimplePolygon();
+            polygons[i] = twoOptPolygonGenerator.createRandomSimplePolygon();
         }
 
         final List<Polygon> exportData = Arrays.asList(polygons);

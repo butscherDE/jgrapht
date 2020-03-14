@@ -9,7 +9,7 @@ import java.util.Random;
 
 import static org.junit.Assert.assertFalse;
 
-public class PolygonGeneratorTest {
+public class TwoOptPolygonGeneratorTest {
     private Random random  = new Random(42);
 
     @Test
@@ -20,16 +20,16 @@ public class PolygonGeneratorTest {
                                                                            new Coordinate(100,0),
                                                                            new Coordinate(0,0)};
 
-        final Polygon simplifiedPolygon = new PolygonGenerator(10).createSimplePolygon(coordinatesInNonSimpleOrder);
+        final Polygon simplifiedPolygon = new TwoOptPolygonGenerator(10).createSimplePolygon(coordinatesInNonSimpleOrder);
         assertFalse(isSelfIntersecting(simplifiedPolygon));
     }
 
 
     @Test
     public void generateRandomPolygonsAndTestIfTheyAreReallySimple() {
-        final PolygonGenerator polygonGenerator = new PolygonGenerator(getNumPoints(100));
+        final TwoOptPolygonGenerator twoOptPolygonGenerator = new TwoOptPolygonGenerator(getNumPoints(100));
         for (int i = 0; i < 1; i++) {
-            final Polygon polygon = polygonGenerator.createRandomSimplePolygon();
+            final Polygon polygon = twoOptPolygonGenerator.createRandomSimplePolygon();
 
             assertFalse(isSelfIntersecting(polygon));
         }

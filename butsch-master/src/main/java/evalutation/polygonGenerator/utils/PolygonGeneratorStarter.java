@@ -1,6 +1,7 @@
 package evalutation.polygonGenerator.utils;
 
 import geometry.PolygonGenerator;
+import geometry.PolygonGeneratorFactory;
 import org.jgrapht.util.StopWatchGraphhopper;
 import org.locationtech.jts.geom.Polygon;
 import storage.CircularPolygonExporter;
@@ -11,7 +12,13 @@ import java.util.List;
 import java.util.Random;
 
 public class PolygonGeneratorStarter {
-    public static void dump(final int maxPoints, final int numPolygons, final String path) throws IOException {
+    private final PolygonGeneratorFactory polygonGeneratorFactory;
+
+    public PolygonGeneratorStarter(final PolygonGeneratorFactory polygonGeneratorFactory) {
+        this.polygonGeneratorFactory = polygonGeneratorFactory;
+    }
+
+    public void dump(final int maxPoints, final int numPolygons, final String path) throws IOException {
         final StopWatchGraphhopper sw = new StopWatchGraphhopper("Generated " + numPolygons + " polygons with up to " + maxPoints + " points in ").start();
 
         final Random random = new Random(42);
@@ -21,10 +28,10 @@ public class PolygonGeneratorStarter {
         System.out.println(sw.stop().toString());
     }
 
-    private static List<Polygon> generatePolygons(final int maxPoints, final int numPolygons, final Random random) {
+    private List<Polygon> generatePolygons(final int maxPoints, final int numPolygons, final Random random) {
         final List<Polygon> polygons = new ArrayList<>(numPolygons);
         for (int i = 0; i < numPolygons; i++) {
-            PolygonGenerator polygonGenerator = new PolygonGenerator(random.nextInt(maxPoints - 3) + 4);
+            PolygonGenerator polygonGenerator = polygonGeneratorFactory.createPolygonGenerator(random.nextInt(maxPoints - 3) + 4);
             final Polygon polygon = polygonGenerator.createRandomSimplePolygon();
             polygons.add(polygon);
 
@@ -33,7 +40,7 @@ public class PolygonGeneratorStarter {
         return polygons;
     }
 
-    private static void export(final String path, final List<Polygon> polygons) throws IOException {
+    private void export(final String path, final List<Polygon> polygons) throws IOException {
         final CircularPolygonExporter exporter = new CircularPolygonExporter(path);
         exporter.export(polygons);
     }
