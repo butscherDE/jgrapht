@@ -81,8 +81,8 @@ public class ImportERPGraph implements Importer {
             maxLongitude = Math.max(maxLongitude, node.longitude);
             minLongitude = Math.min(minLongitude, node.longitude);
         }
-        double latDivisionLine = minLatitude + (maxLatitude - minLatitude) / 3;
-        double lonDivisionLine = minLongitude + (maxLongitude - minLongitude) / 3;
+        double latDivisionLine = minLatitude + (maxLatitude - minLatitude) / 4;
+        double lonDivisionLine = minLongitude + (maxLongitude - minLongitude) / 4;
 
         int newId = 0;
         final List<Node> filteredNodeList = new ArrayList<>(numNodes);

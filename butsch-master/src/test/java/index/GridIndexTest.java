@@ -4,7 +4,7 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import evalutation.Config;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import storage.ImportERPGraph;
@@ -32,7 +32,7 @@ public class GridIndexTest {
     public GridIndexTest() {
         try {
             graph = new ImportERPGraph(Config.ERP_PATH).createGraph();
-            this.gridIndex = new GridIndex(graph, 3600, 1800);
+            this.gridIndex = new GridIndex(graph, 7200, 3600);
 
             double longitudeMinBound = Double.POSITIVE_INFINITY;
             double longitudeMaxBound = Double.NEGATIVE_INFINITY;
@@ -132,14 +132,16 @@ public class GridIndexTest {
     @Test
     public void testRandomClosestEdges() {
         final Random random = new Random(RND_SEED);
-
         for (int i = 0; i < INTENSITY; i++) {
             final Coordinate randomCoordinate = getRandomCoordinate(random);
 
             Edge closestEdge = getClosestEdgeSequentially(randomCoordinate);
             Edge closestEdgeByIndex = gridIndex.getClosestEdge(randomCoordinate.getX(), randomCoordinate.getY());
 
-            assertEquals(closestEdge, closestEdgeByIndex);
+            final double closestDistance = getLineSegment(closestEdge).distance(randomCoordinate);
+            final double indexClosestDistance = getLineSegment(closestEdgeByIndex).distance(randomCoordinate);
+
+            assertEquals(closestDistance, indexClosestDistance, 0.000001);
         }
     }
 

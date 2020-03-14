@@ -7,9 +7,11 @@ import evalutation.StopWatchVerbose;
 import org.jgrapht.Graph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
-import visualizations.GeometryVisualizer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GridIndex implements Index {
     private final Graph graph;
@@ -41,22 +43,25 @@ public class GridIndex implements Index {
         initCells();
         sw.printTimingIfVerbose();
 
-        int c = 0;
-        int min = Integer.MAX_VALUE;
-        int max = Integer.MIN_VALUE;
-        for (final GridCell[] cell : cells) {
-            for (final GridCell gridCell : cell) {
-                final int numEdges = gridCell.edges.size();
-                c += numEdges;
-                min = Math.min(min, numEdges);
-                max = Math.max(max, numEdges);
-            }
-        }
-        System.out.println("Num edges in index: " + c);
-        System.out.println("Smallest cell: " + min);
-        System.out.println("Largest cell: " + max);
-
-        while (true) ;
+//        int c = 0;
+//        int min = Integer.MAX_VALUE;
+//        int max = Integer.MIN_VALUE;
+//        final Set<Edge> allEdgesUnique = new LinkedHashSet<>();
+//        for (final GridCell[] cell : cells) {
+//            for (final GridCell gridCell : cell) {
+//                final int numEdges = gridCell.edges.size();
+//                c += numEdges;
+//                min = Math.min(min, numEdges);
+//                max = Math.max(max, numEdges);
+//                for (final Edge edge : gridCell.edges) {
+//                    allEdgesUnique.add(edge);
+//                }
+//            }
+//        }
+//        System.out.println("Num unique edges " + allEdgesUnique.size());
+//        System.out.println("Num edges in index: " + c);
+//        System.out.println("Smallest cell: " + min);
+//        System.out.println("Largest cell: " + max);
     }
 
     private void initCells() {
@@ -162,7 +167,6 @@ public class GridIndex implements Index {
     }
 
     private List<GridCell> getAllIntersectingCells(final LineSegment edgeRepresentingLine) {
-        final List<GridCell> intersectingCells = new LinkedList<>();
 
         final Coordinate startCoordinate = edgeRepresentingLine.getCoordinate(0);
         final Coordinate endCoordinate = edgeRepresentingLine.getCoordinate(1);
@@ -177,37 +181,19 @@ public class GridIndex implements Index {
         final int minIndexLatitude = Math.min(startIndexLatitude, endIndexLatitude);
         final int maxIndexLatitude = Math.max(startIndexLatitude, endIndexLatitude);
 
-        boolean addedToAtLeastOneCell = false;
-        List<LineSegment[]> boxes = new LinkedList<>();
+
+        final List<GridCell> intersectingCells = new LinkedList<>();
 
         for (int x = minIndexLongitude; x < maxIndexLongitude + 1; x++) {
             for (int y = minIndexLatitude; y < maxIndexLatitude + 1; y++) {
                 final LineSegment[] boundingBoxLineSegments = getBoundingBoxLineSegments(x, y);
-                boxes.add(boundingBoxLineSegments);
                 for (final LineSegment boundingBoxLineSegment : boundingBoxLineSegments) {
                     if (isIntersecting(edgeRepresentingLine, boundingBoxLineSegment)) {
                         intersectingCells.add(cells[x][y]);
-                        addedToAtLeastOneCell = true;
                         break;
                     }
                 }
             }
-        }
-
-        if (!addedToAtLeastOneCell) {
-            System.out.println(edgeRepresentingLine);
-            System.out.println("minIndexLongitude: " + minIndexLongitude);
-            System.out.println("maxIndexLongitude: " + maxIndexLongitude);
-            System.out.println("minIndexLatitude: " + minIndexLatitude);
-            System.out.println("maxIndexLatitude: " + maxIndexLatitude);
-            System.out.println();
-
-            final List<LineSegment> segments = new LinkedList<>();
-            for (final LineSegment[] box : boxes) {
-                segments.addAll(Arrays.asList(box));
-            }
-            final GeometryVisualizer geometryVisualizer = new GeometryVisualizer(Collections.EMPTY_LIST, segments, Collections.singletonList(edgeRepresentingLine));
-//            geometryVisualizer.visualizeGraph();
         }
 
         return intersectingCells;
@@ -280,11 +266,34 @@ public class GridIndex implements Index {
 
         double minDistance = Double.POSITIVE_INFINITY;
         Edge minEdge = null;
+//        System.out.println("###### " + coordinate);
         while (minEdge == null) {
             final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
             for (final GridCell gridCell : cellBlock) {
                 for (final Edge edge : gridCell.edges) {
+//                    if (coordinate.getX() == 48.701978833284116 && coordinate.getY() == 9.939465535867825) {
+//                        System.out.println("Testing " + edge + " for coordinate " + coordinate);
+//                    }
+                    final double distance = getDistance(coordinate, edge);
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        minEdge = edge;
+                    }
+                }
+            }
+        }
+
+        // reassure closest found
+        for (int i = 0; i < 100; i++) {
+            final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
+
+            for (final GridCell gridCell : cellBlock) {
+                for (final Edge edge : gridCell.edges) {
+                    //                    if (coordinate.getX() == 48.701978833284116 && coordinate.getY() == 9.939465535867825) {
+                    //                        System.out.println("Testing " + edge + " for coordinate " + coordinate);
+                    //                    }
                     final double distance = getDistance(coordinate, edge);
 
                     if (distance < minDistance) {
@@ -403,6 +412,8 @@ public class GridIndex implements Index {
             addCenterNode();
             getTopAndBottomRows();
             getSideColumns();
+
+            layer++;
 
             return cellBlock;
         }
