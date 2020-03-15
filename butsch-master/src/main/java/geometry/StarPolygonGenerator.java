@@ -25,7 +25,8 @@ public class StarPolygonGenerator extends PolygonGenerator {
         final Coordinate randomCoordinateOnHull = convexHullCoordinates[random.nextInt(convexHullCoordinates.length)];
 
         final AngularPointSorter sorter = new AngularPointSorter(randomCoordinateOnHull);
-        Arrays.sort(randomCoordinates, sorter);
+        Arrays.sort(randomCoordinates, 0, numPoints, sorter);
+        randomCoordinates[numPoints] = randomCoordinates[0];
 
         return geometryFactory.createPolygon(randomCoordinates);
     }

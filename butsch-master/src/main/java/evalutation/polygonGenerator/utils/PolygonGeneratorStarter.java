@@ -23,7 +23,7 @@ public class PolygonGeneratorStarter {
 
         final Random random = new Random(42);
         final List<Polygon> polygons = generatePolygons(maxPoints, numPolygons, random);
-        export(path + numPolygons + "_" + maxPoints + ".txt", polygons);
+        export(path + numPolygons + "_" + maxPoints + "_" + polygonGeneratorFactory.getClass().getSimpleName() +  ".txt", polygons);
 
         System.out.println(sw.stop().toString());
     }
@@ -35,7 +35,9 @@ public class PolygonGeneratorStarter {
             final Polygon polygon = polygonGenerator.createRandomSimplePolygon();
             polygons.add(polygon);
 
-            System.out.println(i + " / " + numPolygons);
+            if (i % 1000 == 0) {
+                System.out.println(i + " / " + numPolygons);
+            }
         }
         return polygons;
     }
