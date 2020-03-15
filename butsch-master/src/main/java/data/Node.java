@@ -3,13 +3,13 @@ package data;
 import java.util.Objects;
 
 public class Node {
-    public final int id;
+    public final long id;
 
     public final double longitude;
     public final double latitude;
     public final double elevation;
 
-    public Node(int id, double longitude, double latitude, double elevation) {
+    public Node(long id, double longitude, double latitude, double elevation) {
         this.id = id;
         this.longitude = longitude;
         this.latitude = latitude;

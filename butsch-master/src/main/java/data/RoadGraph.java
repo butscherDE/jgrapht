@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class RoadGraph extends DefaultDirectedWeightedGraph<Node, Edge> {
-    final Map<Integer, Node> nodes = new HashMap<>();
+    final Map<Long, Node> nodes = new HashMap<>();
 
     public RoadGraph(Class<? extends Edge> edgeClass) {
         super(edgeClass);
@@ -28,7 +28,7 @@ public class RoadGraph extends DefaultDirectedWeightedGraph<Node, Edge> {
         return isAdded;
     }
 
-    public Node getVertex(final int id) {
+    public Node getVertex(final long id) {
         return nodes.get(id);
     }
 
