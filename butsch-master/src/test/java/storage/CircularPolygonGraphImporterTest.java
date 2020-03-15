@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CircularPolygonImporterTest {
+public class CircularPolygonGraphImporterTest {
     @Test
     public void testImport() {
         String path = Config.POLYGON_PATH + "importtest.txt";

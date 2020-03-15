@@ -17,8 +17,8 @@ class ImportERPGraphTest {
     @Test
     void verifyImportedGraphBySampleNodesAndEdges() {
         try {
-            final Importer importer = new ImportERPGraph(Config.ERP_PATH);
-            final RoadGraph graph = importer.createGraph();
+            final GraphImporter graphImporter = new ImportERPGraph(Config.ERP_PATH);
+            final RoadGraph graph = graphImporter.createGraph();
 
             assertNode(new Node(2923, 48.978, 9.80345, 339), graph);
             assertNode(new Node(29396, 48.7022, 9.58405, 314), graph);
@@ -45,55 +45,55 @@ class ImportERPGraphTest {
     @Test
     void verifyErrorHandlingOnWrongPath() {
         assertThrows(FileNotFoundException.class, () -> {
-            final Importer importer = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\asdfasdfasdfasdfasdfasdf100k_j_d.txt");
+            final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\asdfasdfasdfasdfasdfasdf100k_j_d.txt");
         });
     }
 
     @Test
     void verifyErrorHandlingOnMalformedNodeCount() {
         assertThrows(NumberFormatException.class, () -> {
-            final Importer importer = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedNodeCount.txt");
-            final Graph graph = importer.createGraph();
+            final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedNodeCount.txt");
+            final Graph graph = graphImporter.createGraph();
         });
     }
 
     @Test
     void verifyErrorHandlingOnMalformedEdgeCount() {
         assertThrows(NumberFormatException.class, () -> {
-            final Importer importer = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedEdgeCount.txt");
-            final Graph graph = importer.createGraph();
+            final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedEdgeCount.txt");
+            final Graph graph = graphImporter.createGraph();
         });
     }
 
     @Test
     void verifyErrorHandlingOnMalformedNode() {
         assertThrows(NumberFormatException.class, () -> {
-            final Importer importer = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedNode.txt");
-            final Graph graph = importer.createGraph();
+            final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedNode.txt");
+            final Graph graph = graphImporter.createGraph();
         });
     }
 
     @Test
     void verifyErrorHandlingOnMalformedEdge() {
         assertThrows(NumberFormatException.class, () -> {
-            final Importer importer = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedNodeCount.txt");
-            final Graph graph = importer.createGraph();
+            final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedNodeCount.txt");
+            final Graph graph = graphImporter.createGraph();
         });
     }
 
     @Test
     void verifyErrorHandlingOnWrongEdgeCount() {
         assertThrows(NullPointerException.class, () -> {
-            final Importer importer = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_wrongEdgeCount.txt");
-            final Graph graph = importer.createGraph();
+            final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_wrongEdgeCount.txt");
+            final Graph graph = graphImporter.createGraph();
         });
     }
 
     @Test
     void verifyErrorHandlingOnMalformedWrongNodeCount() {
         assertThrows(NullPointerException.class, () -> {
-            final Importer importer = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_wrongNodeCount.txt");
-            final Graph graph = importer.createGraph();
+            final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_wrongNodeCount.txt");
+            final Graph graph = graphImporter.createGraph();
         });
     }
 

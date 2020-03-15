@@ -19,8 +19,8 @@ class ExportERPGraphTest {
             final RoadGraph graph = GeneralTestGraph.createTestGraph();
             final GraphExporter graphExporter = new ExportERPGraph(graph, "exp.txt");
             graphExporter.export();
-            final Importer importer = new ImportERPGraph("exp.txt");
-            final RoadGraph graphReImp = importer.createGraph();
+            final GraphImporter graphImporter = new ImportERPGraph("exp.txt");
+            final RoadGraph graphReImp = graphImporter.createGraph();
 
             assertNumNudes(graph, graphReImp);
 

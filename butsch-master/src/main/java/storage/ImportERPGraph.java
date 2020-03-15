@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImportERPGraph implements Importer {
+public class ImportERPGraph implements GraphImporter {
     private final FileReader fileReader;
     private BufferedReader reader;
     private int autoId = 0;

@@ -10,7 +10,7 @@ import routing.DijkstraCHFactory;
 import routing.RPHASTFactory;
 import routing.RoutingAlgorithmFactory;
 import storage.ImportERPGraph;
-import storage.Importer;
+import storage.GraphImporter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,8 +40,8 @@ public class CHDijkstraVSRPHAST {
     }
 
     private static void performanceMeasurement() throws FileNotFoundException {
-        final Importer importer = new ImportERPGraph(Config.ERP_PATH);
-        final RoadGraph graph = importer.createGraph();
+        final GraphImporter graphImporter = new ImportERPGraph(Config.ERP_PATH);
+        final RoadGraph graph = graphImporter.createGraph();
         final RoadCH ch = new CHPreprocessing(graph).createCHGraph();
 
         algorithms = new RoutingAlgorithmFactory[]{new DijkstraCHFactory(ch, false), new RPHASTFactory(ch, false)};
