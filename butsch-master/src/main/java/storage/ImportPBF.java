@@ -18,6 +18,7 @@ import java.util.function.Consumer;
 public class ImportPBF implements GraphImporter {
     private final RoadGraph graph = new RoadGraph(Edge.class);
     private final String path;
+    private final List<NodeRelation> nodeRelations = new ArrayList<>();
 
     public ImportPBF(final String path) {
         this.path = path;
@@ -30,13 +31,14 @@ public class ImportPBF implements GraphImporter {
         final InputStream input = new FileInputStream(path);
         final RoadGraphNodeAdder onNodes = new RoadGraphNodeAdder();
         final RoadGraphEdgeAdder onWays = new RoadGraphEdgeAdder();
+        final NodeRelationAdder onRelations = new NodeRelationAdder();
 
         new ParallelBinaryParser(input, 6).onHeader(new HeaderPrinter()).onBoundBox(new Consumer<BoundBox>() {
             @Override
             public void accept(final BoundBox boundBox) {
 
             }
-        }).onComplete(new Completer()).onNode(onNodes).onWay(onWays).onRelation(new NodeRelationAdder())
+        }).onComplete(new Completer()).onNode(onNodes).onWay(onWays).onRelation(onRelations)
                                           .onChangeset(new Consumer<Long>() {
                                               @Override
                                               public void accept(final Long aLong) {
@@ -46,9 +48,17 @@ public class ImportPBF implements GraphImporter {
 
         onNodes.addNodesToGraph();
         onWays.addEdgesToGraph();
+        nodeRelations.addAll(onRelations.getNodeRelations(graph));
 
         swImport.printTimingIfVerbose();
         return graph;
+    }
+
+    public List<NodeRelation> getNodeRelations() {
+        if (graph.vertexSet().size() == 0) {
+            throw new IllegalStateException("Call createGraph() first");
+        }
+        return nodeRelations;
     }
 
     private class HeaderPrinter implements Consumer<Header> {
