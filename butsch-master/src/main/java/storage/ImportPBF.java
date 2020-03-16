@@ -1,12 +1,10 @@
 package storage;
 
 import com.wolt.osm.parallelpbf.ParallelBinaryParser;
-import com.wolt.osm.parallelpbf.entity.BoundBox;
-import com.wolt.osm.parallelpbf.entity.Header;
-import com.wolt.osm.parallelpbf.entity.Relation;
-import com.wolt.osm.parallelpbf.entity.Way;
+import com.wolt.osm.parallelpbf.entity.*;
 import data.Edge;
 import data.Node;
+import data.NodeRelation;
 import data.RoadGraph;
 import evalutation.StopWatchVerbose;
 import org.jgrapht.alg.util.Pair;
@@ -14,10 +12,7 @@ import org.jgrapht.alg.util.Pair;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ImportPBF implements GraphImporter {
@@ -36,25 +31,18 @@ public class ImportPBF implements GraphImporter {
         final RoadGraphNodeAdder onNodes = new RoadGraphNodeAdder();
         final RoadGraphEdgeAdder onWays = new RoadGraphEdgeAdder();
 
-        new ParallelBinaryParser(input, 6)
-                .onHeader(new HeaderPrinter())
-                .onBoundBox(new Consumer<BoundBox>() {
-                    @Override
-                    public void accept(final BoundBox boundBox) {
+        new ParallelBinaryParser(input, 6).onHeader(new HeaderPrinter()).onBoundBox(new Consumer<BoundBox>() {
+            @Override
+            public void accept(final BoundBox boundBox) {
 
-                    }
-                })
-                .onComplete(new Completer())
-                .onNode(onNodes)
-                .onWay(onWays)
-                .onRelation(new RoadGraphRelationAdded())
-                .onChangeset(new Consumer<Long>() {
-                    @Override
-                    public void accept(final Long aLong) {
+            }
+        }).onComplete(new Completer()).onNode(onNodes).onWay(onWays).onRelation(new NodeRelationAdder())
+                                          .onChangeset(new Consumer<Long>() {
+                                              @Override
+                                              public void accept(final Long aLong) {
 
-                    }
-                })
-                .parse();
+                                              }
+                                          }).parse();
 
         onNodes.addNodesToGraph();
         onWays.addEdgesToGraph();
@@ -117,15 +105,47 @@ public class ImportPBF implements GraphImporter {
         }
     }
 
-    private class RoadGraphRelationAdded implements Consumer<Relation> {
+    private class NodeRelationAdder implements Consumer<Relation> {
+        final Map<Long, Relation> relations = Collections.synchronizedMap(new HashMap<>());
 
         @Override
         public void accept(final Relation relation) {
-//            System.out.println("######################");
-//            System.out.println(relation.getMembers());
-//            System.out.println(relation.getInfo());
-//            System.out.println(relation.getTags());
+            final Map<String, String> tags = relation.getTags();
+            if (tags.get("type").equals("boundary") || tags.get("landuse").equals("forest")) {
+                relations.put(relation.getId(), relation);
+            }
         }
+
+        public List<NodeRelation> getNodeRelations(final RoadGraph graph) {
+            final List<NodeRelation> nodeRelations = new LinkedList<>();
+
+            for (final Map.Entry<Long, Relation> relationEntry : relations.entrySet()) {
+                final Relation relation = relationEntry.getValue();
+                final List<Long> nodeIds = recurseToFindNodes(relation);
+
+                nodeRelations.add(NodeRelation.createFromNodeIds(relation.getId(), relation.getInfo().toString(),
+                                                                 relation.getTags(), nodeIds, graph));
+            }
+
+            return nodeRelations;
+        }
+
+        private List<Long> recurseToFindNodes(final Relation relation) {
+            final List<Long> nodeIds = new LinkedList<>();
+
+            final List<RelationMember> members = relation.getMembers();
+            for (final RelationMember member : members) {
+                final RelationMember.Type type = member.getType();
+                if (type == RelationMember.Type.RELATION) {
+                    nodeIds.addAll(recurseToFindNodes(relations.get(member.getId())));
+                } else if (type == RelationMember.Type.NODE) {
+                    nodeIds.add(member.getId());
+                }
+            }
+
+            return nodeIds;
+        }
+
     }
 
     private class Completer implements Runnable {
