@@ -28,10 +28,21 @@ public class ImportPBF implements GraphImporter {
     public RoadGraph createGraph() throws FileNotFoundException {
         final StopWatchVerbose swImport = new StopWatchVerbose("Import PBF");
 
-        final InputStream input = new FileInputStream(path);
         final RoadGraphNodeAdder onNodes = new RoadGraphNodeAdder();
         final RoadGraphEdgeAdder onWays = new RoadGraphEdgeAdder();
         final NodeRelationAdder onRelations = new NodeRelationAdder();
+
+        runParser(onNodes, onWays, onRelations);
+        addGraphData(onNodes, onWays);
+        createNodeRelations(onRelations);
+
+        swImport.printTimingIfVerbose();
+        return graph;
+    }
+
+    private void runParser(final RoadGraphNodeAdder onNodes, final RoadGraphEdgeAdder onWays,
+                           final NodeRelationAdder onRelations) throws FileNotFoundException {
+        final InputStream input = new FileInputStream(path);
 
         new ParallelBinaryParser(input, 6).onHeader(new HeaderPrinter()).onBoundBox(new Consumer<BoundBox>() {
             @Override
@@ -45,13 +56,15 @@ public class ImportPBF implements GraphImporter {
 
                                               }
                                           }).parse();
+    }
 
+    private void addGraphData(final RoadGraphNodeAdder onNodes, final RoadGraphEdgeAdder onWays) {
         onNodes.addNodesToGraph();
         onWays.addEdgesToGraph();
-        nodeRelations.addAll(onRelations.getNodeRelations(graph));
+    }
 
-        swImport.printTimingIfVerbose();
-        return graph;
+    private void createNodeRelations(final NodeRelationAdder onRelations) {
+        nodeRelations.addAll(onRelations.getNodeRelations(graph));
     }
 
     public List<NodeRelation> getNodeRelations() {
