@@ -19,6 +19,9 @@ public class ImportPBF implements GraphImporter {
     private final RoadGraph graph = new RoadGraph(Edge.class);
     private final String path;
     private final List<NodeRelation> nodeRelations = new ArrayList<>();
+    private RoadGraphNodeAdder onNodes;
+    private RoadGraphEdgeAdder onWays;
+    private NodeRelationAdder onRelations;
 
     public ImportPBF(final String path) {
         this.path = path;
@@ -28,43 +31,39 @@ public class ImportPBF implements GraphImporter {
     public RoadGraph createGraph() throws FileNotFoundException {
         final StopWatchVerbose swImport = new StopWatchVerbose("Import PBF");
 
-        final RoadGraphNodeAdder onNodes = new RoadGraphNodeAdder();
-        final RoadGraphEdgeAdder onWays = new RoadGraphEdgeAdder();
-        final NodeRelationAdder onRelations = new NodeRelationAdder();
+        onNodes = new RoadGraphNodeAdder();
+        onWays = new RoadGraphEdgeAdder();
+        onRelations = new NodeRelationAdder();
 
-        runParser(onNodes, onWays, onRelations);
-        addGraphData(onNodes, onWays);
-        createNodeRelations(onRelations);
+        runParser();
+        addGraphData();
+        createNodeRelations();
 
         swImport.printTimingIfVerbose();
         return graph;
     }
 
-    private void runParser(final RoadGraphNodeAdder onNodes, final RoadGraphEdgeAdder onWays,
-                           final NodeRelationAdder onRelations) throws FileNotFoundException {
+    private void runParser() throws FileNotFoundException {
         final InputStream input = new FileInputStream(path);
 
-        new ParallelBinaryParser(input, 6).onHeader(new HeaderPrinter()).onBoundBox(new Consumer<BoundBox>() {
-            @Override
-            public void accept(final BoundBox boundBox) {
-
-            }
-        }).onComplete(new Completer()).onNode(onNodes).onWay(onWays).onRelation(onRelations)
-                                          .onChangeset(new Consumer<Long>() {
-                                              @Override
-                                              public void accept(final Long aLong) {
-
-                                              }
-                                          }).parse();
+        new ParallelBinaryParser(input, 6)
+                .onHeader(new HeaderPrinter())
+                .onBoundBox(new DummyBBox())
+                .onComplete(new Completer())
+                .onNode(onNodes)
+                .onWay(onWays)
+                .onRelation(onRelations)
+                .onChangeset(new DummyChangeSet())
+                .parse();
     }
 
-    private void addGraphData(final RoadGraphNodeAdder onNodes, final RoadGraphEdgeAdder onWays) {
+    private void addGraphData() {
         onNodes.addNodesToGraph();
         onWays.addEdgesToGraph();
     }
 
-    private void createNodeRelations(final NodeRelationAdder onRelations) {
-        nodeRelations.addAll(onRelations.getNodeRelations(graph));
+    private void createNodeRelations() {
+        nodeRelations.addAll(onRelations.getNodeRelations());
     }
 
     public List<NodeRelation> getNodeRelations() {
@@ -75,7 +74,6 @@ public class ImportPBF implements GraphImporter {
     }
 
     private class HeaderPrinter implements Consumer<Header> {
-
         @Override
         public void accept(final Header header) {
             System.out.println("Importing from source " + header.getSource());
@@ -103,9 +101,11 @@ public class ImportPBF implements GraphImporter {
 
     private class RoadGraphEdgeAdder implements Consumer<Way> {
         private final List<Pair<Long, Long>> edges = Collections.synchronizedList(new LinkedList<>());
+        private final Map<Long, Way> ways = Collections.synchronizedMap(new HashMap<>());
 
         @Override
         public void accept(final Way way) {
+            ways.put(way.getId(), way);
             final List<Long> nodeIds = way.getNodes();
 
             final Iterator<Long> nodeIdIterator = nodeIds.iterator();
@@ -134,23 +134,34 @@ public class ImportPBF implements GraphImporter {
         @Override
         public void accept(final Relation relation) {
             final Map<String, String> tags = relation.getTags();
-            if (tags.get("type").equals("boundary") || tags.get("landuse").equals("forest")) {
+            final String type = tags.get("type");
+            final String landuse = tags.get("landuse");
+            if ((type != null && type.equals("boundary")) || (landuse != null) && landuse.equals("forest")) {
                 relations.put(relation.getId(), relation);
             }
         }
 
-        public List<NodeRelation> getNodeRelations(final RoadGraph graph) {
+        public List<NodeRelation> getNodeRelations() {
             final List<NodeRelation> nodeRelations = new LinkedList<>();
 
             for (final Map.Entry<Long, Relation> relationEntry : relations.entrySet()) {
-                final Relation relation = relationEntry.getValue();
-                final List<Long> nodeIds = recurseToFindNodes(relation);
-
-                nodeRelations.add(NodeRelation.createFromNodeIds(relation.getId(), relation.getInfo().toString(),
-                                                                 relation.getTags(), nodeIds, graph));
+                try {
+                    getRelation(nodeRelations, relationEntry);
+                } catch (NullPointerException e) {
+                    addEmptyRelation(relationEntry);
+                }
             }
 
             return nodeRelations;
+        }
+
+        private void getRelation(final List<NodeRelation> nodeRelations,
+                                 final Map.Entry<Long, Relation> relationEntry) {
+            final Relation relation = relationEntry.getValue();
+            final List<Long> nodeIds = recurseToFindNodes(relation);
+
+            nodeRelations.add(NodeRelation.createFromNodeIds(relation.getId(), relation.getInfo().toString(),
+                                                             relation.getTags(), nodeIds, graph));
         }
 
         private List<Long> recurseToFindNodes(final Relation relation) {
@@ -158,17 +169,32 @@ public class ImportPBF implements GraphImporter {
 
             final List<RelationMember> members = relation.getMembers();
             for (final RelationMember member : members) {
+                final Long memberId = member.getId();
                 final RelationMember.Type type = member.getType();
+
                 if (type == RelationMember.Type.RELATION) {
-                    nodeIds.addAll(recurseToFindNodes(relations.get(member.getId())));
+                    nodeIds.addAll(recurseToFindNodes(relations.get(memberId)));
                 } else if (type == RelationMember.Type.NODE) {
-                    nodeIds.add(member.getId());
+                    nodeIds.add(memberId);
+                } else if (type == RelationMember.Type.WAY) {
+                    nodeIds.addAll(recurseToFindNodes(onWays.ways.get(memberId)));
                 }
             }
 
             return nodeIds;
         }
 
+        private List<Long> recurseToFindNodes(final Way way) {
+            return way.getNodes();
+        }
+
+        private void addEmptyRelation(final Map.Entry<Long, Relation> relationEntry) {
+            final Long relationId = relationEntry.getKey();
+            final String description = "INVALID";
+            final Map dummyMap = Collections.EMPTY_MAP;
+            final List dummyNodes = Collections.EMPTY_LIST;
+            nodeRelations.add(new NodeRelation(relationId, description, dummyMap, dummyNodes));
+        }
     }
 
     private class Completer implements Runnable {
@@ -177,6 +203,20 @@ public class ImportPBF implements GraphImporter {
         @Override
         public void run() {
             sw.printTimingIfVerbose();
+        }
+    }
+
+    private class DummyBBox implements Consumer<BoundBox> {
+        @Override
+        public void accept(final BoundBox boundBox) {
+
+        }
+    }
+
+    private class DummyChangeSet implements Consumer<Long> {
+        @Override
+        public void accept(final Long aLong) {
+
         }
     }
 }
