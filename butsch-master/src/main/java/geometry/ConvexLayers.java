@@ -1,6 +1,5 @@
 package geometry;
 
-import org.apache.spark.sql.catalyst.expressions.Conv;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -11,10 +10,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ConvexLayers {
-    private final Geometry[] layers;
+    final Geometry[] layers;
 
-    public ConvexLayers(final Geometry points) {
-        layers = createConvexLayers(points);
+    public ConvexLayers(final Geometry pointGeometry) {
+        layers = createConvexLayers(pointGeometry);
     }
 
     private Geometry[] createConvexLayers(final Geometry points) {
@@ -65,20 +64,23 @@ public class ConvexLayers {
 
     private Coordinate[] getCoordinatesNotContainedInHull(final Coordinate[] coordinates,
                                                           final Coordinate[] hullCoordinates) {
-        final ArrayList<Coordinate> filteredCoordinates = new ArrayList<>(coordinates.length - hullCoordinates.length);
+        final ArrayList<Coordinate> filteredCoordinates = new ArrayList<>(coordinates.length - (hullCoordinates.length - 1));
         int j = 0;
-        for (int i = 0; i < coordinates.length; i++) {
+        for (int i = 0; i < coordinates.length && j < hullCoordinates.length; ) {
             final Coordinate coordinate = coordinates[i];
             final Coordinate hullCoordinate = hullCoordinates[j];
 
             if (coordinate.compareTo(hullCoordinate) < 0) {
                 filteredCoordinates.add(coordinate);
-            } else {
+                i++;
+            } else if (coordinate.compareTo(hullCoordinate) > 0) {
                 j++;
+            } else {
+                i++;
             }
         }
 
-        return (Coordinate[]) filteredCoordinates.toArray();
+        return filteredCoordinates.toArray(new Coordinate[filteredCoordinates.size()]);
     }
 
     private Geometry[] convertToGeometryArray(final ArrayList<ConvexHull> chLayers) {
