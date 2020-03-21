@@ -1,13 +1,14 @@
 package visualizations;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineSegment;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
-import java.util.Collection;
+import java.util.*;
 
 public class GeometryVisualizer {
 	public static final Color BACKGROUND = Color.WHITE;
@@ -17,17 +18,13 @@ public class GeometryVisualizer {
 	public static final int MARGIN = 10;
 	public static final int NODE_SIZE = 4;
 
-	private final Collection<Coordinate> coordinates;
-	private final Collection<LineSegment> lineSegments;
-	private final Collection<LineSegment> highlightedSegments;
+	private final GeometryDrawCollection geometryDrawCollection;
 	private Graphics2D g2d;
 	private ScaledCoordinates scaledCoordinates;
 	private double[] minMax;
 
-	public GeometryVisualizer(Collection<Coordinate> coordinates, Collection<LineSegment> lineSegments, Collection<LineSegment> highlightedSegments) {
-		this.coordinates = coordinates;
-		this.lineSegments = lineSegments;
-		this.highlightedSegments = highlightedSegments;
+	public GeometryVisualizer(final GeometryDrawCollection geometryDrawCollection) {
+		this.geometryDrawCollection = geometryDrawCollection;
 	}
 
 	public void visualizeGraph() {
@@ -78,35 +75,36 @@ public class GeometryVisualizer {
 
 	private void drawCoordinates() {
 		g2d.setColor(NODES);
-		for (Coordinate coordinate : coordinates) {
-			final double x = (coordinate.getX() - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
-			final double y = (coordinate.getY() - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
-			g2d.fill(new Ellipse2D.Double(x - NODE_SIZE / 2, y - NODE_SIZE / 2, NODE_SIZE, NODE_SIZE));
-//			g2d.drawString(coordinate.id + ":" + coordinate.level, (float) x, (float) y);
+		for (final Map.Entry<Color, Collection<Coordinate>> colorCollectionEntry : geometryDrawCollection.coordinates.entrySet()) {
+			final Color color = colorCollectionEntry.getKey();
+			final Collection<Coordinate> coordinates = colorCollectionEntry.getValue();
+
+			g2d.setColor(color);
+			for (Coordinate coordinate : coordinates) {
+				final double x = (coordinate.getX() - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
+				final double y = (coordinate.getY() - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
+				g2d.fill(new Ellipse2D.Double(x - NODE_SIZE / 2, y - NODE_SIZE / 2, NODE_SIZE, NODE_SIZE));
+			}
 		}
 	}
 
 	private void drawLineSegments() {
 		drawNormalLineSegments();
-		drawHighlightedLineSegments();
-//		g2d.setColor(EDGES);
 	}
 
 	private void drawNormalLineSegments() {
-		for (LineSegment line : lineSegments) {
-			drawLineSegment(line, EDGES);
+		for (final Map.Entry<Color, Collection<LineSegment>> colorCollectionEntry : geometryDrawCollection.lineSegments.entrySet()) {
+			final Color color = colorCollectionEntry.getKey();
+			final Collection<LineSegment> lineSegments = colorCollectionEntry.getValue();
+
+			g2d.setColor(color);
+			for (LineSegment line : lineSegments) {
+				drawLineSegment(line);
+			}
 		}
 	}
 
-	private void drawHighlightedLineSegments() {
-		for (final LineSegment line : highlightedSegments) {
-			drawLineSegment(line, EDGES_HIGHLIGHTET);
-		}
-	}
-
-	private void drawLineSegment(LineSegment line, Color color) {
-		g2d.setColor(color);
-
+	private void drawLineSegment(LineSegment line) {
 		final Coordinate startCoordinate = line.getCoordinate(0);
 		final Coordinate endCoordinate = line.getCoordinate(1);
 		final double xi = (startCoordinate.getX() - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
@@ -119,18 +117,17 @@ public class GeometryVisualizer {
 	private double[] extractMinMax() {
 		double[] minMax = {Double.MAX_VALUE, -Double.MAX_VALUE, Double.MAX_VALUE, -Double.MAX_VALUE };
 
-		for (Coordinate coordinate : coordinates) {
-			updateMinMaxWithCoordinate(minMax, coordinate);
+		for (final Collection<Coordinate> coordinates : geometryDrawCollection.coordinates.values()) {
+			for (Coordinate coordinate : coordinates) {
+				updateMinMaxWithCoordinate(minMax, coordinate);
+			}
 		}
 
-		for (final LineSegment lineSegment : lineSegments) {
-			updateMinMaxWithCoordinate(minMax, lineSegment.p0);
-			updateMinMaxWithCoordinate(minMax, lineSegment.p1);
-		}
-
-		for (final LineSegment lineSegment : highlightedSegments) {
-			updateMinMaxWithCoordinate(minMax, lineSegment.p0);
-			updateMinMaxWithCoordinate(minMax, lineSegment.p1);
+		for (final Collection<LineSegment> lineSegments : geometryDrawCollection.lineSegments.values()) {
+			for (final LineSegment lineSegment : lineSegments) {
+				updateMinMaxWithCoordinate(minMax, lineSegment.p0);
+				updateMinMaxWithCoordinate(minMax, lineSegment.p1);
+			}
 		}
 
 		return minMax;
@@ -186,6 +183,41 @@ public class GeometryVisualizer {
 				padY = (h - scale * spreadY) / 2 + MARGIN;
 			}
 			return this;
+		}
+	}
+
+	public static class GeometryDrawCollection {
+		private final HashMap<Color, Collection<Coordinate>> coordinates = new HashMap<>();
+		private final HashMap<Color, Collection<LineSegment>> lineSegments = new HashMap<>();
+
+		public void addCoordinate(final Color color, final Coordinate coordinate) {
+			addCoordinates(color, Collections.singletonList(coordinate));
+		}
+
+		public void addCoordinates(final Color color, final Collection<Coordinate> coordinate) {
+			Collection<Coordinate> coordinates = this.coordinates.get(color);
+
+			if (coordinates == null) {
+				this.coordinates.put(color, new LinkedList<>());
+				this.coordinates.get(color);
+			}
+
+			coordinates.addAll(coordinate);
+		}
+
+		public void addLineSegment(final Color color, final LineSegment segment) {
+			addLineSegments(color, Collections.singletonList(segment));
+		}
+
+		public void addLineSegments(final Color color, final Collection<LineSegment> segments) {
+			Collection<LineSegment> lineSegments = this.lineSegments.get(color);
+
+			if (lineSegments == null) {
+				this.lineSegments.put(color, new LinkedList<>());
+				lineSegments = this.lineSegments.get(color);
+			}
+
+			lineSegments.addAll(segments);
 		}
 	}
 }
