@@ -229,5 +229,29 @@ public class GeometryVisualizer {
 
 			lineSegments.addAll(segments);
 		}
+
+		public void addLineSegmentsFromCoordinates(final Color color, final Collection<Coordinate> coordinates) {
+			if (coordinates.size() < 2 ) {
+				throw new IllegalArgumentException("Cannot create line segments from less than 2 coordinates");
+			}
+
+			final Collection<LineSegment> lineSegments = coordinatesToLineSegments(coordinates);
+
+			addLineSegments(color, lineSegments);
+		}
+
+		private Collection<LineSegment> coordinatesToLineSegments(final Collection<Coordinate> coordinates) {
+			final Collection<LineSegment> lineSegments = new LinkedList<>();
+
+			final Iterator<Coordinate> coordinateIterator = coordinates.iterator();
+			Coordinate lastCoordinate = coordinateIterator.next();
+			while (coordinateIterator.hasNext()) {
+				final Coordinate nextCoordinate = coordinateIterator.next();
+				lineSegments.add(new LineSegment(lastCoordinate, nextCoordinate));
+				lastCoordinate = nextCoordinate;
+			}
+
+			return lineSegments;
+		}
 	}
 }

@@ -4,7 +4,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
+import visualizations.GeometryVisualizer;
 
+import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -168,8 +170,15 @@ public class PolygonMergerTest {
                                                                                     new Coordinate(1,-1),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
+
         System.out.println(expectedCoordinates);
         System.out.println(Arrays.toString(merged));
+
+        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
+        col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(merged));
+        final GeometryVisualizer visualizer = new GeometryVisualizer(col);
+        visualizer.visualizeGraph(100_000);
+
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
