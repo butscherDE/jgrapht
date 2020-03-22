@@ -1,13 +1,12 @@
 package geometry;
 
+import org.apache.avro.generic.GenericData;
 import org.locationtech.jts.algorithm.ConvexHull;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ConvexLayers {
     final Geometry[] layers;
@@ -64,7 +63,8 @@ public class ConvexLayers {
 
     private Coordinate[] getCoordinatesNotContainedInHull(final Coordinate[] coordinates,
                                                           final Coordinate[] hullCoordinates) {
-        final ArrayList<Coordinate> filteredCoordinates = new ArrayList<>(coordinates.length - (hullCoordinates.length - 1));
+        final ArrayList<Coordinate> filteredCoordinates = new ArrayList<>(
+                coordinates.length - (hullCoordinates.length - 1));
         int j = 0;
         for (int i = 0; i < coordinates.length && j < hullCoordinates.length; ) {
             final Coordinate coordinate = coordinates[i];
@@ -89,5 +89,31 @@ public class ConvexLayers {
             layers[i] = chLayers.get(i).getConvexHull();
         }
         return layers;
+    }
+
+    public List<LineSegment> getLayerAsLineSegments(final int index) {
+        if (index >= layers.length) {
+            throw new IllegalArgumentException(index + " out of bounds");
+        }
+
+        final Geometry layer = layers[index];
+        final LineSegment[] lineSegments = new LineSegment[layer.getNumPoints() - 1];
+        final Coordinate[] coordinates = layer.getCoordinates();
+
+        for (int i = 0; i < lineSegments.length; i++) {
+            lineSegments[i] = new LineSegment(coordinates[i], coordinates[i + 1]);
+        }
+
+        return Arrays.asList(lineSegments);
+    }
+
+    public List<List<LineSegment>> getLayersAsLineSegments() {
+        final List<List<LineSegment>> layersAsLS = new ArrayList<>(layers.length);
+
+        for (int i = 0; i < layers.length; i++) {
+            layersAsLS.add(getLayerAsLineSegments(i));
+        }
+
+        return layersAsLS;
     }
 }

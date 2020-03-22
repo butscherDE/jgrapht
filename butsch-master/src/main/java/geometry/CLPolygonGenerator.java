@@ -1,10 +1,9 @@
 package geometry;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Polygon;
-import visualizations.GeometryVisualizer;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -12,6 +11,8 @@ public class CLPolygonGenerator extends PolygonGenerator {
     private final Random random = new Random(42);
     private LineSegment[] outerSegments;
     private LineSegment[] innerSegments;
+    private int[] outerSegmentsIndicesOnHull;
+    private int[] innerSegmentsIndicesOnHull;
 
     public CLPolygonGenerator(final int numPoints) {
         super(numPoints);
@@ -26,44 +27,86 @@ public class CLPolygonGenerator extends PolygonGenerator {
         final ConvexLayers cl = new ConvexLayers(asPoints);
         outerSegments = new LineSegment[cl.layers.length - 1];
         innerSegments = new LineSegment[cl.layers.length - 1];
+        outerSegmentsIndicesOnHull = new int[cl.layers.length - 1];
+        innerSegmentsIndicesOnHull = new int[cl.layers.length - 1];
 
         int layerIndex = 0;
         while (layerIndex < cl.layers.length - 1) {
             outerSegments[layerIndex] = getRandomHullLine(cl.layers[layerIndex]);
             innerSegments[layerIndex] = getRandomEndVisibleLineSegment(outerSegments[layerIndex],
-                                                                       cl.layers[layerIndex + 1]);
+                                                                       cl.getLayerAsLineSegments(layerIndex + 1));
 
             layerIndex++;
         }
 
-        for (int i = 0; i < cl.layers.length - 1; i++) {
-            final LineSegment outerSegment = outerSegments[i];
-            final LineSegment innerSegment = innerSegments[i];
-
-            final LineSegment outerInner1 = new LineSegment(outerSegment.p0, innerSegment.p0);
-            final LineSegment outerInner2 = new LineSegment(outerSegment.p1, innerSegment.p1);
-
-            final Coordinate[] outerCoordinates = cl.layers[i].getCoordinates();
-            final Coordinate[] innerCoordinates = cl.layers[i + 1].getCoordinates();
-            final int iOut0 = CoordinateArrays.indexOf(outerSegment.p0, outerCoordinates);
-            final int iOut1 = CoordinateArrays.indexOf(outerSegment.p1, outerCoordinates);
-            final int iIn0 = CoordinateArrays.indexOf(innerSegment.p0, innerCoordinates);
-            final int iIn1 = CoordinateArrays.indexOf(innerSegment.p1, innerCoordinates);
-
-            System.out.println("iOut0 " + iOut0);
-            System.out.println("iOut1 " + iOut1);
-            System.out.println("iIn0 " + iIn0);
-            System.out.println("iIn1 " + iIn1);
-
-            //            final Coordinate[] combinedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.length - 1];
-            //            System.arraycopy(outerCoordinates, 0, combinedCoordinates, 0, outerCoordinates.length);
-            //            System.arraycopy(innerCoordinates.length, outerCoordinates.length, combinedCoordinates, outerCoordinates.length, innerCoordinates.length);
-            //            if (isIntersectionProduced(outerInner1, outerInner2)) {
-            //                ArrayUtils.reverse(combinedCoordinates, outerCoordinates.length, outerCoordinates.length + innerCoordinates.length);
-            //            }
-            //            combinedCoordinates[combinedCoordinates.length - 1] = combinedCoordinates[0];
+        for (int i = 0; i < outerSegmentsIndicesOnHull.length; i++) {
+            outerSegmentsIndicesOnHull[i] = ArrayUtils.indexOf(cl.layers[i].getCoordinates(), outerSegments[i]);
+            outerSegmentsIndicesOnHull[i] = ArrayUtils.indexOf(cl.layers[i + 1].getCoordinates(), innerSegments[i]);
         }
 
+        final List<LineSegment> randomPolygon = new ArrayList<>(/* TODO we can get this size beforehand */);
+        final List<List<LineSegment>> layersLS = cl.getLayersAsLineSegments();
+        for (int i = 0; i < cl.layers.length - 1; i++) {
+            final List<LineSegment> outerLayer = layersLS.get(i);
+            final List<LineSegment> innerLayer = layersLS.get(i + 1);
+
+            for (int j = 0; j < outerLayer.size(); j++) {
+                if (j < outerSegmentsIndicesOnHull[i]) {
+                    //                    randomPolygon.add()
+                } else if (j == outerSegmentsIndicesOnHull[i]) {
+
+                } else {
+
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private List<LineSegment> getPolygonLines(final List<List<LineSegment>> layerLS, final int layerIndex,
+                                              final int iterationStart) {
+        final List<LineSegment> polygon = new LinkedList<>();
+        final ListIterator<LineSegment> outerIterator = layerLS.get(layerIndex).listIterator(iterationStart);
+
+        while (outerIterator.hasNext()) {
+            final LineSegment outerLine = outerIterator.next();
+
+            if (outerLine.equals(outerSegments[layerIndex])) {
+                final double distanceOutP0ToInP1 = outerLine.p0.distance(innerSegments[layerIndex].p1);
+                final double distanceOutP0ToInP0 = outerLine.p0.distance(innerSegments[layerIndex].p0);
+                if (distanceOutP0ToInP1 < distanceOutP0ToInP0) {
+                    polygon.add(new LineSegment(outerLine.p0, innerSegments[layerIndex].p1));
+                    final List<LineSegment> nextInnerLayer = layerLS.get(layerIndex + 1);
+                    final int startIndexInNextInnerLayer = nextInnerLayer.indexOf(innerSegments[layerIndex]) + 1;
+                    final List<LineSegment> nextInnerSegments = getPolygonLines(layerLS, layerIndex + 1, startIndexInNextInnerLayer);
+                    polygon.addAll(nextInnerSegments);
+                    polygon.add(new LineSegment(innerSegments[layerIndex].p0, outerLine.p1));
+                } else {
+
+                }
+            } else {
+                polygon.add(outerLine);
+            }
+        }
+
+        return null;
+    }
+
+    private List<LineSegment> mergePolygons(final List<LineSegment> outerPolygon, final List<LineSegment> innerPolygon,
+                                            final LineSegment outerChosen, final LineSegment innerChosen) {
+//         final int indexOuter = outerPolygon.indexOf(outerChosen);
+//         final int indexInner = innerPolygon.indexOf(innerChosen);
+//
+//         outerPolygon.remove(indexOuter);
+//         innerPolygon.remove(indexInner);
+
+        final List<LineSegment> mergedPolygon = new ArrayList<>(outerPolygon.size() + innerPolygon.size());
+        mergedPolygon.addAll(outerPolygon);
+        mergedPolygon.addAll(innerPolygon);
+
+        final int indexOuterChosen = mergedPolygon.indexOf(outerChosen);
+        final int indexInnerChosen = mergedPolygon.indexOf(innerChosen);
 
         return null;
     }
@@ -78,64 +121,56 @@ public class CLPolygonGenerator extends PolygonGenerator {
         return new LineSegment(startCoordinate, endCoordinate);
     }
 
-    private LineSegment getRandomEndVisibleLineSegment(final LineSegment outerLineSegment, final Geometry convexLayer) {
-        final List<LineSegment> endVisibleLineSegments = getEndVisibleLineSegments(outerLineSegment, convexLayer);
+    private LineSegment getRandomEndVisibleLineSegment(final LineSegment outerLineSegment,
+                                                       final List<LineSegment> innerLayerAsLineSegments) {
+        final List<LineSegment> endVisibleLineSegments = getEndVisibleLineSegments(outerLineSegment,
+                                                                                   innerLayerAsLineSegments);
 
         return endVisibleLineSegments.get(random.nextInt(endVisibleLineSegments.size()));
     }
 
     private List<LineSegment> getEndVisibleLineSegments(final LineSegment outerLineSegment,
-                                                        final Geometry convexLayer) {
+                                                        final List<LineSegment> innerLayerAsLineSegments) {
         final List<LineSegment> endVisibleLineSegments = new ArrayList<>();
-        final LineSegment[] layerAsLineSegments = convertToLineSegments(convexLayer);
 
-        for (final LineSegment innerLineSegment : layerAsLineSegments) {
-            boolean endVisibleToOuterLine = isEndVisibleToOuterLineSegment(outerLineSegment, innerLineSegment,
-                                                                           layerAsLineSegments);
-
-            if (endVisibleToOuterLine) {
+        for (final LineSegment innerLineSegment : innerLayerAsLineSegments) {
+            if (isEndVisible(outerLineSegment, innerLineSegment, innerLayerAsLineSegments)) {
                 endVisibleLineSegments.add(innerLineSegment);
             }
-        }
-
-        try {
-            Thread.sleep(100_000);
-        } catch (Exception e) {
-
         }
 
         return endVisibleLineSegments;
     }
 
-    private boolean isEndVisibleToOuterLineSegment(final LineSegment outerLineSegment,
-                                                   final LineSegment innerLineSegment,
-                                                   final LineSegment[] layerAsLineSegments) {
-
-        final GeometryVisualizer.GeometryDrawCollection collection = new GeometryVisualizer.GeometryDrawCollection();
-        collection.addLineSegments(Color.BLACK, Arrays.asList(layerAsLineSegments));
-        collection.addLineSegment(Color.BLACK, outerLineSegment);
-        collection.addLineSegment(Color.RED, innerLineSegment);
-        GeometryVisualizer geometryVisualizer = new GeometryVisualizer(collection);
-        geometryVisualizer.visualizeGraph();
-
-
+    private boolean isEndVisible(final LineSegment outerLineSegment, final LineSegment innerLineSegment,
+                                 final List<LineSegment> innerLayerAsLineSegments) {
         final LineSegment[] endVisibilityCheckLines = getEndVisibilityCheckLines(outerLineSegment, innerLineSegment);
+
         boolean endVisibleToOuterLine = true;
-        for (final LineSegment otherLineSegment : layerAsLineSegments) {
+        for (final LineSegment possibleSightBlockingLine : innerLayerAsLineSegments) {
             for (final LineSegment endVisibilityCheckLine : endVisibilityCheckLines) {
-                endVisibleToOuterLine &= isIntersectionProduced(otherLineSegment, endVisibilityCheckLine,
-                                                                innerLineSegment);
+                final boolean isIntersecting = isIntersectionProduced(possibleSightBlockingLine, endVisibilityCheckLine,
+                                                                      innerLineSegment);
+                endVisibleToOuterLine &= !isIntersecting;
             }
         }
 
         return endVisibleToOuterLine;
     }
 
-    private boolean isIntersectionProduced(final LineSegment lineSegment1, final LineSegment lineSegment2,
-                                           final LineSegment notToIntersect) {
-        final boolean isIntersecting = lineSegment1.intersection(lineSegment2) == null;
-        final boolean isntIntersecting = lineSegment2.intersection(notToIntersect) != null;
-        return isIntersecting && isntIntersecting;
+    private boolean isIntersectionProduced(final LineSegment possiblySightBlockingLine, final LineSegment checkLine,
+                                           final LineSegment innerLineThatShallNotBeIntersected) {
+        final Coordinate intersection = possiblySightBlockingLine.intersection(checkLine);
+        if (intersection != null) {
+            return !isIntersectionOnLineThatShouldntBeIntersected(innerLineThatShallNotBeIntersected, intersection);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isIntersectionOnLineThatShouldntBeIntersected(final LineSegment innerLineThatShallNotBeIntersected,
+                                                                  final Coordinate intersection) {
+        return innerLineThatShallNotBeIntersected.distance(intersection) == 0.0;
     }
 
     private LineSegment[] getEndVisibilityCheckLines(final LineSegment outerLineSegment,
@@ -144,17 +179,5 @@ public class CLPolygonGenerator extends PolygonGenerator {
                 outerLineSegment.p0, innerLineSegment.p1), new LineSegment(outerLineSegment.p1,
                                                                            innerLineSegment.p0), new LineSegment(
                 outerLineSegment.p1, innerLineSegment.p1)};
-    }
-
-    private LineSegment[] convertToLineSegments(final Geometry convexLayer) {
-        final LineSegment[] lineSegments = new LineSegment[convexLayer.getNumPoints()];
-        final Coordinate[] coordinates = convexLayer.getCoordinates();
-
-        for (int i = 0; i < lineSegments.length - 1; i++) {
-            lineSegments[i] = new LineSegment(coordinates[i], coordinates[i + 1]);
-        }
-        lineSegments[lineSegments.length - 1] = new LineSegment(coordinates[coordinates.length - 1], coordinates[0]);
-
-        return lineSegments;
     }
 }

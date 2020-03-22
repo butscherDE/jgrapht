@@ -61,7 +61,6 @@ public class GeometryVisualizer {
 				drawCoordinates();
 				drawLineSegments();
 				drawCoordinates();
-				System.out.println(scaledCoordinates.scale);
 
 			}
 		};
@@ -84,6 +83,7 @@ public class GeometryVisualizer {
 				final double x = (coordinate.getX() - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
 				final double y = (coordinate.getY() - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
 				g2d.fill(new Ellipse2D.Double(x - NODE_SIZE / 2, y - NODE_SIZE / 2, NODE_SIZE, NODE_SIZE));
+				g2d.drawString(coordinate.toString(), (float) x, (float) y);
 			}
 		}
 	}
@@ -199,7 +199,7 @@ public class GeometryVisualizer {
 
 			if (coordinates == null) {
 				this.coordinates.put(color, new LinkedList<>());
-				this.coordinates.get(color);
+				coordinates = this.coordinates.get(color);
 			}
 
 			coordinates.addAll(coordinate);
