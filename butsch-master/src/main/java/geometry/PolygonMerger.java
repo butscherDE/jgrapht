@@ -10,48 +10,52 @@ import java.util.*;
 
 public class PolygonMerger {
     private final Coordinate[] outerCoordinates;
-    private final Coordinate[] innerCoordinates;
+    private final List<Coordinate> innerCoordinates;
     private Coordinate[] outerMergeLine;
     private Coordinate[] innerMergeLine;
 
-    public PolygonMerger(final Coordinate[] outerCoordinates, final Coordinate[] innerCoordinates) {
+    public PolygonMerger(final Coordinate[] outerCoordinates, final CircularList<Coordinate> innerCoordinates) {
         this.outerCoordinates = outerCoordinates;
-        this.innerCoordinates = innerCoordinates;
+        if (innerCoordinates.get(0).equals(innerCoordinates.get(innerCoordinates.size() - 1))) {
+            this.innerCoordinates = innerCoordinates.subList(0, innerCoordinates.size() - 1);
+        } else {
+            this.innerCoordinates = innerCoordinates;
+        }
+    }
+
+    public PolygonMerger(final Coordinate[] outerCoordinates, final Coordinate[] innerCoordinates) {
+        this(outerCoordinates, new CircularList<>(Arrays.asList(innerCoordinates)));
     }
 
     public PolygonMerger(final Polygon outerPolygon, final Polygon innerPolygon) {
-        outerCoordinates = outerPolygon.getCoordinates();
-        innerCoordinates = ArrayUtils.subarray(innerPolygon.getCoordinates(), 0, innerPolygon.getNumPoints() - 1);
+        this(outerPolygon.getCoordinates(), innerPolygon.getCoordinates());
     }
 
-    private List<Coordinate> mergePolygons(final LineSegment outerChosen, final LineSegment innerChosen) {
-        final List<Coordinate> mergedPolygon = new ArrayList<>(outerPolygon.size() + innerPolygon.size() - 1);
+    public Coordinate[] mergePolygons(final LineSegment outerChosen, final LineSegment innerChosen) {
+        final Coordinate[] mergedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.size()];
 
-        for (int i = 0; i < outerPolygon.size() - 1; i++) {
-            final LineSegment lineSegment = new LineSegment(outerPolygon.get(i), outerPolygon.get(i + 1));
-            mergedPolygon.add(lineSegment.p0);
-            if (lineSegment.equals(outerChosen)) {
-                innerPolygon.remove(innerPolygon.size() - 1);
-                final int indexOfInnerChosen = innerPolygon.indexOf(innerChosen.p0);
-                LinkedList<Coordinate> innerCoordinates = new LinkedList<>();
-                ListIterator<Coordinate> innerCircularIterator = new CircularList<>(innerPolygon).listIterator(indexOfInnerChosen + 1);
+        int m = 0;
+        for (int i = 0; i < outerCoordinates.length - 1; i++) {
+            mergedCoordinates[m++] = outerCoordinates[i];
+            if (outerCoordinates[i].equals(outerChosen.p0) && outerCoordinates[i + 1].equals(outerChosen.p1)) {
+                final int indexOfInnerChosen = innerCoordinates.indexOf(innerChosen.p0);
+                final int innerStartIndex = indexOfInnerChosen + 1;
+                final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerStartIndex);
                 while (innerCircularIterator.hasNext()) {
                     final Coordinate next = innerCircularIterator.next();
-                    innerCoordinates.add(next);
+                    mergedCoordinates[m++] = next;
                 }
 
-                final Coordinate lastCordAlreadyMerged = mergedPolygon.get(mergedPolygon.size() - 1);
-                final double distanceStart = lastCordAlreadyMerged.distance(innerCoordinates.getFirst());
-                final double distanceEnd = lastCordAlreadyMerged.distance(innerCoordinates.getLast());
+                final Coordinate lastCordAlreadyMerged = outerCoordinates[i];
+                final double distanceStart = lastCordAlreadyMerged.distance(mergedCoordinates[i + 1]);
+                final double distanceEnd = lastCordAlreadyMerged.distance(mergedCoordinates[m - 1]);
                 if (distanceStart > distanceEnd) {
-                    Collections.reverse(innerCoordinates);
+                    ArrayUtils.reverse(mergedCoordinates, i + 1, m);
                 }
-
-                mergedPolygon.addAll(innerCoordinates);
             }
         }
-        mergedPolygon.add(mergedPolygon.get(0));
+        mergedCoordinates[m] = outerCoordinates[outerCoordinates.length - 1];
 
-        return mergedPolygon;
+        return mergedCoordinates;
     }
 }

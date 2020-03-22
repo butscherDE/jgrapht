@@ -28,6 +28,10 @@ public class GeometryVisualizer {
 	}
 
 	public void visualizeGraph() {
+		visualizeGraph(0);
+	}
+
+	public void visualizeGraph(final long millisToSleep) {
 		// compute ranges of X and Y coordinates
 		minMax = extractMinMax();
 		final double spreadX = minMax[1] - minMax[0];
@@ -70,6 +74,12 @@ public class GeometryVisualizer {
 		frame.pack();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
+
+		try {
+			Thread.sleep(millisToSleep);
+		} catch (Exception e) {
+
+		}
 	}
 
 	private void drawCoordinates() {

@@ -3,6 +3,7 @@ package util;
 import data.Edge;
 import data.RoadGraph;
 import evalutation.Config;
+import geometry.PolygonMerger;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -16,8 +17,7 @@ import java.util.*;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LearningTests {
     @Test
@@ -45,13 +45,12 @@ public class LearningTests {
 
     @Test
     public void polygonMergingFirstLines() {
-        final List<Coordinate> outerPolygonCoords = getOuterCoordinates();
-        final List<Coordinate> innerPolygonCoords = getInnerCoordinates();
+        final PolygonMerger polygonMerger = getPolygonMerger();
 
         final LineSegment outerChosen = new LineSegment(-2, -2, -2, 2);
         final LineSegment innerChosen = new LineSegment(-1, -1, -1, 1);
 
-        final List<Coordinate> merged = mergePolygons(outerPolygonCoords, innerPolygonCoords, outerChosen, innerChosen);
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
         final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
                                                                                     new Coordinate(-1,-1),
                                                                                     new Coordinate(1,-1),
@@ -61,18 +60,26 @@ public class LearningTests {
                                                                                     new Coordinate(2, 2),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
-        assertEquals(expectedCoordinates, merged);
+        GeometryVisualizer.GeometryDrawCollection drawCol = new GeometryVisualizer.GeometryDrawCollection();
+        drawCol.addLineSegments(Color.BLACK, coordsToLS(merged));
+        GeometryVisualizer geometryVisualizer = new GeometryVisualizer(drawCol);
+//        geometryVisualizer.visualizeGraph(100000);
+
+
+
+        System.out.println(expectedCoordinates);
+        System.out.println(Arrays.toString(merged));
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
     @Test
     public void polygonMergingFirstAndThirdLines() {
-        final List<Coordinate> outerPolygonCoords = getOuterCoordinates();
-        final List<Coordinate> innerPolygonCoords = getInnerCoordinates();
+        final PolygonMerger polygonMerger = getPolygonMerger();
 
         final LineSegment outerChosen = new LineSegment(-2, -2, -2, 2);
         final LineSegment innerChosen = new LineSegment(1, 1, 1, -1);
 
-        final List<Coordinate> merged = mergePolygons(outerPolygonCoords, innerPolygonCoords, outerChosen, innerChosen);
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
         final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
                                                                                     new Coordinate(1,-1),
                                                                                     new Coordinate(-1,-1),
@@ -82,18 +89,17 @@ public class LearningTests {
                                                                                     new Coordinate(2, 2),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
-        assertEquals(expectedCoordinates, merged);
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
     @Test
     public void polygonMergingThirdAndFirstLines() {
-        final List<Coordinate> outerPolygonCoords = getOuterCoordinates();
-        final List<Coordinate> innerPolygonCoords = getInnerCoordinates();
+        final PolygonMerger polygonMerger = getPolygonMerger();
 
         final LineSegment outerChosen = new LineSegment(2, 2, 2, -2);
         final LineSegment innerChosen = new LineSegment(-1, -1, -1, 1);
 
-        final List<Coordinate> merged = mergePolygons(outerPolygonCoords, innerPolygonCoords, outerChosen, innerChosen);
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
         final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
                                                                                     new Coordinate(-2, 2),
                                                                                     new Coordinate(2, 2),
@@ -103,18 +109,17 @@ public class LearningTests {
                                                                                     new Coordinate(-1,-1),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
-        assertEquals(expectedCoordinates, merged);
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
     @Test
     public void polygonMergingThirdAndThirdLines() {
-        final List<Coordinate> outerPolygonCoords = getOuterCoordinates();
-        final List<Coordinate> innerPolygonCoords = getInnerCoordinates();
+        final PolygonMerger polygonMerger = getPolygonMerger();
 
         final LineSegment outerChosen = new LineSegment(2, 2, 2, -2);
         final LineSegment innerChosen = new LineSegment(1, 1, 1, -1);
 
-        final List<Coordinate> merged = mergePolygons(outerPolygonCoords, innerPolygonCoords, outerChosen, innerChosen);
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
         final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
                                                                                     new Coordinate(-2, 2),
                                                                                     new Coordinate(2, 2),
@@ -124,27 +129,37 @@ public class LearningTests {
                                                                                     new Coordinate(1,-1),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
-        assertEquals(expectedCoordinates, merged);
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
-    private List<Coordinate> getOuterCoordinates() {
-        final List<Coordinate> outerPolygonCoords = new LinkedList<>();
-        outerPolygonCoords.add(new Coordinate(-2,-2));
-        outerPolygonCoords.add(new Coordinate(-2,2));
-        outerPolygonCoords.add(new Coordinate(2,2));
-        outerPolygonCoords.add(new Coordinate(2,-2));
-        outerPolygonCoords.add(new Coordinate(-2,-2));
+    private PolygonMerger getPolygonMerger() {
+        return new PolygonMerger(getOuterCoordinates(), getInnerCoordinates());
+    }
+
+    private Coordinate[] getOuterCoordinates() {
+        final Coordinate[] outerPolygonCoords = new Coordinate[] {
+                new Coordinate(-2,-2),
+                new Coordinate(-2,2),
+                new Coordinate(2,2),
+                new Coordinate(2,-2),
+                new Coordinate(-2,-2)
+        };
         return outerPolygonCoords;
     }
 
-    private List<Coordinate> getInnerCoordinates() {
-        final List<Coordinate> innerPolygonCoords = new LinkedList<>();
-        innerPolygonCoords.add(new Coordinate(-1, -1));
-        innerPolygonCoords.add(new Coordinate(-1, 1));
-        innerPolygonCoords.add(new Coordinate(1, 1));
-        innerPolygonCoords.add(new Coordinate(1, -1));
-        innerPolygonCoords.add(new Coordinate(-1, -1));
+    private Coordinate[] getInnerCoordinates() {
+        final Coordinate[] innerPolygonCoords = new Coordinate[] {
+                new Coordinate(-1, -1),
+                new Coordinate(-1, 1),
+                new Coordinate(1, 1),
+                new Coordinate(1, -1),
+                new Coordinate(-1, -1)
+        };
         return innerPolygonCoords;
+    }
+
+    private List<LineSegment> coordsToLS(final Coordinate[] coordinates) {
+        return coordsToLS(Arrays.asList(coordinates));
     }
 
     private List<LineSegment> coordsToLS(final Collection<Coordinate> coordinates) {
