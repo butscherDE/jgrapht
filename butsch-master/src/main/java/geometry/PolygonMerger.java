@@ -5,11 +5,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 import util.CircularList;
-import visualizations.GeometryVisualizer;
 
-import java.awt.*;
-import java.util.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 
 public class PolygonMerger {
     private final Coordinate[] outerCoordinates;
@@ -43,16 +42,8 @@ public class PolygonMerger {
     }
 
     public Coordinate[] mergePolygons(final LineSegment outerChosen, final LineSegment innerChosen) {
-        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
-        col.addLineSegmentsFromCoordinates(Color.RED, Arrays.asList(outerCoordinates));
-        col.addLineSegmentsFromCoordinates(Color.BLUE, innerCoordinates);
-        col.addLineSegments(Color.GREEN, Arrays.asList(new LineSegment(outerChosen.p0, innerChosen.p0), new LineSegment(outerChosen.p1, innerChosen.p1)));
-        final GeometryVisualizer vis = new GeometryVisualizer(col);
-//        vis.visualizeGraph(100_000);
-
-
-        mergedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.size()];
         calcAndSetInnerStartIndex(innerChosen);
+        mergedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.size()];
 
         m = 0;
         for (i = 0; i < outerCoordinates.length - 1; i++) {
@@ -67,7 +58,7 @@ public class PolygonMerger {
     }
 
     private void processInnerPolygon(final LineSegment outerChosen, final LineSegment innerChosen) {
-        addAllInnerCoordinates(innerChosen);
+        addAllInnerCoordinates();
         reverseInnerInMergedPolygonIfNecessary(outerChosen, innerChosen);
     }
 
@@ -75,7 +66,7 @@ public class PolygonMerger {
         return outerCoordinates[i].equals(outerChosen.p0) && outerCoordinates[i + 1].equals(outerChosen.p1);
     }
 
-    private void addAllInnerCoordinates(final LineSegment innerChosen) {
+    private void addAllInnerCoordinates() {
         final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerIterationStartIndex);
         while (innerCircularIterator.hasNext()) {
             final Coordinate next = innerCircularIterator.next();
