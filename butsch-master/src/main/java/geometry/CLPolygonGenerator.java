@@ -11,10 +11,6 @@ import java.util.List;
 
 public class CLPolygonGenerator extends PolygonGenerator {
     private final Random random = new Random(42);
-    private LineSegment[] outerSegments;
-    private LineSegment[] innerSegments;
-    private int[] outerSegmentsIndicesOnHull;
-    private int[] innerSegmentsIndicesOnHull;
 
     public CLPolygonGenerator(final int numPoints) {
         super(numPoints);
@@ -27,10 +23,6 @@ public class CLPolygonGenerator extends PolygonGenerator {
         final Coordinate[] randomCoordinates = createRandomCoordinates();
         final MultiPoint asPoints = new GeometryFactory().createMultiPointFromCoords(randomCoordinates);
         final ConvexLayers cl = new ConvexLayers(asPoints);
-        outerSegments = new LineSegment[cl.layers.length - 1];
-        innerSegments = new LineSegment[cl.layers.length - 1];
-        outerSegmentsIndicesOnHull = new int[cl.layers.length - 1];
-        innerSegmentsIndicesOnHull = new int[cl.layers.length - 1];
 
         Coordinate[] mergedPolygon = cl.layers[0].getCoordinates();
         LineSegment lastInner = new LineSegment();
