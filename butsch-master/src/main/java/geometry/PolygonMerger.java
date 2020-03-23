@@ -11,8 +11,6 @@ import java.util.*;
 public class PolygonMerger {
     private final Coordinate[] outerCoordinates;
     private final List<Coordinate> innerCoordinates;
-    private Coordinate[] outerMergeLine;
-    private Coordinate[] innerMergeLine;
 
     private int m;
     private int i;
