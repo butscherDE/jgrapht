@@ -3,6 +3,7 @@ package geometry;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import visualizations.GeometryVisualizer;
 
@@ -363,9 +364,9 @@ public class PolygonMergerTest {
 
         final Coordinate outerChosenP0 = new Coordinate(0.30871945533265976, 0.27707849007413665);
         final Coordinate outerChosenP1 = new Coordinate(0.17221793768785243, 0.5874273817862956);
+        final LineSegment outerChosen = new LineSegment(outerChosenP0, outerChosenP1);
         final Coordinate innerChosenP0 = new Coordinate(0.7275636800328681, 0.6832234717598454);
         final Coordinate innerChosenP1 = new Coordinate(0.17737847790937833, 0.5943499108896841);
-        final LineSegment outerChosen = new LineSegment(outerChosenP0, outerChosenP1);
         final LineSegment innerChosen = new LineSegment(innerChosenP0, innerChosenP1);
 
         final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
@@ -380,12 +381,110 @@ public class PolygonMergerTest {
                                                                                     outerPolygon[5],
                                                                                     outerPolygon[6],
                                                                                     outerPolygon[0]));
-//        System.out.println(expectedCoordinates);
-//        System.out.println(Arrays.toString(merged));
-//        drawForDebugging(merged, expectedCoordinates);
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
+    @Test
+    public void threePolygons() {
+        final Coordinate[] coordinates = new Coordinate[] {
+                new Coordinate(-3,-3),
+                new Coordinate(-2,-2),
+                new Coordinate(-1,-1),
+                new Coordinate(3,-3),
+                new Coordinate(2,-2),
+                new Coordinate(1,-1),
+                new Coordinate(-3,3),
+                new Coordinate(-2,2),
+                new Coordinate(-1,1),
+                new Coordinate(3,3),
+                new Coordinate(2,2),
+                new Coordinate(1,1),
+        };
+        final ConvexLayers cl = new ConvexLayers(new GeometryFactory().createMultiPointFromCoords(coordinates));
+
+        final Coordinate[] layer1Coordinates = cl.layers[0].getCoordinates();
+        final Coordinate[] layer2Coordinates = cl.layers[1].getCoordinates();
+        final Coordinate[] layer3Coordinates = cl.layers[2].getCoordinates();
+
+        final PolygonMerger polygonMerger1 = new PolygonMerger(layer1Coordinates, layer2Coordinates);
+        final LineSegment outerChosen1 = new LineSegment(-3, -3, -3, 3);
+        final LineSegment innerChosen1 = new LineSegment(-2, -2, -2, 2);
+        final Coordinate[] mergeStep1 = polygonMerger1.mergePolygons(outerChosen1, innerChosen1);
+
+        final PolygonMerger polygonMerger2 = new PolygonMerger(mergeStep1, layer3Coordinates);
+        final LineSegment outerChosen2 = new LineSegment(2, -2, 2, 2);
+        final LineSegment innerChosen2 = new LineSegment(1, 1, 1, -1);
+        final Coordinate[] mergeStep2 = polygonMerger2.mergePolygons(outerChosen2, innerChosen2);
+
+        final Coordinate[] expectedPolygon = new Coordinate[] {
+                new Coordinate(-3, -3),
+                new Coordinate(-2, -2),
+                new Coordinate(2, -2),
+                new Coordinate(1, -1),
+                new Coordinate(-1, -1),
+                new Coordinate(-1, 1),
+                new Coordinate(1, 1),
+                new Coordinate(2, 2),
+                new Coordinate(-2, 2),
+                new Coordinate(-3, 3),
+                new Coordinate(3, 3),
+                new Coordinate(3, -3),
+                new Coordinate(-3, -3)
+        };
+
+        assertArrayEquals(expectedPolygon, mergeStep2);
+    }
+
+    @Test
+    public void threePolygonsInversedOuterChosen() {
+        final Coordinate[] coordinates = new Coordinate[] {
+                new Coordinate(-3,-3),
+                new Coordinate(-2,-2),
+                new Coordinate(-1,-1),
+                new Coordinate(3,-3),
+                new Coordinate(2,-2),
+                new Coordinate(1,-1),
+                new Coordinate(-3,3),
+                new Coordinate(-2,2),
+                new Coordinate(-1,1),
+                new Coordinate(3,3),
+                new Coordinate(2,2),
+                new Coordinate(1,1),
+                };
+        final ConvexLayers cl = new ConvexLayers(new GeometryFactory().createMultiPointFromCoords(coordinates));
+
+        final Coordinate[] layer1Coordinates = cl.layers[0].getCoordinates();
+        final Coordinate[] layer2Coordinates = cl.layers[1].getCoordinates();
+        final Coordinate[] layer3Coordinates = cl.layers[2].getCoordinates();
+
+        final PolygonMerger polygonMerger1 = new PolygonMerger(layer1Coordinates, layer2Coordinates);
+        final LineSegment outerChosen1 = new LineSegment(-3, -3, -3, 3);
+        final LineSegment innerChosen1 = new LineSegment(-2, -2, -2, 2);
+        final Coordinate[] mergeStep1 = polygonMerger1.mergePolygons(outerChosen1, innerChosen1);
+
+        final PolygonMerger polygonMerger2 = new PolygonMerger(mergeStep1, layer3Coordinates);
+        final LineSegment outerChosen2 = new LineSegment(2, 2, 2, -2);
+        final LineSegment innerChosen2 = new LineSegment(1, 1, 1, -1);
+        final Coordinate[] mergeStep2 = polygonMerger2.mergePolygons(outerChosen2, innerChosen2);
+
+        final Coordinate[] expectedPolygon = new Coordinate[] {
+                new Coordinate(-3, -3),
+                new Coordinate(-2, -2),
+                new Coordinate(2, -2),
+                new Coordinate(1, -1),
+                new Coordinate(-1, -1),
+                new Coordinate(-1, 1),
+                new Coordinate(1, 1),
+                new Coordinate(2, 2),
+                new Coordinate(-2, 2),
+                new Coordinate(-3, 3),
+                new Coordinate(3, 3),
+                new Coordinate(3, -3),
+                new Coordinate(-3, -3)
+        };
+
+        assertArrayEquals(expectedPolygon, mergeStep2);
+    }
 
 
     private void drawForDebugging(final Coordinate[] merged, final List<Coordinate> expectedCoordinates) {

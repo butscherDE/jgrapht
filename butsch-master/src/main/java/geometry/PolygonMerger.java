@@ -42,6 +42,7 @@ public class PolygonMerger {
     }
 
     public Coordinate[] mergePolygons(final LineSegment outerChosen, final LineSegment innerChosen) {
+        outerChosenOrientationCorrection(outerChosen);
         calcAndSetInnerStartIndex(innerChosen);
         mergedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.size()];
 
@@ -55,6 +56,37 @@ public class PolygonMerger {
         mergedCoordinates[m] = outerCoordinates[outerCoordinates.length - 1];
 
         return mergedCoordinates;
+    }
+
+    private void outerChosenOrientationCorrection(final LineSegment outerChosen) {
+        boolean foundForward = searchForward(outerChosen);
+
+        if (!foundForward) {
+            boolean foundReverse = searchAsReverse(outerChosen);
+
+            handleNotFoundCase(foundReverse);
+        }
+    }
+
+    private boolean searchForward(final LineSegment outerChosen) {
+        boolean foundForward = false;
+        for (int k = 0; k < outerCoordinates.length - 1; k++) {
+            final boolean basePointEqual = outerCoordinates[k].equals(outerChosen.p0);
+            final boolean adjPointEqual = outerCoordinates[k + 1].equals(outerChosen.p1);
+            foundForward |= basePointEqual && adjPointEqual;
+        }
+        return foundForward;
+    }
+
+    private boolean searchAsReverse(final LineSegment outerChosen) {
+        outerChosen.reverse();
+        return searchForward(outerChosen);
+    }
+
+    private void handleNotFoundCase(final boolean foundReverse) {
+        if (!foundReverse) {
+            throw new IllegalArgumentException("outerChosen is not on the outer polygon");
+        }
     }
 
     private void processInnerPolygon(final LineSegment outerChosen, final LineSegment innerChosen) {
