@@ -96,7 +96,6 @@ public class PolygonMerger {
         final double distanceEnd = lastCordFromOuterPolygon.distance(mergedCoordinates[m - 1]);
         if (distanceStart > distanceEnd) {
             ArrayUtils.reverse(mergedCoordinates, i + 1, m);
-            System.out.println("reversed");
         }
     }
 }

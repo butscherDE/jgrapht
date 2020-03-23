@@ -209,14 +209,15 @@ public class PolygonMergerTest {
 
         final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
         final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
-                                                                                    new Coordinate(1,-1),
                                                                                     new Coordinate(-1,-1),
-                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(1,-1),
                                                                                     new Coordinate(1,1),
+                                                                                    new Coordinate(-1,1),
                                                                                     new Coordinate(-2, 2),
                                                                                     new Coordinate(2, 2),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
+
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
@@ -251,10 +252,10 @@ public class PolygonMergerTest {
         final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
                                                                                     new Coordinate(-2, 2),
                                                                                     new Coordinate(2, 2),
-                                                                                    new Coordinate(1,1),
                                                                                     new Coordinate(-1,1),
-                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(1,1),
                                                                                     new Coordinate(1,-1),
+                                                                                    new Coordinate(-1,-1),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
         assertArrayEquals(expectedCoordinates.toArray(), merged);
@@ -277,15 +278,6 @@ public class PolygonMergerTest {
                                                                                     new Coordinate(2, 2),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
-
-        System.out.println(expectedCoordinates);
-        System.out.println(Arrays.toString(merged));
-
-        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
-        col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(merged));
-        final GeometryVisualizer visualizer = new GeometryVisualizer(col);
-        //        visualizer.visualizeGraph(100_000);
-
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
@@ -298,10 +290,10 @@ public class PolygonMergerTest {
 
         final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
         final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
-                                                                                    new Coordinate(1,-1),
                                                                                     new Coordinate(-1,-1),
-                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(1,-1),
                                                                                     new Coordinate(1,1),
+                                                                                    new Coordinate(-1,1),
                                                                                     new Coordinate(-2, 2),
                                                                                     new Coordinate(2, 2),
                                                                                     new Coordinate(2, -2),
@@ -340,13 +332,23 @@ public class PolygonMergerTest {
         final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
                                                                                     new Coordinate(-2, 2),
                                                                                     new Coordinate(2, 2),
-                                                                                    new Coordinate(1,1),
                                                                                     new Coordinate(-1,1),
-                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(1,1),
                                                                                     new Coordinate(1,-1),
+                                                                                    new Coordinate(-1,-1),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
         assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+
+    private void verbose(final Coordinate[] merged, final List<Coordinate> expectedCoordinates) {
+        System.out.println(expectedCoordinates);
+        System.out.println(Arrays.toString(merged));
+
+        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
+        col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(merged));
+        final GeometryVisualizer visualizer = new GeometryVisualizer(col);
+        visualizer.visualizeGraph(100_000);
     }
 
     private PolygonMerger getPolygonMerger() {
