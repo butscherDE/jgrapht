@@ -32,52 +32,30 @@ public class CLPolygonGenerator extends PolygonGenerator {
         outerSegmentsIndicesOnHull = new int[cl.layers.length - 1];
         innerSegmentsIndicesOnHull = new int[cl.layers.length - 1];
 
-        int layerIndex = 0;
-        while (layerIndex < cl.layers.length - 1) {
-            outerSegments[layerIndex] = getRandomHullLine(cl.layers[layerIndex]);
-            innerSegments[layerIndex] = getRandomEndVisibleLineSegment(outerSegments[layerIndex],
-                                                                       cl.getLayerAsLineSegments(layerIndex + 1));
-
-            layerIndex++;
-        }
-
-        for (int i = 0; i < outerSegmentsIndicesOnHull.length; i++) {
-            outerSegmentsIndicesOnHull[i] = ArrayUtils.indexOf(cl.layers[i].getCoordinates(), outerSegments[i]);
-            outerSegmentsIndicesOnHull[i] = ArrayUtils.indexOf(cl.layers[i + 1].getCoordinates(), innerSegments[i]);
-        }
-
         Coordinate[] mergedPolygon = cl.layers[0].getCoordinates();
-        for (int i = 1; i < cl.layers.length; i++) {
-            final PolygonMerger merger = new PolygonMerger(mergedPolygon, cl.layers[i].getCoordinates());
-            mergedPolygon = merger.mergePolygons(outerSegments[i - 1], innerSegments[i - 1]);
-        }
+        LineSegment lastInner = new LineSegment();
+        for (int layerIndex = 0; layerIndex < cl.layers.length - 1; layerIndex++) {
+            System.out.println(layerIndex);
+            final LineSegment outerSegment = getRandomHullLine(cl.layers[layerIndex], lastInner);
+            final LineSegment innerSegment = getRandomEndVisibleLineSegment(outerSegment, cl.getLayerAsLineSegments(layerIndex + 1));
 
-        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
-        final Color[] colors = new Color[] {
-                Color.BLUE,
-                Color.RED,
-//                Color.BLUE,
-//                Color.ORANGE,
-//                Color.CYAN
-        };
-        for (int i = 0; i < cl.layers.length; i++) {
-            col.addLineSegmentsFromCoordinates(colors[i], Arrays.asList(cl.layers[i].getCoordinates()));
+            final PolygonMerger polygonMerger = new PolygonMerger(mergedPolygon, cl.layers[layerIndex + 1].getCoordinates());
+            mergedPolygon = polygonMerger.mergePolygons(outerSegment, innerSegment);
         }
-        col.addLineSegment(Color.CYAN, outerSegments[0]);
-        col.addLineSegment(Color.ORANGE, innerSegments[0]);
-        col.addLineSegments(Color.BLACK, Arrays.asList(new LineSegment(outerSegments[0].p0, innerSegments[0].p0), new LineSegment(outerSegments[0].p1, innerSegments[0].p1)));
-        final GeometryVisualizer vis = new GeometryVisualizer(col);
-        vis.visualizeGraph();
 
         return new GeometryFactory().createPolygon(mergedPolygon);
     }
 
-    private LineSegment getRandomHullLine(final Geometry convexLayer) {
-        final Coordinate[] coordinates = convexLayer.getCoordinates();
+    private LineSegment getRandomHullLine(final Geometry convexLayer, final LineSegment last) {
+         final Coordinate[] coordinates = convexLayer.getCoordinates();
 
-        final int randomCoordinateIndex = random.nextInt(convexLayer.getNumPoints() - 1);
-        final Coordinate startCoordinate = coordinates[randomCoordinateIndex];
-        final Coordinate endCoordinate = coordinates[randomCoordinateIndex + 1];
+        Coordinate startCoordinate;
+        Coordinate endCoordinate;
+        do {
+            final int randomCoordinateIndex = random.nextInt(coordinates.length - 1);
+            startCoordinate = coordinates[randomCoordinateIndex];
+            endCoordinate = coordinates[randomCoordinateIndex + 1];
+        } while (startCoordinate.equals(last.p0) && endCoordinate.equals(last.p1));
 
         return new LineSegment(startCoordinate, endCoordinate);
     }
@@ -93,6 +71,7 @@ public class CLPolygonGenerator extends PolygonGenerator {
     private List<LineSegment> getEndVisibleLineSegments(final LineSegment outerLineSegment,
                                                         final List<LineSegment> innerLayerAsLineSegments) {
         final List<LineSegment> endVisibleLineSegments = new ArrayList<>();
+
 
         for (final LineSegment innerLineSegment : innerLayerAsLineSegments) {
             if (isEndVisible(outerLineSegment, innerLineSegment, innerLayerAsLineSegments)) {
