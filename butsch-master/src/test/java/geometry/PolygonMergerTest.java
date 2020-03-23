@@ -486,6 +486,64 @@ public class PolygonMergerTest {
         assertArrayEquals(expectedPolygon, mergeStep2);
     }
 
+    @Test
+    public void innerMostIsLine() {
+        final Coordinate[] coordinates = new Coordinate[] {
+                new Coordinate(-2,-2),
+                new Coordinate(-2,2),
+                new Coordinate(2,2),
+                new Coordinate(2,-2),
+                new Coordinate(-1,0),
+                new Coordinate(1,0)
+        };
+        final ConvexLayers cl = new ConvexLayers(new GeometryFactory().createMultiPointFromCoords(coordinates));
+
+        final PolygonMerger merger = new PolygonMerger(cl.layers[0].getCoordinates(), cl.layers[1].getCoordinates());
+        final LineSegment outerChosen = new LineSegment(-2, -2, -2, 2);
+        final LineSegment innerChosen = new LineSegment(-1, 0, 1, 0);
+        final Coordinate[] merged = merger.mergePolygons(outerChosen, innerChosen);
+
+        final Coordinate[] expectedCoordinates = new Coordinate[] {
+                new Coordinate(-2,-2),
+                new Coordinate(-1,0),
+                new Coordinate(1,0),
+                new Coordinate(-2, 2),
+                new Coordinate(2,2),
+                new Coordinate(2, -2),
+                new Coordinate(-2, -2)
+        };
+
+        assertArrayEquals(expectedCoordinates, merged);
+    }
+
+    @Test
+    public void innerMostIsPoint() {
+        final Coordinate[] coordinates = new Coordinate[] {
+                new Coordinate(-2,-2),
+                new Coordinate(-2,2),
+                new Coordinate(2,2),
+                new Coordinate(2,-2),
+                new Coordinate(0,0)
+        };
+        final ConvexLayers cl = new ConvexLayers(new GeometryFactory().createMultiPointFromCoords(coordinates));
+
+        final PolygonMerger merger = new PolygonMerger(cl.layers[0].getCoordinates(), cl.layers[1].getCoordinates());
+        final LineSegment outerChosen = new LineSegment(-2, -2, -2, 2);
+        final LineSegment innerChosen = new LineSegment(0, 0, 0, 0);
+        final Coordinate[] merged = merger.mergePolygons(outerChosen, innerChosen);
+
+        final Coordinate[] expectedCoordinates = new Coordinate[] {
+                new Coordinate(-2,-2),
+                new Coordinate(0,0),
+                new Coordinate(-2, 2),
+                new Coordinate(2,2),
+                new Coordinate(2, -2),
+                new Coordinate(-2, -2)
+        };
+
+        assertArrayEquals(expectedCoordinates, merged);
+    }
+
 
     private void drawForDebugging(final Coordinate[] merged, final List<Coordinate> expectedCoordinates) {
         System.out.println(expectedCoordinates);

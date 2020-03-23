@@ -26,11 +26,19 @@ public class PolygonMerger {
         }
 
         this.outerCoordinates = outerCoordinates;
-        if (innerCoordinates.get(0).equals(innerCoordinates.get(innerCoordinates.size() - 1))) {
+        if (isFirstAndLastEqual(innerCoordinates) && isSizeLargerThan1(innerCoordinates)) {
             this.innerCoordinates = innerCoordinates.subList(0, innerCoordinates.size() - 1);
         } else {
             this.innerCoordinates = innerCoordinates;
         }
+    }
+
+    private boolean isFirstAndLastEqual(final CircularList<Coordinate> innerCoordinates) {
+        return innerCoordinates.get(0).equals(innerCoordinates.get(innerCoordinates.size() - 1));
+    }
+
+    private boolean isSizeLargerThan1(final CircularList<Coordinate> innerCoordinates) {
+        return innerCoordinates.size() > 1;
     }
 
     public PolygonMerger(final Coordinate[] outerCoordinates, final Coordinate[] innerCoordinates) {
@@ -43,7 +51,6 @@ public class PolygonMerger {
 
     public Coordinate[] mergePolygons(final LineSegment outerChosen, final LineSegment innerChosen) {
         outerChosenOrientationCorrection(outerChosen);
-        calcAndSetInnerStartIndex(innerChosen);
         mergedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.size()];
 
         m = 0;
@@ -90,8 +97,21 @@ public class PolygonMerger {
     }
 
     private void processInnerPolygon(final LineSegment outerChosen, final LineSegment innerChosen) {
+        if (innerCoordinates.size() > 1) {
+            calcAndSetInnerStartIndex(innerChosen);
+            processWhenInnerLargeEnoughToBeAPolygon(outerChosen, innerChosen);
+        } else {
+            processWhenInnerIsJustAPoint(outerChosen);
+        }
+    }
+
+    private void processWhenInnerLargeEnoughToBeAPolygon(final LineSegment outerChosen, final LineSegment innerChosen) {
         addAllInnerCoordinates();
         reverseInnerInMergedPolygonIfNecessary(outerChosen, innerChosen);
+    }
+
+    private void processWhenInnerIsJustAPoint(final LineSegment outerChosen) {
+        mergedCoordinates[m++] = innerCoordinates.get(0);
     }
 
     private boolean areNextTwoCoordsChosenByLineSegment(final LineSegment outerChosen) {

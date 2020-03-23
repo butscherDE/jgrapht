@@ -27,12 +27,6 @@ public class CLPolygonGenerator extends PolygonGenerator {
         final Coordinate[] randomCoordinates = createRandomCoordinates();
         final MultiPoint asPoints = new GeometryFactory().createMultiPointFromCoords(randomCoordinates);
         final ConvexLayers cl = new ConvexLayers(asPoints);
-        for (final Geometry layer : cl.layers) {
-            System.out.println("########## layer ########");
-            for (final Coordinate coordinate : layer.getCoordinates()) {
-                System.out.println(coordinate);
-            }
-        }
         outerSegments = new LineSegment[cl.layers.length - 1];
         innerSegments = new LineSegment[cl.layers.length - 1];
         outerSegmentsIndicesOnHull = new int[cl.layers.length - 1];
