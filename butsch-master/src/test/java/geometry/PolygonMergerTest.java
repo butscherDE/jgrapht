@@ -341,7 +341,54 @@ public class PolygonMergerTest {
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
-    private void verbose(final Coordinate[] merged, final List<Coordinate> expectedCoordinates) {
+    @Test
+    public void realCase1() {
+        final Coordinate[] outerPolygon = new Coordinate[] {
+                new Coordinate(0.36878291341130565, 0.2757480694417024),
+                new Coordinate(0.30871945533265976, 0.27707849007413665),
+                new Coordinate(0.17221793768785243, 0.5874273817862956),
+                new Coordinate(0.20976756886633208, 0.825965871887821),
+                new Coordinate(0.6655489517945736, 0.9033722646721782),
+                new Coordinate(0.9193277828687169, 0.43649097442328655),
+                new Coordinate(0.7499061812554475, 0.38656687435934867),
+                new Coordinate(0.36878291341130565, 0.2757480694417024)
+        };
+        final Coordinate[] innerPolygon = new Coordinate[] {
+                new Coordinate(0.17737847790937833, 0.5943499108896841),
+                new Coordinate(0.46365357580915334, 0.7829017787900358),
+                new Coordinate(0.7275636800328681, 0.6832234717598454),
+                new Coordinate(0.17737847790937833, 0.5943499108896841)
+        };
+        final PolygonMerger polygonMerger = new PolygonMerger(outerPolygon, innerPolygon);
+
+        final Coordinate outerChosenP0 = new Coordinate(0.30871945533265976, 0.27707849007413665);
+        final Coordinate outerChosenP1 = new Coordinate(0.17221793768785243, 0.5874273817862956);
+        final Coordinate innerChosenP0 = new Coordinate(0.7275636800328681, 0.6832234717598454);
+        final Coordinate innerChosenP1 = new Coordinate(0.17737847790937833, 0.5943499108896841);
+        final LineSegment outerChosen = new LineSegment(outerChosenP0, outerChosenP1);
+        final LineSegment innerChosen = new LineSegment(innerChosenP0, innerChosenP1);
+
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(outerPolygon[0],
+                                                                                    outerPolygon[1],
+                                                                                    innerPolygon[2],
+                                                                                    innerPolygon[1],
+                                                                                    innerPolygon[0],
+                                                                                    outerPolygon[2],
+                                                                                    outerPolygon[3],
+                                                                                    outerPolygon[4],
+                                                                                    outerPolygon[5],
+                                                                                    outerPolygon[6],
+                                                                                    outerPolygon[0]));
+//        System.out.println(expectedCoordinates);
+//        System.out.println(Arrays.toString(merged));
+//        drawForDebugging(merged, expectedCoordinates);
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+
+
+
+    private void drawForDebugging(final Coordinate[] merged, final List<Coordinate> expectedCoordinates) {
         System.out.println(expectedCoordinates);
         System.out.println(Arrays.toString(merged));
 

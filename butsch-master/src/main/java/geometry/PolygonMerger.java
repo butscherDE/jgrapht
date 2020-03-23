@@ -5,8 +5,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 import util.CircularList;
+import visualizations.GeometryVisualizer;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class PolygonMerger {
     private final Coordinate[] outerCoordinates;
@@ -15,6 +18,8 @@ public class PolygonMerger {
     private int m;
     private int i;
     private Coordinate[] mergedCoordinates;
+    private boolean chosenAndInnerRingInversed;
+    private int innerIterationStartIndex;
 
     public PolygonMerger(final Coordinate[] outerCoordinates, final CircularList<Coordinate> innerCoordinates) {
         if (!outerCoordinates[0].equals(outerCoordinates[outerCoordinates.length - 1])) {
@@ -38,13 +43,22 @@ public class PolygonMerger {
     }
 
     public Coordinate[] mergePolygons(final LineSegment outerChosen, final LineSegment innerChosen) {
+        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
+        col.addLineSegmentsFromCoordinates(Color.RED, Arrays.asList(outerCoordinates));
+        col.addLineSegmentsFromCoordinates(Color.BLUE, innerCoordinates);
+        col.addLineSegments(Color.GREEN, Arrays.asList(new LineSegment(outerChosen.p0, innerChosen.p0), new LineSegment(outerChosen.p1, innerChosen.p1)));
+        final GeometryVisualizer vis = new GeometryVisualizer(col);
+//        vis.visualizeGraph(100_000);
+
+
         mergedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.size()];
+        calcAndSetInnerStartIndex(innerChosen);
 
         m = 0;
         for (i = 0; i < outerCoordinates.length - 1; i++) {
             mergedCoordinates[m++] = outerCoordinates[i];
             if (areNextTwoCoordsChosenByLineSegment(outerChosen)) {
-                processInnerPolygon(innerChosen);
+                processInnerPolygon(outerChosen, innerChosen);
             }
         }
         mergedCoordinates[m] = outerCoordinates[outerCoordinates.length - 1];
@@ -52,9 +66,9 @@ public class PolygonMerger {
         return mergedCoordinates;
     }
 
-    private void processInnerPolygon(final LineSegment innerChosen) {
+    private void processInnerPolygon(final LineSegment outerChosen, final LineSegment innerChosen) {
         addAllInnerCoordinates(innerChosen);
-        reverseInnerInMergedPolygonIfNecessary();
+        reverseInnerInMergedPolygonIfNecessary(outerChosen, innerChosen);
     }
 
     private boolean areNextTwoCoordsChosenByLineSegment(final LineSegment outerChosen) {
@@ -62,38 +76,45 @@ public class PolygonMerger {
     }
 
     private void addAllInnerCoordinates(final LineSegment innerChosen) {
-        final int innerStartIndex = getInnerStartIndex(innerChosen);
-        final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerStartIndex);
+        final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerIterationStartIndex);
         while (innerCircularIterator.hasNext()) {
             final Coordinate next = innerCircularIterator.next();
             mergedCoordinates[m++] = next;
         }
     }
 
-    private int getInnerStartIndex(final LineSegment innerChosen) {
+    private void calcAndSetInnerStartIndex(final LineSegment innerChosen) {
         final int indexOfInnerChosen = innerCoordinates.indexOf(innerChosen.p0);
-        final boolean nextEqualToInnerChosenP1 = nextInnerEqualToChosenP1(innerChosen, indexOfInnerChosen);
-        final int startIndexNotOutOfBounds = getStartIndexOnInnerSafely(indexOfInnerChosen, nextEqualToInnerChosenP1);
-        return startIndexNotOutOfBounds;
+        nextInnerEqualToChosenP1(innerChosen, indexOfInnerChosen);
+        innerIterationStartIndex = getStartIndexOnInnerSafely(indexOfInnerChosen);
     }
 
-    private boolean nextInnerEqualToChosenP1(final LineSegment innerChosen, final int indexOfInnerChosen) {
+    private void nextInnerEqualToChosenP1(final LineSegment innerChosen, final int indexOfInnerChosen) {
         final int indexOfNextToChosen = (indexOfInnerChosen + 1) % innerCoordinates.size();
         final Coordinate nextCoordinateToInnerP0 = innerCoordinates.get(indexOfNextToChosen);
-        return nextCoordinateToInnerP0.equals(innerChosen.p1);
+        chosenAndInnerRingInversed = nextCoordinateToInnerP0.equals(innerChosen.p1);
     }
 
-    private int getStartIndexOnInnerSafely(final int indexOfInnerChosen, final boolean nextEqualToInnerChosenP1) {
-        final int startIndex = nextEqualToInnerChosenP1 ? indexOfInnerChosen + 1 : indexOfInnerChosen;
+    private int getStartIndexOnInnerSafely(final int indexOfInnerChosen) {
+        final int startIndex = chosenAndInnerRingInversed ? indexOfInnerChosen + 1 : indexOfInnerChosen;
         return startIndex % innerCoordinates.size();
     }
 
-    private void reverseInnerInMergedPolygonIfNecessary() {
-        final Coordinate lastCordFromOuterPolygon = outerCoordinates[i];
-        final double distanceStart = lastCordFromOuterPolygon.distance(mergedCoordinates[i + 1]);
-        final double distanceEnd = lastCordFromOuterPolygon.distance(mergedCoordinates[m - 1]);
-        if (distanceStart > distanceEnd) {
+    private void reverseInnerInMergedPolygonIfNecessary(final LineSegment outerChosen, final LineSegment innerChosen) {
+        final boolean isIntersecting = isIntersectionProduced(outerChosen, innerChosen);
+        if (! (!isIntersecting ^ chosenAndInnerRingInversed)) {
             ArrayUtils.reverse(mergedCoordinates, i + 1, m);
         }
+    }
+
+    private boolean isIntersectionProduced(final LineSegment outerChosen, final LineSegment innerChosen) {
+        final LineSegment p0ToP0 = new LineSegment(outerChosen.p0, innerChosen.p0);
+        final LineSegment p1ToP1 = new LineSegment(outerChosen.p1, innerChosen.p1);
+        return isIntersecting(p0ToP0, p1ToP1);
+    }
+
+    private boolean isIntersecting(final LineSegment p0ToP0, final LineSegment p1ToP1) {
+        final Coordinate intersection = p0ToP0.intersection(p1ToP1);
+        return intersection != null;
     }
 }
