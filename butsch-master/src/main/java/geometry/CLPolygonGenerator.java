@@ -93,24 +93,6 @@ public class CLPolygonGenerator extends PolygonGenerator {
         return null;
     }
 
-    private List<LineSegment> mergePolygons(final List<LineSegment> outerPolygon, final List<LineSegment> innerPolygon,
-                                            final LineSegment outerChosen, final LineSegment innerChosen) {
-//         final int indexOuter = outerPolygon.indexOf(outerChosen);
-//         final int indexInner = innerPolygon.indexOf(innerChosen);
-//
-//         outerPolygon.remove(indexOuter);
-//         innerPolygon.remove(indexInner);
-
-        final List<LineSegment> mergedPolygon = new ArrayList<>(outerPolygon.size() + innerPolygon.size());
-        mergedPolygon.addAll(outerPolygon);
-        mergedPolygon.addAll(innerPolygon);
-
-        final int indexOuterChosen = mergedPolygon.indexOf(outerChosen);
-        final int indexInnerChosen = mergedPolygon.indexOf(innerChosen);
-
-        return null;
-    }
-
     private LineSegment getRandomHullLine(final Geometry convexLayer) {
         final Coordinate[] coordinates = convexLayer.getCoordinates();
 

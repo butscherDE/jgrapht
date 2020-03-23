@@ -74,9 +74,20 @@ public class PolygonMerger {
 
     private int getInnerStartIndex(final LineSegment innerChosen) {
         final int indexOfInnerChosen = innerCoordinates.indexOf(innerChosen.p0);
-        final Coordinate nextCoordinateToInnerP0 = innerCoordinates.get(indexOfInnerChosen + 1);
-        final boolean nextEqualToInnerChosenP1 = nextCoordinateToInnerP0.equals(innerChosen.p1);
-        return nextEqualToInnerChosenP1 ? indexOfInnerChosen + 1 : indexOfInnerChosen;
+        final boolean nextEqualToInnerChosenP1 = nextInnerEqualToChosenP1(innerChosen, indexOfInnerChosen);
+        final int startIndexNotOutOfBounds = getStartIndexOnInnerSafely(indexOfInnerChosen, nextEqualToInnerChosenP1);
+        return startIndexNotOutOfBounds;
+    }
+
+    private boolean nextInnerEqualToChosenP1(final LineSegment innerChosen, final int indexOfInnerChosen) {
+        final int indexOfNextToChosen = (indexOfInnerChosen + 1) % innerCoordinates.size();
+        final Coordinate nextCoordinateToInnerP0 = innerCoordinates.get(indexOfNextToChosen);
+        return nextCoordinateToInnerP0.equals(innerChosen.p1);
+    }
+
+    private int getStartIndexOnInnerSafely(final int indexOfInnerChosen, final boolean nextEqualToInnerChosenP1) {
+        final int startIndex = nextEqualToInnerChosenP1 ? indexOfInnerChosen + 1 : indexOfInnerChosen;
+        return startIndex % innerCoordinates.size();
     }
 
     private void reverseInnerInMergedPolygonIfNecessary() {

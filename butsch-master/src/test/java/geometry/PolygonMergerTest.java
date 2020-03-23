@@ -178,6 +178,105 @@ public class PolygonMergerTest {
                                                                                     new Coordinate(1,-1),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+    @Test
+    public void firstAndFirstLinesInnerChosenReversed() {
+        final PolygonMerger polygonMerger = getPolygonMerger();
+
+        final LineSegment outerChosen = new LineSegment(-2, -2, -2, 2);
+        final LineSegment innerChosen = new LineSegment(-1, 1, -1, -1);
+
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2, -2),
+                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(1,-1),
+                                                                                    new Coordinate(1,1),
+                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(-2, 2),
+                                                                                    new Coordinate(2, 2),
+                                                                                    new Coordinate(2, -2),
+                                                                                    new Coordinate(-2, -2)));
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+
+    @Test
+    public void firstAndThirdLinesInnerChosenReversed() {
+        final PolygonMerger polygonMerger = getPolygonMerger();
+
+        final LineSegment outerChosen = new LineSegment(-2, -2, -2, 2);
+        final LineSegment innerChosen = new LineSegment(-1, 1, -1, -1);
+
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
+                                                                                    new Coordinate(1,-1),
+                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(1,1),
+                                                                                    new Coordinate(-2, 2),
+                                                                                    new Coordinate(2, 2),
+                                                                                    new Coordinate(2, -2),
+                                                                                    new Coordinate(-2, -2)));
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+
+    @Test
+    public void thirdAndFirstLinesInnerChosenReversed() {
+        final PolygonMerger polygonMerger = getPolygonMerger();
+
+        final LineSegment outerChosen = new LineSegment(2, 2, 2, -2);
+        final LineSegment innerChosen = new LineSegment(-1, 1, -1, -1);
+
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
+                                                                                    new Coordinate(-2, 2),
+                                                                                    new Coordinate(2, 2),
+                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(1,1),
+                                                                                    new Coordinate(1,-1),
+                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(2, -2),
+                                                                                    new Coordinate(-2, -2)));
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+
+    @Test
+    public void thirdAndThirdLinesInnerChosenReversed() {
+        final PolygonMerger polygonMerger = getPolygonMerger();
+
+        final LineSegment outerChosen = new LineSegment(2, 2, 2, -2);
+        final LineSegment innerChosen = new LineSegment(-1, 1, -1, -1);
+
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
+                                                                                    new Coordinate(-2, 2),
+                                                                                    new Coordinate(2, 2),
+                                                                                    new Coordinate(1,1),
+                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(1,-1),
+                                                                                    new Coordinate(2, -2),
+                                                                                    new Coordinate(-2, -2)));
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+
+    @Test
+    public void firstAndFirstLinesInnerReversedInnerChosenReversed() {
+        final PolygonMerger polygonMerger = getPolygonMergerInnerReversed();
+
+        final LineSegment outerChosen = new LineSegment(-2, -2, -2, 2);
+        final LineSegment innerChosen = new LineSegment(-1, 1, -1, -1);
+
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2, -2),
+                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(1,-1),
+                                                                                    new Coordinate(1,1),
+                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(-2, 2),
+                                                                                    new Coordinate(2, 2),
+                                                                                    new Coordinate(2, -2),
+                                                                                    new Coordinate(-2, -2)));
 
         System.out.println(expectedCoordinates);
         System.out.println(Arrays.toString(merged));
@@ -185,8 +284,68 @@ public class PolygonMergerTest {
         final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
         col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(merged));
         final GeometryVisualizer visualizer = new GeometryVisualizer(col);
-//        visualizer.visualizeGraph(100000);
+        //        visualizer.visualizeGraph(100_000);
 
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+
+    @Test
+    public void firstAndThirdLinesInnerReversedInnerChosenReversed() {
+        final PolygonMerger polygonMerger = getPolygonMergerInnerReversed();
+
+        final LineSegment outerChosen = new LineSegment(-2, -2, -2, 2);
+        final LineSegment innerChosen = new LineSegment(-1, 1, -1, -1);
+
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
+                                                                                    new Coordinate(1,-1),
+                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(1,1),
+                                                                                    new Coordinate(-2, 2),
+                                                                                    new Coordinate(2, 2),
+                                                                                    new Coordinate(2, -2),
+                                                                                    new Coordinate(-2, -2)));
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+
+    @Test
+    public void thirdAndFirstLinesInnerReversedInnerChosenReversed() {
+        final PolygonMerger polygonMerger = getPolygonMergerInnerReversed();
+
+        final LineSegment outerChosen = new LineSegment(2, 2, 2, -2);
+        final LineSegment innerChosen = new LineSegment(-1, 1, -1, -1);
+
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
+                                                                                    new Coordinate(-2, 2),
+                                                                                    new Coordinate(2, 2),
+                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(1,1),
+                                                                                    new Coordinate(1,-1),
+                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(2, -2),
+                                                                                    new Coordinate(-2, -2)));
+        assertArrayEquals(expectedCoordinates.toArray(), merged);
+    }
+
+    @Test
+    public void thirdAndThirdLinesInnerReversedInnerChosenReversed() {
+        final PolygonMerger polygonMerger = getPolygonMergerInnerReversed();
+
+        final LineSegment outerChosen = new LineSegment(2, 2, 2, -2);
+        final LineSegment innerChosen = new LineSegment(-1, 1, -1, -1);
+
+        final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(new Coordinate(-2,-2),
+                                                                                    new Coordinate(-2, 2),
+                                                                                    new Coordinate(2, 2),
+                                                                                    new Coordinate(1,1),
+                                                                                    new Coordinate(-1,1),
+                                                                                    new Coordinate(-1,-1),
+                                                                                    new Coordinate(1,-1),
+                                                                                    new Coordinate(2, -2),
+                                                                                    new Coordinate(-2, -2)));
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
