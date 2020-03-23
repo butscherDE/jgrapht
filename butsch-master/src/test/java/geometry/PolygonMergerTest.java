@@ -110,6 +110,14 @@ public class PolygonMergerTest {
                                                                                     new Coordinate(2, 2),
                                                                                     new Coordinate(2, -2),
                                                                                     new Coordinate(-2, -2)));
+
+        System.out.println(expectedCoordinates);
+        System.out.println(Arrays.toString(merged));
+
+        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
+        col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(merged));
+        final GeometryVisualizer visualizer = new GeometryVisualizer(col);
+//        visualizer.visualizeGraph(100_000);
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
@@ -177,7 +185,7 @@ public class PolygonMergerTest {
         final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
         col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(merged));
         final GeometryVisualizer visualizer = new GeometryVisualizer(col);
-        visualizer.visualizeGraph(100_000);
+//        visualizer.visualizeGraph(100000);
 
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
