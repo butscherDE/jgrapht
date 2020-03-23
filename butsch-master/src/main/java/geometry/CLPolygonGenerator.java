@@ -3,7 +3,9 @@ package geometry;
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Polygon;
+import visualizations.GeometryVisualizer;
 
+import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -44,53 +46,29 @@ public class CLPolygonGenerator extends PolygonGenerator {
             outerSegmentsIndicesOnHull[i] = ArrayUtils.indexOf(cl.layers[i + 1].getCoordinates(), innerSegments[i]);
         }
 
-        final List<LineSegment> randomPolygon = new ArrayList<>(/* TODO we can get this size beforehand */);
-        final List<List<LineSegment>> layersLS = cl.getLayersAsLineSegments();
-        for (int i = 0; i < cl.layers.length - 1; i++) {
-            final List<LineSegment> outerLayer = layersLS.get(i);
-            final List<LineSegment> innerLayer = layersLS.get(i + 1);
-
-            for (int j = 0; j < outerLayer.size(); j++) {
-                if (j < outerSegmentsIndicesOnHull[i]) {
-                    //                    randomPolygon.add()
-                } else if (j == outerSegmentsIndicesOnHull[i]) {
-
-                } else {
-
-                }
-            }
+        Coordinate[] mergedPolygon = cl.layers[0].getCoordinates();
+        for (int i = 1; i < cl.layers.length; i++) {
+            final PolygonMerger merger = new PolygonMerger(mergedPolygon, cl.layers[i].getCoordinates());
+            mergedPolygon = merger.mergePolygons(outerSegments[i - 1], innerSegments[i - 1]);
         }
 
-        return null;
-    }
-
-    private List<LineSegment> getPolygonLines(final List<List<LineSegment>> layerLS, final int layerIndex,
-                                              final int iterationStart) {
-        final List<LineSegment> polygon = new LinkedList<>();
-        final ListIterator<LineSegment> outerIterator = layerLS.get(layerIndex).listIterator(iterationStart);
-
-        while (outerIterator.hasNext()) {
-            final LineSegment outerLine = outerIterator.next();
-
-            if (outerLine.equals(outerSegments[layerIndex])) {
-                final double distanceOutP0ToInP1 = outerLine.p0.distance(innerSegments[layerIndex].p1);
-                final double distanceOutP0ToInP0 = outerLine.p0.distance(innerSegments[layerIndex].p0);
-                if (distanceOutP0ToInP1 < distanceOutP0ToInP0) {
-                    polygon.add(new LineSegment(outerLine.p0, innerSegments[layerIndex].p1));
-                    final List<LineSegment> nextInnerLayer = layerLS.get(layerIndex + 1);
-                    final int startIndexInNextInnerLayer = nextInnerLayer.indexOf(innerSegments[layerIndex]) + 1;
-                    final List<LineSegment> nextInnerSegments = getPolygonLines(layerLS, layerIndex + 1, startIndexInNextInnerLayer);
-                    polygon.addAll(nextInnerSegments);
-                    polygon.add(new LineSegment(innerSegments[layerIndex].p0, outerLine.p1));
-                } else {
-
-                }
-            } else {
-                polygon.add(outerLine);
-            }
+        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
+        final Color[] colors = new Color[] {
+                Color.BLUE,
+                Color.RED,
+//                Color.BLUE,
+//                Color.ORANGE,
+//                Color.CYAN
+        };
+        for (int i = 0; i < cl.layers.length; i++) {
+            col.addLineSegmentsFromCoordinates(colors[i], Arrays.asList(cl.layers[i].getCoordinates()));
         }
+        col.addLineSegment(Color.CYAN, outerSegments[0]);
+        col.addLineSegment(Color.ORANGE, innerSegments[0]);
+        final GeometryVisualizer vis = new GeometryVisualizer(col);
+        vis.visualizeGraph();
 
-        return null;
+        return new GeometryFactory().createPolygon(mergedPolygon);
     }
 
     private LineSegment getRandomHullLine(final Geometry convexLayer) {
