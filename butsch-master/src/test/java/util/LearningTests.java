@@ -41,4 +41,30 @@ public class LearningTests {
         assertEquals(5, iterator.next());
         assertFalse(iterator.hasNext());
     }
+
+    @Test
+    public void bunt() {
+        final GeometryVisualizer.GeometryDrawCollection collection = new GeometryVisualizer.GeometryDrawCollection();
+        final Random random = new Random(42);
+        final Color[] colors = new Color[]{Color.BLACK, Color.RED, Color.ORANGE, Color.BLUE, Color.CYAN, Color.YELLOW, Color.GREEN};
+        final int numColors = colors.length;
+
+        for (int i = 0; i < 100; i++) {
+            if (random.nextBoolean()) {
+                // draw a random line
+                final LineSegment randomLineSegment = new LineSegment(random.nextDouble(),
+                                                                      random.nextDouble(),
+                                                                      random.nextDouble(),
+                                                                      random.nextDouble());
+                collection.addLineSegment(colors[random.nextInt(numColors)], randomLineSegment);
+            } else {
+                final Coordinate randomCoordinate = new Coordinate(random.nextDouble(),
+                                                                   random.nextDouble());
+                collection.addCoordinate(colors[random.nextInt(numColors)], randomCoordinate);
+            }
+        }
+
+        final GeometryVisualizer visualizer = new GeometryVisualizer(collection);
+        visualizer.visualizeGraph(100_000);
+    }
 }

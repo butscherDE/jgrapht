@@ -2,9 +2,11 @@ package geometry;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import visualizations.GeometryVisualizer;
 
+import javax.sound.sampled.Line;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -21,7 +23,8 @@ public class CLPolygonGenerator extends PolygonGenerator {
      * Creates random coordinates from the same convex layers.
      */ public Polygon createRandomSimplePolygon() {
         final Coordinate[] randomCoordinates = createRandomCoordinates();
-        final MultiPoint asPoints = new GeometryFactory().createMultiPointFromCoords(randomCoordinates);
+        final GeometryFactory geometryFactory = new GeometryFactory();
+        final MultiPoint asPoints = geometryFactory.createMultiPointFromCoords(randomCoordinates);
         final ConvexLayers cl = new ConvexLayers(asPoints);
 
         Coordinate[] mergedPolygon = cl.layers[0].getCoordinates();
@@ -29,17 +32,44 @@ public class CLPolygonGenerator extends PolygonGenerator {
         for (int layerIndex = 0; layerIndex < cl.layers.length - 1; layerIndex++) {
             System.out.println(layerIndex);
             final LineSegment outerSegment = getRandomHullLine(cl.layers[layerIndex], lastInner);
-            final LineSegment innerSegment = getRandomEndVisibleLineSegment(outerSegment, cl.getLayerAsLineSegments(layerIndex + 1));
 
-            final PolygonMerger polygonMerger = new PolygonMerger(mergedPolygon, cl.layers[layerIndex + 1].getCoordinates());
+                final GeometryVisualizer.GeometryDrawCollection collection = new GeometryVisualizer.GeometryDrawCollection();
+                collection.addLineSegmentsFromCoordinates(Color.BLUE, Arrays.asList(mergedPolygon));
+                collection.addLineSegment(Color.RED, outerSegment);
+                collection.addLineSegments(Color.BLACK, cl.getLayerAsLineSegments(layerIndex + 1));
+                final GeometryVisualizer visualizer = new GeometryVisualizer(collection);
+                visualizer.visualizeGraph();
+            System.out.println("############# outer #############");
+            for (final Coordinate coordinate : mergedPolygon) {
+                System.out.println(coordinate);
+            }
+            System.out.println("############# inner #############");
+            for (final Coordinate coordinate : cl.layers[layerIndex + 1].getCoordinates()) {
+                System.out.println(coordinate);
+            }
+
+            final LineSegment innerSegment;
+            if (cl.layers[layerIndex + 1] instanceof Point) {
+                final Point point = (Point) cl.layers[layerIndex + 1];
+                innerSegment = new LineSegment(point.getX(), point.getY(), point.getX(), point.getY());
+            } else {
+                innerSegment = getRandomEndVisibleLineSegment(outerSegment, cl.getLayerAsLineSegments(layerIndex + 1));
+            }
+            System.out.println(outerSegment);
+            System.out.println(innerSegment);
+
+            lastInner = innerSegment;
+
+            final PolygonMerger polygonMerger = new PolygonMerger(mergedPolygon,
+                                                                  cl.layers[layerIndex + 1].getCoordinates());
             mergedPolygon = polygonMerger.mergePolygons(outerSegment, innerSegment);
         }
 
-        return new GeometryFactory().createPolygon(mergedPolygon);
+        return geometryFactory.createPolygon(mergedPolygon);
     }
 
     private LineSegment getRandomHullLine(final Geometry convexLayer, final LineSegment last) {
-         final Coordinate[] coordinates = convexLayer.getCoordinates();
+        final Coordinate[] coordinates = convexLayer.getCoordinates();
 
         Coordinate startCoordinate;
         Coordinate endCoordinate;
@@ -77,17 +107,36 @@ public class CLPolygonGenerator extends PolygonGenerator {
     private boolean isEndVisible(final LineSegment outerLineSegment, final LineSegment innerLineSegment,
                                  final List<LineSegment> innerLayerAsLineSegments) {
         final LineSegment[] endVisibilityCheckLines = getEndVisibilityCheckLines(outerLineSegment, innerLineSegment);
+        final boolean[] isNotIntersected = new boolean[4];
 
-        boolean endVisibleToOuterLine = true;
-        for (final LineSegment possibleSightBlockingLine : innerLayerAsLineSegments) {
-            for (final LineSegment endVisibilityCheckLine : endVisibilityCheckLines) {
+        for (int i = 0; i < isNotIntersected.length; i++) {
+            final LineSegment endVisibilityCheckLine = endVisibilityCheckLines[i];
+            isNotIntersected[i] = true;
+            for (final LineSegment possibleSightBlockingLine : innerLayerAsLineSegments) {
                 final boolean isIntersecting = isIntersectionProduced(possibleSightBlockingLine, endVisibilityCheckLine,
                                                                       innerLineSegment);
-                endVisibleToOuterLine &= !isIntersecting;
+                isNotIntersected[i] &= !isIntersecting;
             }
         }
 
-        return endVisibleToOuterLine;
+        if (isNotIntersected[0] && isNotIntersected[3]) {
+            return true;
+        } else if (isNotIntersected[1] && isNotIntersected[2]) {
+            return true;
+        } else {
+            return false;
+        }
+
+        //        boolean endVisibleToOuterLine = true;
+        //        for (final LineSegment possibleSightBlockingLine : innerLayerAsLineSegments) {
+        //            for (final LineSegment endVisibilityCheckLine : endVisibilityCheckLines) {
+        //                final boolean isIntersecting = isIntersectionProduced(possibleSightBlockingLine, endVisibilityCheckLine,
+        //                                                                      innerLineSegment);
+        //                endVisibleToOuterLine &= !isIntersecting;
+        //            }
+        //        }
+
+//        return endVisibleToOuterLine;
     }
 
     private boolean isIntersectionProduced(final LineSegment possiblySightBlockingLine, final LineSegment checkLine,

@@ -10,6 +10,9 @@ public abstract class PolygonGenerator {
     final Random random = new Random(42);
 
     public PolygonGenerator(final int numPoints) {
+        if (numPoints < 3) {
+            throw new IllegalArgumentException("Cannot create polygons with less than 3 points.");
+        }
         this.numPoints = numPoints;
     }
 

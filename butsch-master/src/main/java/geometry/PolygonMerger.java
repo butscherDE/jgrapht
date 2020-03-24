@@ -5,8 +5,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 import util.CircularList;
+import visualizations.GeometryVisualizer;
 
+import java.awt.*;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -17,8 +20,9 @@ public class PolygonMerger {
     private int m;
     private int i;
     private Coordinate[] mergedCoordinates;
-    private boolean chosenAndInnerRingInversed;
     private int innerIterationStartIndex;
+    private boolean chosenToInnerRingNotInversed;
+    private boolean chosenToOuterRingInversed;
 
     public PolygonMerger(final Coordinate[] outerCoordinates, final CircularList<Coordinate> innerCoordinates) {
         if (!outerCoordinates[0].equals(outerCoordinates[outerCoordinates.length - 1])) {
@@ -73,6 +77,8 @@ public class PolygonMerger {
 
             handleNotFoundCase(foundReverse);
         }
+
+        chosenToOuterRingInversed = !foundForward;
     }
 
     private boolean searchForward(final LineSegment outerChosen) {
@@ -135,19 +141,103 @@ public class PolygonMerger {
     private void nextInnerEqualToChosenP1(final LineSegment innerChosen, final int indexOfInnerChosen) {
         final int indexOfNextToChosen = (indexOfInnerChosen + 1) % innerCoordinates.size();
         final Coordinate nextCoordinateToInnerP0 = innerCoordinates.get(indexOfNextToChosen);
-        chosenAndInnerRingInversed = nextCoordinateToInnerP0.equals(innerChosen.p1);
+        chosenToInnerRingNotInversed = nextCoordinateToInnerP0.equals(innerChosen.p1);
     }
 
     private int getStartIndexOnInnerSafely(final int indexOfInnerChosen) {
-        final int startIndex = chosenAndInnerRingInversed ? indexOfInnerChosen + 1 : indexOfInnerChosen;
+        final int startIndex = chosenToInnerRingNotInversed ? indexOfInnerChosen + 1 : indexOfInnerChosen;
         return startIndex % innerCoordinates.size();
     }
 
     private void reverseInnerInMergedPolygonIfNecessary(final LineSegment outerChosen, final LineSegment innerChosen) {
+//        test(0);
+
         final boolean isIntersecting = isIntersectionProduced(outerChosen, innerChosen);
-        if (! (!isIntersecting ^ chosenAndInnerRingInversed)) {
-            ArrayUtils.reverse(mergedCoordinates, i + 1, m);
+        final boolean b = !(!isIntersecting ^ chosenToInnerRingNotInversed);
+        final boolean x = outerChosen.p0.distance(innerChosen.p0) > outerChosen.p0.distance(innerChosen.p1);
+        System.out.println(chosenToOuterRingInversed);
+        System.out.println(chosenToInnerRingNotInversed);
+        System.out.println(isIntersecting);
+        System.out.println(x);
+//        System.out.println(b);
+        checker.add(new Boolean[] {chosenToOuterRingInversed, chosenToInnerRingNotInversed,
+                                   isIntersecting,
+                                   x});
+        if (truthtable(chosenToOuterRingInversed, chosenToInnerRingNotInversed, isIntersecting, x)) {
+            System.out.println("inversing");
+            ArrayUtils.reverse(this.mergedCoordinates, this.i + 1, m);
         }
+
+//        test(100_000);
+    }
+
+    static List<Boolean[]> checker = new LinkedList<>();
+
+    private boolean truthtable(final boolean outerInversed, final boolean innerInversed, final boolean isIntersecting, final boolean distanceP0P0Larger) {
+        if (!outerInversed && !innerInversed && !isIntersecting && !distanceP0P0Larger) {
+            return false;
+        }
+        if (!outerInversed && !innerInversed && !isIntersecting && distanceP0P0Larger) {
+            throw new IllegalStateException("Not covered yet: " + outerInversed + ", " + innerInversed + ", " + isIntersecting + ", " + distanceP0P0Larger);
+        }
+        if (!outerInversed && !innerInversed && isIntersecting && !distanceP0P0Larger) {
+            throw new IllegalStateException("Not covered yet: " + outerInversed + ", " + innerInversed + ", " + isIntersecting + ", " + distanceP0P0Larger);
+        }
+        if (!outerInversed && !innerInversed && isIntersecting && distanceP0P0Larger) {
+            return true;
+        }
+        if (!outerInversed && innerInversed && !isIntersecting && !distanceP0P0Larger) {
+            return true;
+        }
+        if (!outerInversed && innerInversed && !isIntersecting && distanceP0P0Larger) {
+            return true;
+        }
+        if (!outerInversed && innerInversed && isIntersecting && !distanceP0P0Larger) {
+            throw new IllegalStateException("Not covered yet: " + outerInversed + ", " + innerInversed + ", " + isIntersecting + ", " + distanceP0P0Larger);
+        }
+        if (!outerInversed && innerInversed && isIntersecting && distanceP0P0Larger) {
+            return false;
+        }
+        if (outerInversed && !innerInversed && !isIntersecting && !distanceP0P0Larger) {
+            return false;
+        }
+        if (outerInversed && !innerInversed && !isIntersecting && distanceP0P0Larger) {
+            throw new IllegalStateException("Not covered yet: " + outerInversed + ", " + innerInversed + ", " + isIntersecting + ", " + distanceP0P0Larger);
+        }
+        if (outerInversed && !innerInversed && isIntersecting && !distanceP0P0Larger) {
+            throw new IllegalStateException("Not covered yet: " + outerInversed + ", " + innerInversed + ", " + isIntersecting + ", " + distanceP0P0Larger);
+        }
+        if (outerInversed && !innerInversed && isIntersecting && distanceP0P0Larger) {
+            return true;
+        }
+        if (outerInversed && innerInversed && !isIntersecting && !distanceP0P0Larger) {
+            return true;
+        }
+        if (outerInversed && innerInversed && !isIntersecting && distanceP0P0Larger) {
+            return false;
+//            return true;
+        }
+        if (outerInversed && innerInversed && isIntersecting && !distanceP0P0Larger) {
+            throw new IllegalStateException("Not covered yet: " + outerInversed + ", " + innerInversed + ", " + isIntersecting + ", " + distanceP0P0Larger);
+        }
+        if (outerInversed && innerInversed && isIntersecting && distanceP0P0Larger) {
+            return false;
+        }
+
+        throw new IllegalStateException("cannot happen");
+    }
+
+    private void test(final int millis) {
+        final Coordinate[] coordinatesFromOuter = ArrayUtils.subarray(mergedCoordinates, 0, i + 1);
+        final Coordinate[] coordinatesFromInner = ArrayUtils.subarray(mergedCoordinates, i, m);
+        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
+//        final Coordinate[] mergedCoordinates = this.mergedCoordinates;
+//        final int i = ArrayUtils.indexOf(mergedCoordinates, null);
+//        final Coordinate[] coordsToDraw = ArrayUtils.subarray(mergedCoordinates, 0, i);
+        col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(coordinatesFromOuter));
+        col.addLineSegmentsFromCoordinates(Color.RED, Arrays.asList(coordinatesFromInner));
+        final GeometryVisualizer visualizer = new GeometryVisualizer(col);
+        visualizer.visualizeGraph(millis);
     }
 
     private boolean isIntersectionProduced(final LineSegment outerChosen, final LineSegment innerChosen) {
