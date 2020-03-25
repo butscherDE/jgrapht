@@ -8,7 +8,8 @@ import org.locationtech.jts.geom.LineSegment;
 import visualizations.GeometryVisualizer;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

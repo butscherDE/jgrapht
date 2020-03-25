@@ -9,8 +9,8 @@ import evalutation.measurements.utils.Result;
 import routing.DijkstraCHFactory;
 import routing.RPHASTFactory;
 import routing.RoutingAlgorithmFactory;
-import storage.ImportERPGraph;
 import storage.GraphImporter;
+import storage.ImportERPGraph;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

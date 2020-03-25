@@ -1,9 +1,9 @@
 package storage;
 
 
+import data.Node;
 import data.NodeRelation;
 import data.RoadGraph;
-import data.Node;
 import evalutation.Config;
 import org.junit.jupiter.api.Test;
 

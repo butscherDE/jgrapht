@@ -1,13 +1,15 @@
 package geometry;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.*;
 import visualizations.GeometryVisualizer;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class CLPolygonGenerator extends PolygonGenerator {
     private final Random random = new Random(42);

@@ -140,6 +140,8 @@
 					<version>3.8.1</version>
 					<configuration>
 						<release>11</release>
+						<source>11</source>
+						<target>11</target>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -291,8 +293,6 @@
 		<module>jgrapht-demo</module>
 		<module>jgrapht-bundle</module>
 		<module>jgrapht-dist</module>
-        <module>ButschMaster</module>
-		<module>ButschMaster</module>
 	</modules>
 
 	<profiles>
