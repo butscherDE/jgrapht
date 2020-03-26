@@ -68,7 +68,101 @@ public class CircularListTest {
     public void testCircularIteratorOutOfBounds() {
         final List<Integer> list = getIntegers();
 
-        assertThrows(IndexOutOfBoundsException.class, () -> {list.listIterator(5);});
+        assertThrows(IndexOutOfBoundsException.class, () -> {list.listIterator(6);});
+    }
+
+    @Test
+    public void testCircularIteratorReverseFromStart() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> listIt = list.listIterator(0);
+        assertTrue(listIt.hasPrevious());
+        assertEquals(5, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(4, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(3, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(2, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(1, listIt.previous());
+        assertFalse(listIt.hasPrevious());
+    }
+
+    @Test
+    public void testCircularIteratorReverseFromMiddle() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> listIt = list.listIterator(2);
+        assertTrue(listIt.hasPrevious());
+        assertEquals(2, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(1, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(5, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(4, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(3, listIt.previous());
+        assertFalse(listIt.hasPrevious());
+    }
+
+    @Test
+    public void testCircularIteratorReverseFromEnd() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> listIt = list.listIterator(5);
+        assertTrue(listIt.hasPrevious());
+        assertEquals(5, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(4, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(3, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(2, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(1, listIt.previous());
+        assertFalse(listIt.hasPrevious());
+    }
+
+    @Test
+    public void testCircularIteratorForwardAndBackward() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> listIt = list.listIterator(0);
+        assertTrue(listIt.hasNext());
+        assertEquals(1, listIt.next());
+        assertTrue(listIt.hasNext());
+        assertEquals(2, listIt.next());
+        assertTrue(listIt.hasNext());
+        assertEquals(3, listIt.next());
+        assertTrue(listIt.hasNext());
+        assertEquals(4, listIt.next());
+        assertTrue(listIt.hasNext());
+        assertEquals(5, listIt.next());
+        assertFalse(listIt.hasNext());
+
+        assertEquals(5, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(4, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(3, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(2, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(1, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+
+        assertEquals(5, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(4, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(3, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(2, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(1, listIt.previous());
+        assertFalse(listIt.hasPrevious());
     }
 
     private List<Integer> getIntegers() {

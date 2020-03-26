@@ -117,7 +117,7 @@ public class CircularList<T extends Object> implements List<T> {
     @Override
     public ListIterator<T> listIterator(final int index) {
         if (index >= list.size()) {
-            throw new IndexOutOfBoundsException();
+            list.listIterator(index);
         }
 
         return new ListIterator<T>() {
@@ -136,7 +136,7 @@ public class CircularList<T extends Object> implements List<T> {
                 if (iterator.hasNext()) {
                     popedElems++;
                     return iterator.next();
-                } else if (!iterator.hasNext() && !restarted) {
+                } else if (hasNext()) {
                     iterator = list.listIterator(0);
                     popedElems++;
                     return iterator.next();
@@ -147,37 +147,46 @@ public class CircularList<T extends Object> implements List<T> {
 
             @Override
             public boolean hasPrevious() {
-                return false;
+                return popedElems > (maxElemsToPop * -1);
             }
 
             @Override
             public T previous() {
-                return null;
+                if (iterator.hasPrevious()) {
+                    popedElems--;
+                    return iterator.previous();
+                } else if (hasPrevious()) {
+                    iterator = list.listIterator(list.size());
+                    popedElems--;
+                    return iterator.previous();
+                } else {
+                    throw new NoSuchElementException("There are no more elements");
+                }
             }
 
             @Override
             public int nextIndex() {
-                return -1;
+                return iterator.nextIndex();
             }
 
             @Override
             public int previousIndex() {
-                return -1;
+                return iterator.previousIndex();
             }
 
             @Override
             public void remove() {
-                throw new UnsupportedOperationException("no removing");
+                iterator.remove();
             }
 
             @Override
             public void set(final T t) {
-                throw new UnsupportedOperationException("no setting");
+                iterator.set(t);
             }
 
             @Override
             public void add(final T t) {
-                throw new UnsupportedOperationException("no adding");
+                iterator.add(t);
             }
         };
     }

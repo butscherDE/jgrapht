@@ -176,11 +176,12 @@ public class PolygonMerger {
 
     public int getIndexDistance(final int index1, final int index2, final int sizeOfCollection) {
         final int difference = index1 - index2;
-
         final int maxIndexOfCollection = sizeOfCollection - 1;
         final int negativeMaxIndexOfCollection = maxIndexOfCollection * -1;
-        if (difference == negativeMaxIndexOfCollection) {
+        if (difference == maxIndexOfCollection) {
             return -1;
+        } else if (difference == negativeMaxIndexOfCollection) {
+            return 1;
         } else {
             return difference;
         }
