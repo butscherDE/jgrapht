@@ -21,8 +21,8 @@ import org.jgrapht.*;
 import org.jgrapht.alg.util.*;
 import org.jgrapht.graph.*;
 import org.jgrapht.graph.builder.*;
-import org.jheaps.*;
-import org.jheaps.tree.*;
+import org.jheaps.AddressableHeap;
+import org.jheaps.tree.PairingHeap;
 
 import java.util.*;
 import java.util.concurrent.*;

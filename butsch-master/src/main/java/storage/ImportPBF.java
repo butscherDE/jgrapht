@@ -46,7 +46,7 @@ public class ImportPBF implements GraphImporter {
     private void runParser() throws FileNotFoundException {
         final InputStream input = new FileInputStream(path);
 
-        new ParallelBinaryParser(input, 6)
+        new ParallelBinaryParser(input, Runtime.getRuntime().availableProcessors() -2)
                 .onHeader(new HeaderPrinter())
                 .onBoundBox(new DummyBBox())
                 .onComplete(new Completer())
