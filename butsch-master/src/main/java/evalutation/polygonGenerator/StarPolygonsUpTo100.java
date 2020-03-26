@@ -5,6 +5,7 @@ import evalutation.polygonGenerator.utils.PolygonGeneratorStarter;
 import geometry.StarPolygonGeneratorFactory;
 
 import java.io.IOException;
+import java.util.Random;
 
 public class StarPolygonsUpTo100 {
     private final static int NUM_POLYGONS = 10000;
@@ -13,7 +14,8 @@ public class StarPolygonsUpTo100 {
 
     public static void main(String[] args) {
         try {
-            final StarPolygonGeneratorFactory polygonGeneratorFactory = new StarPolygonGeneratorFactory();
+            final Random random = new Random(42);
+            final StarPolygonGeneratorFactory polygonGeneratorFactory = new StarPolygonGeneratorFactory(random);
             final PolygonGeneratorStarter polygonGeneratorStarter = new PolygonGeneratorStarter(polygonGeneratorFactory);
             polygonGeneratorStarter.dump(MAX_POINTS, NUM_POLYGONS, PATH);
         } catch (IOException e) {

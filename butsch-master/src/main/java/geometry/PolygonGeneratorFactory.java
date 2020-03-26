@@ -1,5 +1,5 @@
 package geometry;
 
 public interface PolygonGeneratorFactory {
-    public PolygonGenerator createPolygonGenerator(int numPoints);
+    PolygonGenerator createPolygonGenerator(int numPoints);
 }

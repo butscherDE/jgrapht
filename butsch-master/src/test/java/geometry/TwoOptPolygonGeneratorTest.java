@@ -19,14 +19,15 @@ public class TwoOptPolygonGeneratorTest extends PolygonGeneratorTest {
                                                                            new Coordinate(100,0),
                                                                            new Coordinate(0,0)};
 
-        final Polygon simplifiedPolygon = new TwoOptPolygonGenerator(10).createSimplePolygon(coordinatesInNonSimpleOrder);
+        final TwoOptPolygonGenerator twoOptPolygonGenerator = new TwoOptPolygonGenerator(10, random);
+        final Polygon simplifiedPolygon = twoOptPolygonGenerator.createSimplePolygon(coordinatesInNonSimpleOrder);
         assertFalse(isSelfIntersecting(simplifiedPolygon));
     }
 
 
     @Test
     public void generateRandomPolygonsAndTestIfTheyAreReallySimple() {
-        final TwoOptPolygonGenerator twoOptPolygonGenerator = new TwoOptPolygonGenerator(getNumPoints(100));
+        final TwoOptPolygonGenerator twoOptPolygonGenerator = new TwoOptPolygonGenerator(getNumPoints(100), random);
         for (int i = 0; i < 1000; i++) {
             final Polygon polygon = twoOptPolygonGenerator.createRandomSimplePolygon();
 

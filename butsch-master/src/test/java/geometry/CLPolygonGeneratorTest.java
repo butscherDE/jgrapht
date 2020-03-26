@@ -12,9 +12,8 @@ public class CLPolygonGeneratorTest extends PolygonGeneratorTest {
     public void createRandomPolygons() {
         final Random random = new Random(42);
 
-        for (int i = 0; i < 10; i++) {
-            System.out.println(i);
-            final int numPoints = 5000;// random.nextInt(4997) + 3; //105);
+        for (int i = 0; i < 1000; i++) {
+            final int numPoints = random.nextInt(497) + 3;
 
             final CLPolygonGenerator generator = new CLPolygonGenerator(numPoints, random);
             final Polygon randomPolygon = generator.createRandomSimplePolygon();

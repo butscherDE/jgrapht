@@ -5,6 +5,7 @@ import evalutation.polygonGenerator.utils.PolygonGeneratorStarter;
 import geometry.TwoOptPolygonGeneratorFactory;
 
 import java.io.IOException;
+import java.util.Random;
 
 public class TwoOptPolygonsUpTo100 {
     private final static int NUM_POLYGONS = 10000;
@@ -13,7 +14,8 @@ public class TwoOptPolygonsUpTo100 {
 
     public static void main(String[] args) {
         try {
-            final TwoOptPolygonGeneratorFactory polygonGeneratorFactory = new TwoOptPolygonGeneratorFactory();
+            final Random random = new Random(42);
+            final TwoOptPolygonGeneratorFactory polygonGeneratorFactory = new TwoOptPolygonGeneratorFactory(random);
             final PolygonGeneratorStarter polygonGeneratorStarter = new PolygonGeneratorStarter(polygonGeneratorFactory);
             polygonGeneratorStarter.dump(MAX_POINTS, NUM_POLYGONS, PATH);
         } catch (IOException e) {

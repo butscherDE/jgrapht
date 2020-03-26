@@ -9,13 +9,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CircularPolygonExporterTest {
     @Test
     public void test() {
-        final TwoOptPolygonGenerator twoOptPolygonGenerator = new TwoOptPolygonGenerator(10);
+        final Random random = new Random(42);
+        final TwoOptPolygonGenerator twoOptPolygonGenerator = new TwoOptPolygonGenerator(10, random);
         final Polygon[] polygons = new Polygon[10];
         for (int i = 0; i < polygons.length; i++) {
             polygons[i] = twoOptPolygonGenerator.createRandomSimplePolygon();

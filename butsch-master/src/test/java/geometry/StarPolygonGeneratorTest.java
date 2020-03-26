@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Polygon;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -24,7 +25,8 @@ public class StarPolygonGeneratorTest extends PolygonGeneratorTest {
 
     @Test
     public void generateRandomPolygonsAndTestIfTheyAreReallySimple() {
-        final TwoOptPolygonGenerator twoOptPolygonGenerator = new TwoOptPolygonGenerator(getNumPoints(100));
+        final Random random = new Random(42);
+        final TwoOptPolygonGenerator twoOptPolygonGenerator = new TwoOptPolygonGenerator(getNumPoints(100), random);
         for (int i = 0; i < 1000; i++) {
             final Polygon polygon = twoOptPolygonGenerator.createRandomSimplePolygon();
 

@@ -3,9 +3,7 @@ package geometry;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
-import visualizations.GeometryVisualizer;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -13,7 +11,7 @@ public class CLPolygonGenerator extends PolygonGenerator {
     private final Random random;
 
     public CLPolygonGenerator(final int numPoints, final Random random) {
-        super(numPoints);
+        super(numPoints, random);
         this.random = random;
     }
 

@@ -8,12 +8,13 @@ import org.locationtech.jts.math.Vector2D;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Random;
 
 public class StarPolygonGenerator extends PolygonGenerator {
     final GeometryFactory geometryFactory = new GeometryFactory();
 
-    public StarPolygonGenerator(final int numPoints) {
-        super(numPoints);
+    public StarPolygonGenerator(final int numPoints, final Random random) {
+        super(numPoints, random);
     }
 
     @Override

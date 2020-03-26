@@ -6,17 +6,19 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 
+import java.util.Random;
+
 public class TwoOptPolygonGenerator extends PolygonGenerator {
     private int numGenerated = 0;
     private final String path;
 
-    public TwoOptPolygonGenerator(final int numPoints, final String path) {
-        super(numPoints);
+    public TwoOptPolygonGenerator(final int numPoints, final Random random, final String path) {
+        super(numPoints, random);
         this.path = path;
     }
 
-    public TwoOptPolygonGenerator(final int numPoints) {
-        this(numPoints, null);
+    public TwoOptPolygonGenerator(final int numPoints, final Random random) {
+        this(numPoints, random, null);
     }
 
     public Polygon createRandomSimplePolygon() {

@@ -7,9 +7,10 @@ import java.util.Random;
 
 public abstract class PolygonGenerator {
     int numPoints;
-    final Random random = new Random(42);
+    final Random random;
 
-    public PolygonGenerator(final int numPoints) {
+    public PolygonGenerator(final int numPoints, final Random random) {
+        this.random = random;
         if (numPoints < 3) {
             throw new IllegalArgumentException("Cannot create polygons with less than 3 points.");
         }
