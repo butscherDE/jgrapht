@@ -1,27 +1,27 @@
 package geometry;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import visualizations.GeometryVisualizer;
 
-import javax.sound.sampled.Line;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
 public class CLPolygonGenerator extends PolygonGenerator {
-    private final Random random = new Random(42);
+    private final Random random;
 
-    public CLPolygonGenerator(final int numPoints) {
+    public CLPolygonGenerator(final int numPoints, final Random random) {
         super(numPoints);
+        this.random = random;
     }
 
     @Override
     /**
      * Creates random coordinates from the same convex layers.
-     */ public Polygon createRandomSimplePolygon() {
+     */
+    public Polygon createRandomSimplePolygon() {
         final Coordinate[] randomCoordinates = createRandomCoordinates();
         final GeometryFactory geometryFactory = new GeometryFactory();
         final MultiPoint asPoints = geometryFactory.createMultiPointFromCoords(randomCoordinates);
@@ -30,7 +30,6 @@ public class CLPolygonGenerator extends PolygonGenerator {
         Coordinate[] mergedPolygon = cl.layers[0].getCoordinates();
         LineSegment lastInner = new LineSegment();
         for (int layerIndex = 0; layerIndex < cl.layers.length - 1; layerIndex++) {
-            System.out.println(layerIndex);
             final LineSegment outerSegment = getRandomHullLine(cl.layers[layerIndex], lastInner);
 
             final LineSegment innerSegment;
@@ -44,25 +43,9 @@ public class CLPolygonGenerator extends PolygonGenerator {
 
             final PolygonMerger polygonMerger = new PolygonMerger(mergedPolygon, cl.layers[layerIndex + 1].getCoordinates());
             mergedPolygon = polygonMerger.mergePolygons(outerSegment, innerSegment);
-
-            if (!geometryFactory.createPolygon(mergedPolygon).isSimple()) {
-                test(cl, mergedPolygon, layerIndex, outerSegment, 1_000_000);
-                System.exit(-1);
-            }
         }
 
         return geometryFactory.createPolygon(mergedPolygon);
-    }
-
-    private void test(final ConvexLayers cl, final Coordinate[] mergedPolygon, final int layerIndex,
-                      final LineSegment outerSegment, final int millis) {
-        final GeometryVisualizer.GeometryDrawCollection collection = new GeometryVisualizer.GeometryDrawCollection();
-        collection.addLineSegmentsFromCoordinates(Color.BLUE, Arrays.asList(mergedPolygon));
-//        collection.addLineSegment(Color.RED, outerSegment);
-//        collection.addLineSegments(Color.BLACK, cl.getLayerAsLineSegments(layerIndex));
-//        collection.addLineSegments(Color.GRAY, cl.getLayerAsLineSegments(layerIndex + 1));
-        final GeometryVisualizer visualizer = new GeometryVisualizer(collection);
-        visualizer.visualizeGraph(millis);
     }
 
     private LineSegment getRandomHullLine(final Geometry convexLayer, final LineSegment last) {

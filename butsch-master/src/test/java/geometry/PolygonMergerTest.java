@@ -706,17 +706,18 @@ public class PolygonMergerTest {
         final LineSegment innerChosen = new LineSegment(innerChosenP0, innerChosenP1);
 
         final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
-        final List<Coordinate> expectedCoordinates = new LinkedList<>(Arrays.asList(outerPolygon[0],
-                                                                                    outerPolygon[1],
-                                                                                    innerPolygon[2],
-                                                                                    innerPolygon[1],
-                                                                                    innerPolygon[0],
-                                                                                    outerPolygon[2],
-                                                                                    outerPolygon[3],
-                                                                                    outerPolygon[4],
-                                                                                    outerPolygon[5],
-                                                                                    outerPolygon[6],
-                                                                                    outerPolygon[0]));
+        final List<Coordinate> expectedCoordinates = new LinkedList<>(
+                Arrays.asList(new Coordinate(0.36878291341130565, 0.2757480694417024),
+                              new Coordinate(0.30871945533265976, 0.27707849007413665),
+                              new Coordinate(0.7275636800328681, 0.6832234717598454),
+                              new Coordinate(0.46365357580915334, 0.7829017787900358),
+                              new Coordinate(0.17737847790937833, 0.5943499108896841),
+                              new Coordinate(0.17221793768785243, 0.5874273817862956),
+                              new Coordinate(0.20976756886633208, 0.825965871887821),
+                              new Coordinate(0.6655489517945736, 0.9033722646721782),
+                              new Coordinate(0.9193277828687169, 0.43649097442328655),
+                              new Coordinate(0.7499061812554475, 0.38656687435934867),
+                              new Coordinate(0.36878291341130565, 0.2757480694417024)));
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
@@ -852,36 +853,47 @@ public class PolygonMergerTest {
 
         final Coordinate[] merged = polygonMerger.mergePolygons(outerChosen, innerChosen);
         final List<Coordinate> expectedCoordinates = new LinkedList<>(
-                Arrays.asList(new Coordinate(0.49732689247592055, 0.027314166285965835),
-                              new Coordinate(0.6351110144563881, 0.12625782329876534),
-                              new Coordinate(0.940172465685381, 0.3846108439172914),
-                              new Coordinate(0.8718145959648387, 0.805730942661998),
-                              new Coordinate(0.4690225206155686, 0.8273224240149951),
-                              new Coordinate(0.6462319787976428, 0.770465637773941),
-                              new Coordinate(0.8940427958184088, 0.5988370371450177),
-                              new Coordinate(0.9193277828687169, 0.43649097442328655),
-                              new Coordinate(0.8992053297295577, 0.3738361436205424),
-                              new Coordinate(0.7751206959271756, 0.2788223024987677),
-                              new Coordinate(0.36878291341130565, 0.2757480694417024),
-                              new Coordinate(0.30871945533265976, 0.27707849007413665),
-                              new Coordinate(0.17221793768785243, 0.5874273817862956),
-                              new Coordinate(0.19614707188185154, 0.8091248167277394),
-                              new Coordinate(0.6655489517945736, 0.9033722646721782),
-                              new Coordinate(0.20976756886633208, 0.825965871887821),
-                              new Coordinate(0.17085973788289754, 0.8053907199213823),
-                              new Coordinate(0.03648451669024966, 0.48384385495430515),
-                              new Coordinate(0.195964207423156, 0.17927344087491737),
-                              new Coordinate(0.13978959528686086, 0.09294681694145557),
-                              new Coordinate(0.03141823882658079, 0.35791991947712865),
-                              new Coordinate(0.02702986688213338, 0.5483346917317515),
-                              new Coordinate(0.096450915880824, 0.7451533062153856),
-                              new Coordinate(0.15103155452875827, 0.8338662354441657),
-                              new Coordinate(0.6972487292697295, 0.908614580207571),
-                              new Coordinate(0.9498601346594666, 0.8204918233863466),
-                              new Coordinate(0.9740356814958814, 0.7134062578232291),
-                              new Coordinate(0.9760344716184084, 0.077085112935252),
-                              new Coordinate(0.49732689247592055, 0.027314166285965835)));
-        drawForDebugging(merged, expectedCoordinates);
+                Arrays.asList(
+                        new Coordinate(0.5041689536693501, 0.2720104762251929),
+                        new Coordinate(0.39411972111154014, 0.2858051431556119),
+                        new Coordinate(0.2918569062269333, 0.42636987238454715),
+                        new Coordinate(0.2857913111237683, 0.4856139517139312),
+                        new Coordinate(0.2802255720962452, 0.5786021505674769),
+                        new Coordinate(0.3247503600193369, 0.6476585002302937),
+                        new Coordinate(0.385323019538774, 0.7038357512142029),
+                        new Coordinate(0.4582138900846239, 0.7216524774332927),
+                        new Coordinate(0.38191355348372735, 0.6837134065303719),
+                        new Coordinate(0.3397728172797295, 0.655652397024369),
+                        new Coordinate(0.30301132482396886, 0.5409247897830715),
+                        new Coordinate(0.2946880152681616, 0.4546209760717981),
+                        new Coordinate(0.3666537763479548, 0.3325797865055212),
+                        new Coordinate(0.41434358816794037, 0.2909996968266976),
+                        new Coordinate(0.46030637266116115, 0.2805719916728102),
+                        new Coordinate(0.5248931350664783, 0.28816077562285036),
+                        new Coordinate(0.5505802650995787, 0.29179226462549923),
+                        new Coordinate(0.6255689339834456, 0.32087429412210533),
+                        new Coordinate(0.7201246754012255, 0.38779615803820233),
+                        new Coordinate(0.736772998171578, 0.4730150884780566),
+                        new Coordinate(0.7421965659863677, 0.5322042672758481),
+                        new Coordinate(0.6994841174460614, 0.6547420655094701),
+                        new Coordinate(0.6564395625062794, 0.7345154157832644),
+                        new Coordinate(0.5800248845020607, 0.752509948590651),
+                        new Coordinate(0.4831028867051521, 0.7335003567819076),
+                        new Coordinate(0.4637984435979211, 0.7398155091791095),
+                        new Coordinate(0.48717369679347966, 0.7445610538216378),
+                        new Coordinate(0.5883930634921403, 0.7555250935454403),
+                        new Coordinate(0.6024816199768233, 0.75410087701525),
+                        new Coordinate(0.6466889896937116, 0.7492599372945875),
+                        new Coordinate(0.6667151977223019, 0.7338302132899737),
+                        new Coordinate(0.7140427787020803, 0.6447979658367226),
+                        new Coordinate(0.7359713556262162, 0.570073961493798),
+                        new Coordinate(0.7519985165684118, 0.4955174470392185),
+                        new Coordinate(0.7513014261189027, 0.46674749219445766),
+                        new Coordinate(0.7065858600517958, 0.34360523073670424),
+                        new Coordinate(0.6568729954984174, 0.3186475059556044),
+                        new Coordinate(0.5602522274866408, 0.28794235878643937),
+                        new Coordinate(0.5041689536693501, 0.2720104762251929)
+                ));
         assertArrayEquals(expectedCoordinates.toArray(), merged);
     }
 
@@ -5214,61 +5226,6 @@ public class PolygonMergerTest {
 
         assertArrayEquals(expectedCoordinates, merged);
     }
-
-    @AfterAll
-    public static void summary() {
-        for (final Boolean[] booleans : PolygonMerger.checker) {
-            System.out.println(Arrays.toString(booleans));
-        }
-
-        final boolean[][] allBoolCombis = new boolean[][] {
-                new boolean[] {false, false, false, false},
-                new boolean[] {false, false, false, true},
-                new boolean[] {false, false, true, false},
-                new boolean[] {false, false, true, true},
-                new boolean[] {false, true, false, false},
-                new boolean[] {false, true, false, true},
-                new boolean[] {false, true, true, false},
-                new boolean[] {false, true, true, true},
-                new boolean[] {true, false, false, false},
-                new boolean[] {true, false, false, true},
-                new boolean[] {true, false, true, false},
-                new boolean[] {true, false, true, true},
-                new boolean[] {true, true, false, false},
-                new boolean[] {true, true, false, true},
-                new boolean[] {true, true, true, false},
-                new boolean[] {true, true, true, true},
-        };
-//        final boolean[][] allBoolCombis = new boolean[][] {
-//                new boolean[] {false, false, false},
-//                new boolean[] {false, false, true},
-//                new boolean[] {false, true, false},
-//                new boolean[] {false, true, true},
-//                new boolean[] {true, false, false},
-//                new boolean[] {true, false, true},
-//                new boolean[] {true, true, false},
-//                new boolean[] {true, true, true}
-//        };
-
-        for (final boolean[] boolCombi : allBoolCombis) {
-            System.out.println(Arrays.toString(boolCombi) + ": " + count(boolCombi));
-        }
-    }
-
-    private static int count(final boolean[] bools) {
-        int count = 0;
-        for (final Boolean[] fromTests : PolygonMerger.checker) {
-            boolean allEqual = true;
-            for (int i = 0; i < bools.length; i++) {
-                allEqual &= (bools[i] == fromTests[i]);
-            }
-
-            count = allEqual ? count + 1 : count;
-        }
-
-        return count;
-    }
-
 
     private void drawForDebugging(final Coordinate[] merged, final List<Coordinate> expectedCoordinates) {
         System.out.println(expectedCoordinates);
