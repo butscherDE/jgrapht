@@ -66,6 +66,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<main.basedir>${project.basedir}</main.basedir>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
 
 	<dependencyManagement>
@@ -291,8 +293,7 @@
 		<module>jgrapht-demo</module>
 		<module>jgrapht-bundle</module>
 		<module>jgrapht-dist</module>
-        <module>ButschMaster</module>
-		<module>ButschMaster</module>
+		<module>butsch-master</module>
 	</modules>
 
 	<profiles>

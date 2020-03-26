@@ -1,12 +1,8 @@
 package geometry;
 
-import org.junit.Test;
 import org.locationtech.jts.geom.Polygon;
-import visualizations.GeometryVisualizer;
-
-import java.awt.*;
-import java.util.Arrays;
 import java.util.Random;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 

@@ -3,7 +3,6 @@ package util;
 import data.Edge;
 import data.RoadGraph;
 import evalutation.Config;
-import geometry.PolygonMerger;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
@@ -12,10 +11,9 @@ import visualizations.GeometryVisualizer;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LearningTests {

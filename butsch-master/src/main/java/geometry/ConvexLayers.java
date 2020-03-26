@@ -1,6 +1,5 @@
 package geometry;
 
-import org.apache.avro.generic.GenericData;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.*;
 

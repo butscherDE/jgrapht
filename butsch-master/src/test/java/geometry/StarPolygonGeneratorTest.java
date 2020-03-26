@@ -4,8 +4,8 @@ import org.locationtech.jts.geom.Polygon;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class StarPolygonGeneratorTest extends PolygonGeneratorTest {
     @Test
