@@ -124,22 +124,25 @@ public class PolygonMerger {
         final Coordinate innerEntryPoint = endVisibilityBridgeLines[0].p1;
         final Coordinate innerExitPoint = endVisibilityBridgeLines[1].p1;
 
-        int newInnerIterationStartIndex = innerCoordinates.indexOf(innerEntryPoint);
+        int innerIterationStartIndex = innerCoordinates.indexOf(innerEntryPoint);
         int newInnerIterationExitIndex = innerCoordinates.indexOf(innerExitPoint);
 
-        if (getIndexDistance(newInnerIterationExitIndex, newInnerIterationStartIndex, innerCoordinates.size()) == 1) {
-            Collections.reverse(innerCoordinates);
-            newInnerIterationStartIndex = innerCoordinates.indexOf(innerEntryPoint);
-        } else if (getIndexDistance(newInnerIterationExitIndex, newInnerIterationStartIndex, innerCoordinates.size()) == -1) {
-            // Alles gut
+        if (getIndexDistance(newInnerIterationExitIndex, innerIterationStartIndex, innerCoordinates.size()) == 1) {
+            final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerIterationStartIndex + 1);
+            while (innerCircularIterator.hasPrevious()) {
+                final Coordinate previous = innerCircularIterator.previous();
+                mergedCoordinates[m++] = previous;
+            }
+        } else if (getIndexDistance(newInnerIterationExitIndex, innerIterationStartIndex,
+                                    innerCoordinates.size()) == -1) {
+            final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(
+                    innerIterationStartIndex);
+            while (innerCircularIterator.hasNext()) {
+                final Coordinate next = innerCircularIterator.next();
+                mergedCoordinates[m++] = next;
+            }
         } else {
             throw new IllegalStateException("This cannot happen");
-        }
-
-        final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(newInnerIterationStartIndex);
-        while (innerCircularIterator.hasNext()) {
-            final Coordinate next = innerCircularIterator.next();
-            mergedCoordinates[m++] = next;
         }
     }
 
@@ -169,7 +172,7 @@ public class PolygonMerger {
     }
 
     private LineSegment[] getEndVisibilityBridgeLines(final LineSegment outerChosen, final LineSegment innerChosen,
-                                                                  final List<LineSegment> innerLayerAsLineSegments) {
+                                                      final List<LineSegment> innerLayerAsLineSegments) {
         final LineSegment[] endVisibilityCheckLines = getEndVisibilityCheckLines(outerChosen, innerChosen);
         final boolean[] isNotIntersected = new boolean[4];
 
@@ -184,10 +187,12 @@ public class PolygonMerger {
         }
 
 
-        if (isNotIntersected[0] && isNotIntersected[3] && !isIntersecting(endVisibilityCheckLines[0], endVisibilityCheckLines[3])) {
-            return new LineSegment[] {endVisibilityCheckLines[0], endVisibilityCheckLines[3]};
-        } else if (isNotIntersected[1] && isNotIntersected[2] && !isIntersecting(endVisibilityCheckLines[1], endVisibilityCheckLines[2])) {
-            return new LineSegment[] {endVisibilityCheckLines[1], endVisibilityCheckLines[2]};
+        if (isNotIntersected[0] && isNotIntersected[3] && !isIntersecting(endVisibilityCheckLines[0],
+                                                                          endVisibilityCheckLines[3])) {
+            return new LineSegment[]{endVisibilityCheckLines[0], endVisibilityCheckLines[3]};
+        } else if (isNotIntersected[1] && isNotIntersected[2] && !isIntersecting(endVisibilityCheckLines[1],
+                                                                                 endVisibilityCheckLines[2])) {
+            return new LineSegment[]{endVisibilityCheckLines[1], endVisibilityCheckLines[2]};
         } else {
             throw new IllegalStateException("This shall never be happening");
         }
@@ -210,10 +215,10 @@ public class PolygonMerger {
 
     private LineSegment[] getEndVisibilityCheckLines(final LineSegment outerLineSegment,
                                                      final LineSegment innerLineSegment) {
-        return new LineSegment[]{new LineSegment(outerLineSegment.p0, innerLineSegment.p0),
-                                 new LineSegment(outerLineSegment.p0, innerLineSegment.p1),
-                                 new LineSegment(outerLineSegment.p1, innerLineSegment.p0),
-                                 new LineSegment(outerLineSegment.p1, innerLineSegment.p1)};
+        return new LineSegment[]{new LineSegment(outerLineSegment.p0, innerLineSegment.p0), new LineSegment(
+                outerLineSegment.p0, innerLineSegment.p1), new LineSegment(outerLineSegment.p1,
+                                                                           innerLineSegment.p0), new LineSegment(
+                outerLineSegment.p1, innerLineSegment.p1)};
     }
 
     private boolean isIntersecting(final LineSegment p0ToP0, final LineSegment p1ToP1) {
