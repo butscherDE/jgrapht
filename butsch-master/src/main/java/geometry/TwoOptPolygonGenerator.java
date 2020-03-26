@@ -42,7 +42,7 @@ public class TwoOptPolygonGenerator extends PolygonGenerator {
         return polygon;
     }
 
-    private static void linearIntersectionSweep(final Coordinate[] coordinates) {
+    public static void linearIntersectionSweep(final Coordinate[] coordinates) {
         for (int i = 0; i < coordinates.length - 2; i++) {
             for (int j = i + 1; j < coordinates.length - 1; j++) {
                 final Coordinate a = coordinates[i];

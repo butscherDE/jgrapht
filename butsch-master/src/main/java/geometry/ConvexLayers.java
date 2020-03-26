@@ -6,6 +6,7 @@ import org.locationtech.jts.geom.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class ConvexLayers {
@@ -97,13 +98,24 @@ public class ConvexLayers {
         }
 
         final Geometry layer = layers[index];
+
+        return getLineSegments(layer);
+    }
+
+    public static List<LineSegment> getLineSegments(final Collection<Coordinate> coordinates) {
+        final Coordinate[] coordinatesArr = (Coordinate[]) coordinates.toArray(new Coordinate[coordinates.size() + 1]);
+        coordinatesArr[coordinatesArr.length - 1] = coordinatesArr[0];
+        final Geometry geometry = new GeometryFactory().createPolygon(coordinatesArr);
+        return getLineSegments(geometry);
+    }
+
+    public static List<LineSegment> getLineSegments(final Geometry layer) {
         final LineSegment[] lineSegments = new LineSegment[layer.getNumPoints() - 1];
         final Coordinate[] coordinates = layer.getCoordinates();
 
         for (int i = 0; i < lineSegments.length; i++) {
             lineSegments[i] = new LineSegment(coordinates[i], coordinates[i + 1]);
         }
-
         return Arrays.asList(lineSegments);
     }
 

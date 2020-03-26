@@ -188,4 +188,9 @@ public class CircularList<T extends Object> implements List<T> {
     public List<T> subList(final int fromIndex, final int toIndex) {
         return new CircularList<>(list.subList(fromIndex, toIndex));
     }
+
+    @Override
+    public String toString() {
+        return list.toString();
+    }
 }

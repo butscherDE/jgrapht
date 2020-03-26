@@ -33,21 +33,6 @@ public class CLPolygonGenerator extends PolygonGenerator {
             System.out.println(layerIndex);
             final LineSegment outerSegment = getRandomHullLine(cl.layers[layerIndex], lastInner);
 
-                final GeometryVisualizer.GeometryDrawCollection collection = new GeometryVisualizer.GeometryDrawCollection();
-                collection.addLineSegmentsFromCoordinates(Color.BLUE, Arrays.asList(mergedPolygon));
-                collection.addLineSegment(Color.RED, outerSegment);
-                collection.addLineSegments(Color.BLACK, cl.getLayerAsLineSegments(layerIndex + 1));
-                final GeometryVisualizer visualizer = new GeometryVisualizer(collection);
-                visualizer.visualizeGraph();
-            System.out.println("############# outer #############");
-            for (final Coordinate coordinate : mergedPolygon) {
-                System.out.println(coordinate);
-            }
-            System.out.println("############# inner #############");
-            for (final Coordinate coordinate : cl.layers[layerIndex + 1].getCoordinates()) {
-                System.out.println(coordinate);
-            }
-
             final LineSegment innerSegment;
             if (cl.layers[layerIndex + 1] instanceof Point) {
                 final Point point = (Point) cl.layers[layerIndex + 1];
@@ -55,17 +40,29 @@ public class CLPolygonGenerator extends PolygonGenerator {
             } else {
                 innerSegment = getRandomEndVisibleLineSegment(outerSegment, cl.getLayerAsLineSegments(layerIndex + 1));
             }
-            System.out.println(outerSegment);
-            System.out.println(innerSegment);
-
             lastInner = innerSegment;
 
-            final PolygonMerger polygonMerger = new PolygonMerger(mergedPolygon,
-                                                                  cl.layers[layerIndex + 1].getCoordinates());
+            final PolygonMerger polygonMerger = new PolygonMerger(mergedPolygon, cl.layers[layerIndex + 1].getCoordinates());
             mergedPolygon = polygonMerger.mergePolygons(outerSegment, innerSegment);
+
+            if (!geometryFactory.createPolygon(mergedPolygon).isSimple()) {
+                test(cl, mergedPolygon, layerIndex, outerSegment, 1_000_000);
+                System.exit(-1);
+            }
         }
 
         return geometryFactory.createPolygon(mergedPolygon);
+    }
+
+    private void test(final ConvexLayers cl, final Coordinate[] mergedPolygon, final int layerIndex,
+                      final LineSegment outerSegment, final int millis) {
+        final GeometryVisualizer.GeometryDrawCollection collection = new GeometryVisualizer.GeometryDrawCollection();
+        collection.addLineSegmentsFromCoordinates(Color.BLUE, Arrays.asList(mergedPolygon));
+//        collection.addLineSegment(Color.RED, outerSegment);
+//        collection.addLineSegments(Color.BLACK, cl.getLayerAsLineSegments(layerIndex));
+//        collection.addLineSegments(Color.GRAY, cl.getLayerAsLineSegments(layerIndex + 1));
+        final GeometryVisualizer visualizer = new GeometryVisualizer(collection);
+        visualizer.visualizeGraph(millis);
     }
 
     private LineSegment getRandomHullLine(final Geometry convexLayer, final LineSegment last) {
@@ -119,24 +116,13 @@ public class CLPolygonGenerator extends PolygonGenerator {
             }
         }
 
-        if (isNotIntersected[0] && isNotIntersected[3]) {
+        if (isNotIntersected[0] && isNotIntersected[3] && !isIntersecting(endVisibilityCheckLines[0], endVisibilityCheckLines[3])) {
             return true;
-        } else if (isNotIntersected[1] && isNotIntersected[2]) {
+        } else if (isNotIntersected[1] && isNotIntersected[2] && !isIntersecting(endVisibilityCheckLines[1], endVisibilityCheckLines[2])) {
             return true;
         } else {
             return false;
         }
-
-        //        boolean endVisibleToOuterLine = true;
-        //        for (final LineSegment possibleSightBlockingLine : innerLayerAsLineSegments) {
-        //            for (final LineSegment endVisibilityCheckLine : endVisibilityCheckLines) {
-        //                final boolean isIntersecting = isIntersectionProduced(possibleSightBlockingLine, endVisibilityCheckLine,
-        //                                                                      innerLineSegment);
-        //                endVisibleToOuterLine &= !isIntersecting;
-        //            }
-        //        }
-
-//        return endVisibleToOuterLine;
     }
 
     private boolean isIntersectionProduced(final LineSegment possiblySightBlockingLine, final LineSegment checkLine,
@@ -156,9 +142,14 @@ public class CLPolygonGenerator extends PolygonGenerator {
 
     private LineSegment[] getEndVisibilityCheckLines(final LineSegment outerLineSegment,
                                                      final LineSegment innerLineSegment) {
-        return new LineSegment[]{new LineSegment(outerLineSegment.p0, innerLineSegment.p0), new LineSegment(
-                outerLineSegment.p0, innerLineSegment.p1), new LineSegment(outerLineSegment.p1,
-                                                                           innerLineSegment.p0), new LineSegment(
-                outerLineSegment.p1, innerLineSegment.p1)};
+        return new LineSegment[]{new LineSegment(outerLineSegment.p0, innerLineSegment.p0),
+                                 new LineSegment(outerLineSegment.p0, innerLineSegment.p1),
+                                 new LineSegment(outerLineSegment.p1, innerLineSegment.p0),
+                                 new LineSegment(outerLineSegment.p1, innerLineSegment.p1)};
+    }
+
+    private boolean isIntersecting(final LineSegment ls1, final LineSegment ls2) {
+        final Coordinate intersection = ls1.intersection(ls2);
+        return intersection != null;
     }
 }

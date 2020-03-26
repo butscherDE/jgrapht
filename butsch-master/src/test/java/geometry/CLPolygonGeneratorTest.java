@@ -18,15 +18,15 @@ public class CLPolygonGeneratorTest extends PolygonGeneratorTest {
 
         for (int i = 0; i < 1000; i++) {
             System.out.println(i);
-            final int numPoints = random.nextInt(105);
+            final int numPoints = random.nextInt(500); //105);
 
             final CLPolygonGenerator generator = new CLPolygonGenerator(numPoints);
             final Polygon randomPolygon = generator.createRandomSimplePolygon();
 
-            final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
-            col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(randomPolygon.getCoordinates()));
-            final GeometryVisualizer vis = new GeometryVisualizer(col);
-            vis.visualizeGraph(100_000);
+//            final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
+//            col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(randomPolygon.getCoordinates()));
+//            final GeometryVisualizer vis = new GeometryVisualizer(col);
+//            vis.visualizeGraph(100_000);
 
             assertFalse(isSelfIntersecting(randomPolygon));
         }
