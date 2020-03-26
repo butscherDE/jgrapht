@@ -101,7 +101,7 @@ public class PolygonMerger {
             calcAndSetInnerStartIndex(innerChosen);
             processWhenInnerLargeEnoughToBeAPolygon(outerChosen, innerChosen);
         } else {
-            processWhenInnerIsJustAPoint(outerChosen);
+            processWhenInnerIsJustAPoint();
         }
     }
 
@@ -109,7 +109,7 @@ public class PolygonMerger {
         addAllInnerCoordinates(outerChosen, innerChosen);
     }
 
-    private void processWhenInnerIsJustAPoint(final LineSegment outerChosen) {
+    private void processWhenInnerIsJustAPoint() {
         mergedCoordinates[m++] = innerCoordinates.get(0);
     }
 
