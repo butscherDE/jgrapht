@@ -374,7 +374,7 @@ public class PolygonMerger {
         col.addCoordinate(Color.ORANGE, innerChosen.p0);
         col.addCoordinate(Color.ORANGE, innerChosen.p1);
         final GeometryVisualizer vis = new GeometryVisualizer(col);
-        vis.visualizeGraph();
+//        vis.visualizeGraph();
 
 
         if (isNotIntersected[0] && isNotIntersected[3] && !isIntersecting(endVisibilityCheckLines[0], endVisibilityCheckLines[3])) {
