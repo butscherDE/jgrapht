@@ -112,12 +112,12 @@ public class PolygonMerger {
     }
 
     private boolean areNextTwoCoordsChosenByLineSegment() {
-        return outerCoordinates[outerCoordinatesPointer].equals(outerChosen.p0) && outerCoordinates[outerCoordinatesPointer + 1].equals(outerChosen.p1);
+        return outerCoordinates[outerCoordinatesPointer].equals(
+                outerChosen.p0) && outerCoordinates[outerCoordinatesPointer + 1].equals(outerChosen.p1);
     }
 
     private void addAllInnerCoordinates() {
-        final List<LineSegment> innerLayerAsLineSegments = ConvexLayers.getLineSegments(innerCoordinates);
-        final LineSegment[] linesToConnectInnerAndOuter = getEndVisibilityBridgeLines(innerLayerAsLineSegments);
+        final LineSegment[] linesToConnectInnerAndOuter = getLinesToConnectInnerAndOuter();
         int innerIterationStartIndex = getIndexOfEntryPoint(linesToConnectInnerAndOuter[0]);
         int newInnerIterationExitIndex = getIndexOfExitPoint(linesToConnectInnerAndOuter, 1);
 
@@ -128,6 +128,11 @@ public class PolygonMerger {
         } else {
             throw new IllegalStateException("This cannot happen");
         }
+    }
+
+    private LineSegment[] getLinesToConnectInnerAndOuter() {
+        final List<LineSegment> innerLayerAsLineSegments = ConvexLayers.getLineSegments(innerCoordinates);
+        return getEndVisibilityBridgeLines(innerLayerAsLineSegments);
     }
 
     private int getIndexOfEntryPoint(final LineSegment lineSegment) {
@@ -145,7 +150,8 @@ public class PolygonMerger {
     }
 
     private void addInnerCoordinatesBackward(final int innerIterationStartIndex) {
-        final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerIterationStartIndex + 1);
+        final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(
+                innerIterationStartIndex + 1);
         while (innerCircularIterator.hasPrevious()) {
             final Coordinate previous = innerCircularIterator.previous();
             mergedCoordinates[mergedCoordinatesPointer++] = previous;
@@ -153,13 +159,11 @@ public class PolygonMerger {
     }
 
     private boolean isStartAfterExit(final int innerIterationStartIndex, final int newInnerIterationExitIndex) {
-        return getIndexDistance(newInnerIterationExitIndex, innerIterationStartIndex,
-                                    innerCoordinates.size()) == -1;
+        return getIndexDistance(newInnerIterationExitIndex, innerIterationStartIndex, innerCoordinates.size()) == -1;
     }
 
     private void addInnerCoordinatesForward(final int innerIterationStartIndex) {
-        final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(
-                innerIterationStartIndex);
+        final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerIterationStartIndex);
         while (innerCircularIterator.hasNext()) {
             final Coordinate next = innerCircularIterator.next();
             mergedCoordinates[mergedCoordinatesPointer++] = next;
@@ -170,6 +174,7 @@ public class PolygonMerger {
         final int difference = index1 - index2;
         final int maxIndexOfCollection = sizeOfCollection - 1;
         final int negativeMaxIndexOfCollection = maxIndexOfCollection * -1;
+
         if (difference == maxIndexOfCollection) {
             return -1;
         } else if (difference == negativeMaxIndexOfCollection) {
@@ -181,27 +186,35 @@ public class PolygonMerger {
 
     private LineSegment[] getEndVisibilityBridgeLines(final List<LineSegment> innerLayerAsLineSegments) {
         final LineSegment[] endVisibilityCheckLines = getEndVisibilityCheckLines();
+        final boolean[] isNotIntersected = areEndVisibilityCheckLinesIntersectionFree(innerLayerAsLineSegments,
+                                                                                      endVisibilityCheckLines);
+
+        final boolean is0And3Intersecting = !isIntersecting(endVisibilityCheckLines[0], endVisibilityCheckLines[3]);
+        final boolean is1And2Intersecting = !isIntersecting(endVisibilityCheckLines[1], endVisibilityCheckLines[2]);
+
+        if (isNotIntersected[0] && isNotIntersected[3] && is0And3Intersecting) {
+            return new LineSegment[]{endVisibilityCheckLines[0], endVisibilityCheckLines[3]};
+        } else if (isNotIntersected[1] && isNotIntersected[2] && is1And2Intersecting) {
+            return new LineSegment[]{endVisibilityCheckLines[1], endVisibilityCheckLines[2]};
+        } else {
+            throw new IllegalStateException("This shall never be happening");
+        }
+    }
+
+    private boolean[] areEndVisibilityCheckLinesIntersectionFree(final List<LineSegment> innerLayerAsLineSegments,
+                                                                 final LineSegment[] endVisibilityCheckLines) {
         final boolean[] isNotIntersected = new boolean[4];
 
         for (int i = 0; i < isNotIntersected.length; i++) {
             final LineSegment endVisibilityCheckLine = endVisibilityCheckLines[i];
             isNotIntersected[i] = true;
             for (final LineSegment possibleSightBlockingLine : innerLayerAsLineSegments) {
-                final boolean isIntersecting = isIntersectionProduced(possibleSightBlockingLine, endVisibilityCheckLine);
+                final boolean isIntersecting = isIntersectionProduced(possibleSightBlockingLine,
+                                                                      endVisibilityCheckLine);
                 isNotIntersected[i] &= !isIntersecting;
             }
         }
-
-
-        if (isNotIntersected[0] && isNotIntersected[3] && !isIntersecting(endVisibilityCheckLines[0],
-                                                                          endVisibilityCheckLines[3])) {
-            return new LineSegment[]{endVisibilityCheckLines[0], endVisibilityCheckLines[3]};
-        } else if (isNotIntersected[1] && isNotIntersected[2] && !isIntersecting(endVisibilityCheckLines[1],
-                                                                                 endVisibilityCheckLines[2])) {
-            return new LineSegment[]{endVisibilityCheckLines[1], endVisibilityCheckLines[2]};
-        } else {
-            throw new IllegalStateException("This shall never be happening");
-        }
+        return isNotIntersected;
     }
 
     private boolean isIntersectionProduced(final LineSegment possiblySightBlockingLine, final LineSegment checkLine) {
@@ -219,14 +232,16 @@ public class PolygonMerger {
     }
 
     private LineSegment[] getEndVisibilityCheckLines() {
-        return new LineSegment[]{new LineSegment(outerChosen.p0, innerChosen.p0), new LineSegment(
-                outerChosen.p0, innerChosen.p1), new LineSegment(outerChosen.p1,
-                                                                 innerChosen.p0), new LineSegment(
-                outerChosen.p1, innerChosen.p1)};
+        final LineSegment line00 = new LineSegment(outerChosen.p0, innerChosen.p0);
+        final LineSegment line01 = new LineSegment(outerChosen.p0, innerChosen.p1);
+        final LineSegment line10 = new LineSegment(outerChosen.p1, innerChosen.p0);
+        final LineSegment line11 = new LineSegment(outerChosen.p1, innerChosen.p1);
+
+        return new LineSegment[]{line00, line01, line10, line11};
     }
 
-    private boolean isIntersecting(final LineSegment p0ToP0, final LineSegment p1ToP1) {
-        final Coordinate intersection = p0ToP0.intersection(p1ToP1);
+    private boolean isIntersecting(final LineSegment line1, final LineSegment line2) {
+        final Coordinate intersection = line1.intersection(line2);
         return intersection != null;
     }
 }
