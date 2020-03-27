@@ -11,8 +11,8 @@ public class CLPolygonGenerator extends PolygonGenerator {
     private final GeometryFactory geometryFactory = new GeometryFactory();
     private final Random random;
 
-    private LineSegment outerSegment;
-    private LineSegment innerSegment;
+    private LineSegment outerLineSegment;
+    private LineSegment innerLineSegment;
     private Coordinate[] mergedPolygon;
     private LineSegment lastInner;
     private ConvexLayers cl;
@@ -55,24 +55,32 @@ public class CLPolygonGenerator extends PolygonGenerator {
     }
 
     public void chooseOuterLineSegment(final ConvexLayers cl, final LineSegment lastInner, final int layerIndex) {
-        outerSegment = getRandomHullLine(cl.layers[layerIndex], lastInner);
+        outerLineSegment = getRandomHullLine(cl.layers[layerIndex], lastInner);
     }
 
     public LineSegment chooseEndVisibleInnerLineSegment(final ConvexLayers cl, final int layerIndex) {
         final LineSegment lastInner;
-        if (cl.layers[layerIndex + 1] instanceof Point) {
-            final Point point = (Point) cl.layers[layerIndex + 1];
-            innerSegment = new LineSegment(point.getX(), point.getY(), point.getX(), point.getY());
+        if (isLayerAPoint(cl.layers[layerIndex + 1])) {
+            createPointSegment(cl.layers[layerIndex + 1]);
         } else {
-            innerSegment = getRandomEndVisibleLineSegment(outerSegment, cl.getLayerAsLineSegments(layerIndex + 1));
+            innerLineSegment = getRandomEndVisibleLineSegment(cl.getLayerAsLineSegments(layerIndex + 1));
         }
-        lastInner = innerSegment;
+        lastInner = innerLineSegment;
         return lastInner;
+    }
+
+    public boolean isLayerAPoint(final Geometry layer) {
+        return layer instanceof Point;
+    }
+
+    public void createPointSegment(final Geometry layer) {
+        final Point point = (Point) layer;
+        innerLineSegment = new LineSegment(point.getX(), point.getY(), point.getX(), point.getY());
     }
 
     public void mergeNextLayer(final Geometry layer) {
         final PolygonMerger polygonMerger = new PolygonMerger(mergedPolygon, layer.getCoordinates());
-        mergedPolygon = polygonMerger.mergePolygons(outerSegment, innerSegment);
+        mergedPolygon = polygonMerger.mergePolygons(outerLineSegment, innerLineSegment);
     }
 
     public Polygon createPolygon() {
@@ -93,31 +101,42 @@ public class CLPolygonGenerator extends PolygonGenerator {
         return new LineSegment(startCoordinate, endCoordinate);
     }
 
-    private LineSegment getRandomEndVisibleLineSegment(final LineSegment outerLineSegment,
-                                                       final List<LineSegment> innerLayerAsLineSegments) {
-        final List<LineSegment> endVisibleLineSegments = getEndVisibleLineSegments(outerLineSegment,
-                                                                                   innerLayerAsLineSegments);
+    private LineSegment getRandomEndVisibleLineSegment(final List<LineSegment> innerLayerAsLineSegments) {
+        final List<LineSegment> endVisibleLineSegments = getEndVisibleLineSegments(innerLayerAsLineSegments);
 
         return endVisibleLineSegments.get(random.nextInt(endVisibleLineSegments.size()));
     }
 
-    private List<LineSegment> getEndVisibleLineSegments(final LineSegment outerLineSegment,
-                                                        final List<LineSegment> innerLayerAsLineSegments) {
+    private List<LineSegment> getEndVisibleLineSegments(final List<LineSegment> innerLayerAsLineSegments) {
         final List<LineSegment> endVisibleLineSegments = new ArrayList<>();
 
-
         for (final LineSegment innerLineSegment : innerLayerAsLineSegments) {
-            if (isEndVisible(outerLineSegment, innerLineSegment, innerLayerAsLineSegments)) {
+            if (isEndVisible(innerLineSegment, innerLayerAsLineSegments)) {
                 endVisibleLineSegments.add(innerLineSegment);
             }
         }
-
         return endVisibleLineSegments;
     }
 
-    private boolean isEndVisible(final LineSegment outerLineSegment, final LineSegment innerLineSegment,
-                                 final List<LineSegment> innerLayerAsLineSegments) {
+    private boolean isEndVisible(final LineSegment innerLineSegment, final List<LineSegment> innerLayerAsLineSegments) {
         final LineSegment[] endVisibilityCheckLines = getEndVisibilityCheckLines(outerLineSegment, innerLineSegment);
+        final boolean[] isNotIntersected = areCheckLinesIntersectedByLayer(innerLineSegment, innerLayerAsLineSegments,
+                                                                           endVisibilityCheckLines);
+
+        final boolean isNotIntersected03 = !isIntersecting(endVisibilityCheckLines[0], endVisibilityCheckLines[3]);
+        final boolean isNotIntersected12 = !isIntersecting(endVisibilityCheckLines[1], endVisibilityCheckLines[2]);
+        if (isNotIntersected[0] && isNotIntersected[3] && isNotIntersected03) {
+            return true;
+        } else if (isNotIntersected[1] && isNotIntersected[2] && isNotIntersected12) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean[] areCheckLinesIntersectedByLayer(final LineSegment innerLineSegment,
+                                                      final List<LineSegment> innerLayerAsLineSegments,
+                                                      final LineSegment[] endVisibilityCheckLines) {
         final boolean[] isNotIntersected = new boolean[4];
 
         for (int i = 0; i < isNotIntersected.length; i++) {
@@ -129,14 +148,7 @@ public class CLPolygonGenerator extends PolygonGenerator {
                 isNotIntersected[i] &= !isIntersecting;
             }
         }
-
-        if (isNotIntersected[0] && isNotIntersected[3] && !isIntersecting(endVisibilityCheckLines[0], endVisibilityCheckLines[3])) {
-            return true;
-        } else if (isNotIntersected[1] && isNotIntersected[2] && !isIntersecting(endVisibilityCheckLines[1], endVisibilityCheckLines[2])) {
-            return true;
-        } else {
-            return false;
-        }
+        return isNotIntersected;
     }
 
     private boolean isIntersectionProduced(final LineSegment possiblySightBlockingLine, final LineSegment checkLine,
