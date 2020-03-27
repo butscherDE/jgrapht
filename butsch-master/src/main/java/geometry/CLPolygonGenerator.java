@@ -8,7 +8,11 @@ import java.util.*;
 import java.util.List;
 
 public class CLPolygonGenerator extends PolygonGenerator {
+    private final GeometryFactory geometryFactory = new GeometryFactory();
     private final Random random;
+    private LineSegment outerSegment;
+    private LineSegment innerSegment;
+    private Coordinate[] mergedPolygon;
 
     public CLPolygonGenerator(final int numPoints, final Random random) {
         super(numPoints, random);
@@ -21,28 +25,43 @@ public class CLPolygonGenerator extends PolygonGenerator {
      */
     public Polygon createRandomSimplePolygon() {
         final Coordinate[] randomCoordinates = createRandomCoordinates();
-        final GeometryFactory geometryFactory = new GeometryFactory();
         final MultiPoint asPoints = geometryFactory.createMultiPointFromCoords(randomCoordinates);
         final ConvexLayers cl = new ConvexLayers(asPoints);
 
-        Coordinate[] mergedPolygon = cl.layers[0].getCoordinates();
+        mergedPolygon = cl.layers[0].getCoordinates();
         LineSegment lastInner = new LineSegment();
         for (int layerIndex = 0; layerIndex < cl.layers.length - 1; layerIndex++) {
-            final LineSegment outerSegment = getRandomHullLine(cl.layers[layerIndex], lastInner);
+            chooseOuterLineSegment(cl, lastInner, layerIndex);
+            lastInner = chooseEndVisibleInnerLineSegment(cl, layerIndex);
 
-            final LineSegment innerSegment;
-            if (cl.layers[layerIndex + 1] instanceof Point) {
-                final Point point = (Point) cl.layers[layerIndex + 1];
-                innerSegment = new LineSegment(point.getX(), point.getY(), point.getX(), point.getY());
-            } else {
-                innerSegment = getRandomEndVisibleLineSegment(outerSegment, cl.getLayerAsLineSegments(layerIndex + 1));
-            }
-            lastInner = innerSegment;
-
-            final PolygonMerger polygonMerger = new PolygonMerger(mergedPolygon, cl.layers[layerIndex + 1].getCoordinates());
-            mergedPolygon = polygonMerger.mergePolygons(outerSegment, innerSegment);
+            mergeNextLayer(cl.layers[layerIndex + 1]);
         }
 
+        return createPolygon(mergedPolygon);
+    }
+
+    public void chooseOuterLineSegment(final ConvexLayers cl, final LineSegment lastInner, final int layerIndex) {
+        outerSegment = getRandomHullLine(cl.layers[layerIndex], lastInner);
+    }
+
+    public LineSegment chooseEndVisibleInnerLineSegment(final ConvexLayers cl, final int layerIndex) {
+        final LineSegment lastInner;
+        if (cl.layers[layerIndex + 1] instanceof Point) {
+            final Point point = (Point) cl.layers[layerIndex + 1];
+            innerSegment = new LineSegment(point.getX(), point.getY(), point.getX(), point.getY());
+        } else {
+            innerSegment = getRandomEndVisibleLineSegment(outerSegment, cl.getLayerAsLineSegments(layerIndex + 1));
+        }
+        lastInner = innerSegment;
+        return lastInner;
+    }
+
+    public void mergeNextLayer(final Geometry layer) {
+        final PolygonMerger polygonMerger = new PolygonMerger(mergedPolygon, layer.getCoordinates());
+        mergedPolygon = polygonMerger.mergePolygons(outerSegment, innerSegment);
+    }
+
+    public Polygon createPolygon(final Coordinate[] mergedPolygon) {
         return geometryFactory.createPolygon(mergedPolygon);
     }
 
