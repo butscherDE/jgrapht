@@ -42,10 +42,6 @@ public class PolygonMerger {
         this(outerCoordinates, new CircularList<>(Arrays.asList(innerCoordinates)));
     }
 
-    public PolygonMerger(final Polygon outerPolygon, final Polygon innerPolygon) {
-        this(outerPolygon.getCoordinates(), innerPolygon.getCoordinates());
-    }
-
     public Coordinate[] mergePolygons(final LineSegment outerChosen, final LineSegment innerChosen) {
         outerChosenOrientationCorrection(outerChosen);
         mergedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.size()];
