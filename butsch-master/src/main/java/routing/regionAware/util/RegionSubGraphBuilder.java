@@ -16,17 +16,32 @@ public class RegionSubGraphBuilder {
     private GeometryFactory geometryFactory = new GeometryFactory();
     private RoadGraph graph;
     private RoadGraph subGraph;
-    private Polygon region;
+    private Polygon whiteRegion;
+    private Polygon blackRegion;
     private Collection<Node> whitelist;
 
-    public RoadGraph getSubGraph(final RoadGraph graph, final Polygon region, final Collection<Node> whitelist) {
+    public RoadGraph getSubGraph(final RoadGraph graph, final Polygon whiteRegion, final Collection<Node> whitelist) {
         this.graph = graph;
         this.subGraph = new RoadGraph(Edge.class);
-        this.region = region;
+        this.whiteRegion = whiteRegion;
         this.whitelist = whitelist;
 
         addWhitelistNodes();
-        addNodes();
+        addNodesWhite();
+        addEdges();
+
+        return subGraph;
+    }
+
+    public RoadGraph getSubGraph(final RoadGraph graph, final Polygon whiteRegion, final Polygon blackRegion, final Collection<Node> whitelist) {
+        this.graph = graph;
+        this.subGraph = new RoadGraph(Edge.class);
+        this.whiteRegion = whiteRegion;
+        this.blackRegion = blackRegion;
+        this.whitelist = whitelist;
+
+        addWhitelistNodes();
+        addNodesWhiteBlack();
         addEdges();
 
         return subGraph;
@@ -39,14 +54,27 @@ public class RegionSubGraphBuilder {
         }
     }
 
-    public void addNodes() {
+    public void addNodesWhite() {
         for (final Node node : graph.vertexSet()) {
             final Geometry point = toPoint(node);
-            if (region.contains(point)) {
-                isNodeInRegion.set(node, true);
-                subGraph.addVertex(node);
+            if (whiteRegion.contains(point)) {
+                addNode(node);
             }
         }
+    }
+
+    public void addNodesWhiteBlack() {
+        for (final Node node : graph.vertexSet()) {
+            final Geometry point = toPoint(node);
+            if (whiteRegion.contains(point) && !blackRegion.contains(point)) {
+                addNode(node);
+            }
+        }
+    }
+
+    public void addNode(final Node node) {
+        isNodeInRegion.set(node, true);
+        subGraph.addVertex(node);
     }
 
     public void addEdges() {
