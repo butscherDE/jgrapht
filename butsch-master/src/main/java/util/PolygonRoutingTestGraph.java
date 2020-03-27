@@ -18,7 +18,7 @@ public class PolygonRoutingTestGraph {
     public RoadCH ch;
     public Polygon polygon;
 
-    private PolygonRoutingTestGraph() {
+    public PolygonRoutingTestGraph() {
         this(getDefaultNodeList(), getDefaultEdgeList());
     }
 
