@@ -12,9 +12,11 @@ public class PolygonMerger {
     private final Coordinate[] outerCoordinates;
     private final List<Coordinate> innerCoordinates;
 
-    private int m;
-    private int i;
+    private int mergedCoordinatesPointer;
+    private int outerCoordinatesPointer;
     private Coordinate[] mergedCoordinates;
+    private LineSegment outerChosen;
+    private LineSegment innerChosen;
 
     public PolygonMerger(final Coordinate[] outerCoordinates, final CircularList<Coordinate> innerCoordinates) {
         if (!outerCoordinates[0].equals(outerCoordinates[outerCoordinates.length - 1])) {
@@ -42,44 +44,49 @@ public class PolygonMerger {
     }
 
     public Coordinate[] mergePolygons(final LineSegment outerChosen, final LineSegment innerChosen) {
-        outerChosenOrientationCorrection(outerChosen);
-        mergedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.size()];
+        setupDataStructures(outerChosen, innerChosen);
 
-        m = 0;
-        for (i = 0; i < outerCoordinates.length - 1; i++) {
-            mergedCoordinates[m++] = outerCoordinates[i];
-            if (areNextTwoCoordsChosenByLineSegment(outerChosen)) {
-                processInnerPolygon(outerChosen, innerChosen);
+        final int endOfOuterCoordinates = outerCoordinates.length - 1;
+        for (outerCoordinatesPointer = 0; outerCoordinatesPointer < endOfOuterCoordinates; outerCoordinatesPointer++) {
+            mergedCoordinates[mergedCoordinatesPointer++] = outerCoordinates[outerCoordinatesPointer];
+
+            if (areNextTwoCoordsChosenByLineSegment()) {
+                processInnerPolygon();
             }
         }
-        mergedCoordinates[m] = outerCoordinates[outerCoordinates.length - 1];
+        mergedCoordinates[mergedCoordinatesPointer] = outerCoordinates[endOfOuterCoordinates];
 
         return mergedCoordinates;
     }
 
+    public void setupDataStructures(final LineSegment outerChosen, final LineSegment innerChosen) {
+        outerChosenOrientationCorrection(outerChosen);
+        this.outerChosen = outerChosen;
+        this.innerChosen = innerChosen;
+        mergedCoordinates = new Coordinate[outerCoordinates.length + innerCoordinates.size()];
+        mergedCoordinatesPointer = 0;
+    }
+
     private void outerChosenOrientationCorrection(final LineSegment outerChosen) {
-        boolean foundForward = searchForwardOnOuterRing(outerChosen);
+        boolean foundForward = searchForwardOnOuterCoordinates(outerChosen);
 
         if (!foundForward) {
-            boolean foundReverse = searchAsReverse(outerChosen);
+            outerChosen.reverse();
+            boolean foundReverse = searchForwardOnOuterCoordinates(outerChosen);
 
             handleNotFoundCase(foundReverse);
         }
     }
 
-    private boolean searchForwardOnOuterRing(final LineSegment outerChosen) {
+    private boolean searchForwardOnOuterCoordinates(final LineSegment outerChosen) {
         boolean foundForward = false;
-        for (int k = 0; k < outerCoordinates.length - 1; k++) {
-            final boolean basePointEqual = outerCoordinates[k].equals(outerChosen.p0);
-            final boolean adjPointEqual = outerCoordinates[k + 1].equals(outerChosen.p1);
+        for (int j = 0; j < outerCoordinates.length - 1; j++) {
+            final boolean basePointEqual = outerCoordinates[j].equals(outerChosen.p0);
+            final boolean adjPointEqual = outerCoordinates[j + 1].equals(outerChosen.p1);
+
             foundForward |= basePointEqual && adjPointEqual;
         }
         return foundForward;
-    }
-
-    private boolean searchAsReverse(final LineSegment outerChosen) {
-        outerChosen.reverse();
-        return searchForwardOnOuterRing(outerChosen);
     }
 
     private void handleNotFoundCase(final boolean foundReverse) {
@@ -88,52 +95,74 @@ public class PolygonMerger {
         }
     }
 
-    private void processInnerPolygon(final LineSegment outerChosen, final LineSegment innerChosen) {
+    private void processInnerPolygon() {
         if (innerCoordinates.size() > 1) {
-            processWhenInnerLargeEnoughToBeAPolygon(outerChosen, innerChosen);
+            processWhenInnerLargeEnoughToBeAPolygon();
         } else {
             processWhenInnerIsJustAPoint();
         }
     }
 
-    private void processWhenInnerLargeEnoughToBeAPolygon(final LineSegment outerChosen, final LineSegment innerChosen) {
-        addAllInnerCoordinates(outerChosen, innerChosen);
+    private void processWhenInnerLargeEnoughToBeAPolygon() {
+        addAllInnerCoordinates();
     }
 
     private void processWhenInnerIsJustAPoint() {
-        mergedCoordinates[m++] = innerCoordinates.get(0);
+        mergedCoordinates[mergedCoordinatesPointer++] = innerCoordinates.get(0);
     }
 
-    private boolean areNextTwoCoordsChosenByLineSegment(final LineSegment outerChosen) {
-        return outerCoordinates[i].equals(outerChosen.p0) && outerCoordinates[i + 1].equals(outerChosen.p1);
+    private boolean areNextTwoCoordsChosenByLineSegment() {
+        return outerCoordinates[outerCoordinatesPointer].equals(outerChosen.p0) && outerCoordinates[outerCoordinatesPointer + 1].equals(outerChosen.p1);
     }
 
-    private void addAllInnerCoordinates(final LineSegment outerChosen, final LineSegment innerChosen) {
+    private void addAllInnerCoordinates() {
         final List<LineSegment> innerLayerAsLineSegments = ConvexLayers.getLineSegments(innerCoordinates);
-        final LineSegment[] endVisibilityBridgeLines = getEndVisibilityBridgeLines(outerChosen, innerChosen,
-                                                                                   innerLayerAsLineSegments);
-        final Coordinate innerEntryPoint = endVisibilityBridgeLines[0].p1;
-        final Coordinate innerExitPoint = endVisibilityBridgeLines[1].p1;
+        final LineSegment[] linesToConnectInnerAndOuter = getEndVisibilityBridgeLines(innerLayerAsLineSegments);
+        int innerIterationStartIndex = getIndexOfEntryPoint(linesToConnectInnerAndOuter[0]);
+        int newInnerIterationExitIndex = getIndexOfExitPoint(linesToConnectInnerAndOuter, 1);
 
-        int innerIterationStartIndex = innerCoordinates.indexOf(innerEntryPoint);
-        int newInnerIterationExitIndex = innerCoordinates.indexOf(innerExitPoint);
-
-        if (getIndexDistance(newInnerIterationExitIndex, innerIterationStartIndex, innerCoordinates.size()) == 1) {
-            final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerIterationStartIndex + 1);
-            while (innerCircularIterator.hasPrevious()) {
-                final Coordinate previous = innerCircularIterator.previous();
-                mergedCoordinates[m++] = previous;
-            }
-        } else if (getIndexDistance(newInnerIterationExitIndex, innerIterationStartIndex,
-                                    innerCoordinates.size()) == -1) {
-            final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(
-                    innerIterationStartIndex);
-            while (innerCircularIterator.hasNext()) {
-                final Coordinate next = innerCircularIterator.next();
-                mergedCoordinates[m++] = next;
-            }
+        if (isStartBeforeExit(innerIterationStartIndex, newInnerIterationExitIndex)) {
+            addInnerCoordinatesBackward(innerIterationStartIndex);
+        } else if (isStartAfterExit(innerIterationStartIndex, newInnerIterationExitIndex)) {
+            addInnerCoordinatesForward(innerIterationStartIndex);
         } else {
             throw new IllegalStateException("This cannot happen");
+        }
+    }
+
+    private int getIndexOfEntryPoint(final LineSegment lineSegment) {
+        final Coordinate innerEntryPoint = lineSegment.p1;
+        return innerCoordinates.indexOf(innerEntryPoint);
+    }
+
+    private int getIndexOfExitPoint(final LineSegment[] linesToConnectInnerAndOuter, final int i) {
+        final Coordinate innerExitPoint = linesToConnectInnerAndOuter[i].p1;
+        return innerCoordinates.indexOf(innerExitPoint);
+    }
+
+    private boolean isStartBeforeExit(final int innerIterationStartIndex, final int newInnerIterationExitIndex) {
+        return getIndexDistance(newInnerIterationExitIndex, innerIterationStartIndex, innerCoordinates.size()) == 1;
+    }
+
+    private void addInnerCoordinatesBackward(final int innerIterationStartIndex) {
+        final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerIterationStartIndex + 1);
+        while (innerCircularIterator.hasPrevious()) {
+            final Coordinate previous = innerCircularIterator.previous();
+            mergedCoordinates[mergedCoordinatesPointer++] = previous;
+        }
+    }
+
+    private boolean isStartAfterExit(final int innerIterationStartIndex, final int newInnerIterationExitIndex) {
+        return getIndexDistance(newInnerIterationExitIndex, innerIterationStartIndex,
+                                    innerCoordinates.size()) == -1;
+    }
+
+    private void addInnerCoordinatesForward(final int innerIterationStartIndex) {
+        final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(
+                innerIterationStartIndex);
+        while (innerCircularIterator.hasNext()) {
+            final Coordinate next = innerCircularIterator.next();
+            mergedCoordinates[mergedCoordinatesPointer++] = next;
         }
     }
 
@@ -150,17 +179,15 @@ public class PolygonMerger {
         }
     }
 
-    private LineSegment[] getEndVisibilityBridgeLines(final LineSegment outerChosen, final LineSegment innerChosen,
-                                                      final List<LineSegment> innerLayerAsLineSegments) {
-        final LineSegment[] endVisibilityCheckLines = getEndVisibilityCheckLines(outerChosen, innerChosen);
+    private LineSegment[] getEndVisibilityBridgeLines(final List<LineSegment> innerLayerAsLineSegments) {
+        final LineSegment[] endVisibilityCheckLines = getEndVisibilityCheckLines();
         final boolean[] isNotIntersected = new boolean[4];
 
         for (int i = 0; i < isNotIntersected.length; i++) {
             final LineSegment endVisibilityCheckLine = endVisibilityCheckLines[i];
             isNotIntersected[i] = true;
             for (final LineSegment possibleSightBlockingLine : innerLayerAsLineSegments) {
-                final boolean isIntersecting = isIntersectionProduced(possibleSightBlockingLine, endVisibilityCheckLine,
-                                                                      innerChosen);
+                final boolean isIntersecting = isIntersectionProduced(possibleSightBlockingLine, endVisibilityCheckLine);
                 isNotIntersected[i] &= !isIntersecting;
             }
         }
@@ -177,11 +204,10 @@ public class PolygonMerger {
         }
     }
 
-    private boolean isIntersectionProduced(final LineSegment possiblySightBlockingLine, final LineSegment checkLine,
-                                           final LineSegment innerLineThatShallNotBeIntersected) {
+    private boolean isIntersectionProduced(final LineSegment possiblySightBlockingLine, final LineSegment checkLine) {
         final Coordinate intersection = possiblySightBlockingLine.intersection(checkLine);
         if (intersection != null) {
-            return !isIntersectionOnLineThatShouldntBeIntersected(innerLineThatShallNotBeIntersected, intersection);
+            return !isIntersectionOnLineThatShouldntBeIntersected(innerChosen, intersection);
         } else {
             return false;
         }
@@ -192,12 +218,11 @@ public class PolygonMerger {
         return innerLineThatShallNotBeIntersected.distance(intersection) == 0.0;
     }
 
-    private LineSegment[] getEndVisibilityCheckLines(final LineSegment outerLineSegment,
-                                                     final LineSegment innerLineSegment) {
-        return new LineSegment[]{new LineSegment(outerLineSegment.p0, innerLineSegment.p0), new LineSegment(
-                outerLineSegment.p0, innerLineSegment.p1), new LineSegment(outerLineSegment.p1,
-                                                                           innerLineSegment.p0), new LineSegment(
-                outerLineSegment.p1, innerLineSegment.p1)};
+    private LineSegment[] getEndVisibilityCheckLines() {
+        return new LineSegment[]{new LineSegment(outerChosen.p0, innerChosen.p0), new LineSegment(
+                outerChosen.p0, innerChosen.p1), new LineSegment(outerChosen.p1,
+                                                                 innerChosen.p0), new LineSegment(
+                outerChosen.p1, innerChosen.p1)};
     }
 
     private boolean isIntersecting(final LineSegment p0ToP0, final LineSegment p1ToP1) {
