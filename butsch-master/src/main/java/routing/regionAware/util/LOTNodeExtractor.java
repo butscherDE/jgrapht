@@ -47,7 +47,7 @@ public class LOTNodeExtractor {
     }
 
     private boolean isLotNode(final Node viaPoint, final Node entryExitPoint) {
-        boolean shorterToSomeNeighbor = false;
+        boolean longerToSomeNeighbor = false;
 
         for (final Object oIncidence : graph.incomingEdgesOf(entryExitPoint)) {
             final Edge edge = (Edge) oIncidence;
@@ -59,11 +59,11 @@ public class LOTNodeExtractor {
                 final Path pathToEntryExitPoint = allPaths.get(new Pair(viaPoint, entryExitPoint));
                 final double distanceToEntryExitPoint = pathToEntryExitPoint.getWeight();
 
-                shorterToSomeNeighbor |= distanceToEntryExitPoint < distanceToNeighbor;
+                longerToSomeNeighbor |= distanceToEntryExitPoint > distanceToNeighbor;
             }
         }
 
-        return shorterToSomeNeighbor;
+        return !longerToSomeNeighbor;
     }
 
     private boolean isEntryExitPoint(final Node neighbor) {

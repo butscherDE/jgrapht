@@ -305,6 +305,9 @@ public class PolygonRoutingTestGraph {
 
             final Edge edge = graph.addEdge(sourceNode, targetNode);
             graph.setEdgeWeight(edge, weight);
+
+            final Edge edge2 = graph.addEdge(targetNode, sourceNode);
+            graph.setEdgeWeight(edge2, weight);
         }
     }
 

@@ -53,9 +53,10 @@ public class LOTNodeExtractorTest {
 
     @Test
     public void correctLotNodesForViaPoint0() {
-        final List<Node> lotNodesForViaPoint0 = createLotNodesForViaPoint0();
+        final List<Node> expectedLotNodesForViaPoint0 = createLotNodesForViaPoint0();
+        final List<Node> lotNodesForViaPoint0 = this.extractor.getLotNodesFor(graph.getVertex(0));
 
-        assertEquals(lotNodesForViaPoint0, this.extractor.getLotNodesFor(graph.getVertex(0)));
+        assertEquals(expectedLotNodesForViaPoint0, lotNodesForViaPoint0);
     }
 
     private List<Node> createLotNodesForViaPoint0() {
@@ -81,8 +82,8 @@ public class LOTNodeExtractorTest {
 
     @Test
     public void correctPathsViaPoint0() {
-        final List<Integer> path0To28 = new ArrayList<>(Arrays.asList(new Integer[] {0, 1, 28}));
-        final List<Integer> path0To44 = new ArrayList<>(Arrays.asList(new Integer[] {0, 7, 44}));
+        final List<Node> path0To28 = new ArrayList<>(Arrays.asList(new Node[] {graph.getVertex(0), graph.getVertex(1), graph.getVertex(28)}));
+        final List<Node> path0To44 = new ArrayList<>(Arrays.asList(new Node[] {graph.getVertex(0), graph.getVertex(7), graph.getVertex(44)}));
 
         assertEquals(path0To28, this.extractor.getLotNodePathFor(graph.getVertex(0), graph.getVertex(28)).getVertexList());
         assertEquals(path0To44, this.extractor.getLotNodePathFor(graph.getVertex(0), graph.getVertex(44)).getVertexList());
@@ -90,8 +91,8 @@ public class LOTNodeExtractorTest {
 
     @Test
     public void correctPathsViaPoint2() {
-        final List<Integer> path2To28 = new ArrayList<>(Arrays.asList(new Integer[] {2, 28}));
-        final List<Integer> path2To44 = new ArrayList<>(Arrays.asList(new Integer[] {2, 1, 45}));
+        final List<Node> path2To28 = new ArrayList<>(Arrays.asList(new Node[] {graph.getVertex(2), graph.getVertex(28)}));
+        final List<Node> path2To44 = new ArrayList<>(Arrays.asList(new Node[] {graph.getVertex(2), graph.getVertex(1), graph.getVertex(45)}));
 
         assertEquals(path2To28, this.extractor.getLotNodePathFor(graph.getVertex(2), graph.getVertex(28)).getVertexList());
         assertEquals(path2To44, this.extractor.getLotNodePathFor(graph.getVertex(2), graph.getVertex(45)).getVertexList());
