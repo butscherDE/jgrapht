@@ -2,7 +2,6 @@ package geometry;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
-import org.locationtech.jts.geom.Polygon;
 import util.CircularList;
 
 import java.util.Arrays;
@@ -59,7 +58,7 @@ public class PolygonMerger {
     }
 
     private void outerChosenOrientationCorrection(final LineSegment outerChosen) {
-        boolean foundForward = searchForward(outerChosen);
+        boolean foundForward = searchForwardOnOuterRing(outerChosen);
 
         if (!foundForward) {
             boolean foundReverse = searchAsReverse(outerChosen);
@@ -68,7 +67,7 @@ public class PolygonMerger {
         }
     }
 
-    private boolean searchForward(final LineSegment outerChosen) {
+    private boolean searchForwardOnOuterRing(final LineSegment outerChosen) {
         boolean foundForward = false;
         for (int k = 0; k < outerCoordinates.length - 1; k++) {
             final boolean basePointEqual = outerCoordinates[k].equals(outerChosen.p0);
@@ -80,7 +79,7 @@ public class PolygonMerger {
 
     private boolean searchAsReverse(final LineSegment outerChosen) {
         outerChosen.reverse();
-        return searchForward(outerChosen);
+        return searchForwardOnOuterRing(outerChosen);
     }
 
     private void handleNotFoundCase(final boolean foundReverse) {
