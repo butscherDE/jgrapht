@@ -1,15 +1,13 @@
 package geometry;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 import util.CircularList;
-import visualizations.GeometryVisualizer;
 
-import java.awt.*;
-import java.util.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.ListIterator;
 
 public class PolygonMerger {
     private final Coordinate[] outerCoordinates;
@@ -18,7 +16,6 @@ public class PolygonMerger {
     private int m;
     private int i;
     private Coordinate[] mergedCoordinates;
-    private boolean chosenToInnerRingNotInversed;
 
     public PolygonMerger(final Coordinate[] outerCoordinates, final CircularList<Coordinate> innerCoordinates) {
         if (!outerCoordinates[0].equals(outerCoordinates[outerCoordinates.length - 1])) {
@@ -98,7 +95,6 @@ public class PolygonMerger {
 
     private void processInnerPolygon(final LineSegment outerChosen, final LineSegment innerChosen) {
         if (innerCoordinates.size() > 1) {
-            calcAndSetInnerStartIndex(innerChosen);
             processWhenInnerLargeEnoughToBeAPolygon(outerChosen, innerChosen);
         } else {
             processWhenInnerIsJustAPoint();
@@ -157,18 +153,6 @@ public class PolygonMerger {
         } else {
             return difference;
         }
-    }
-
-
-    private void calcAndSetInnerStartIndex(final LineSegment innerChosen) {
-        final int indexOfInnerChosen = innerCoordinates.indexOf(innerChosen.p0);
-        nextInnerEqualToChosenP1(innerChosen, indexOfInnerChosen);
-    }
-
-    private void nextInnerEqualToChosenP1(final LineSegment innerChosen, final int indexOfInnerChosen) {
-        final int indexOfNextToChosen = (indexOfInnerChosen + 1) % innerCoordinates.size();
-        final Coordinate nextCoordinateToInnerP0 = innerCoordinates.get(indexOfNextToChosen);
-        chosenToInnerRingNotInversed = nextCoordinateToInnerP0.equals(innerChosen.p1);
     }
 
     private LineSegment[] getEndVisibilityBridgeLines(final LineSegment outerChosen, final LineSegment innerChosen,
