@@ -10,9 +10,12 @@ import java.util.List;
 public class CLPolygonGenerator extends PolygonGenerator {
     private final GeometryFactory geometryFactory = new GeometryFactory();
     private final Random random;
+
     private LineSegment outerSegment;
     private LineSegment innerSegment;
     private Coordinate[] mergedPolygon;
+    private LineSegment lastInner;
+    private ConvexLayers cl;
 
     public CLPolygonGenerator(final int numPoints, final Random random) {
         super(numPoints, random);
@@ -24,20 +27,31 @@ public class CLPolygonGenerator extends PolygonGenerator {
      * Creates random coordinates from the same convex layers.
      */
     public Polygon createRandomSimplePolygon() {
+        createRandomConvexLayers();
+        mergeConvexLayersRandomly();
+
+        return createPolygon();
+    }
+
+    public void createRandomConvexLayers() {
         final Coordinate[] randomCoordinates = createRandomCoordinates();
         final MultiPoint asPoints = geometryFactory.createMultiPointFromCoords(randomCoordinates);
-        final ConvexLayers cl = new ConvexLayers(asPoints);
+        cl = new ConvexLayers(asPoints);
+    }
 
+    public void mergeConvexLayersRandomly() {
         mergedPolygon = cl.layers[0].getCoordinates();
-        LineSegment lastInner = new LineSegment();
+        lastInner = new LineSegment();
         for (int layerIndex = 0; layerIndex < cl.layers.length - 1; layerIndex++) {
-            chooseOuterLineSegment(cl, lastInner, layerIndex);
-            lastInner = chooseEndVisibleInnerLineSegment(cl, layerIndex);
+            chooseOuterInnerLineSegments(cl, layerIndex);
 
             mergeNextLayer(cl.layers[layerIndex + 1]);
         }
+    }
 
-        return createPolygon(mergedPolygon);
+    public void chooseOuterInnerLineSegments(final ConvexLayers cl, final int layerIndex) {
+        chooseOuterLineSegment(cl, lastInner, layerIndex);
+        lastInner = chooseEndVisibleInnerLineSegment(cl, layerIndex);
     }
 
     public void chooseOuterLineSegment(final ConvexLayers cl, final LineSegment lastInner, final int layerIndex) {
@@ -61,7 +75,7 @@ public class CLPolygonGenerator extends PolygonGenerator {
         mergedPolygon = polygonMerger.mergePolygons(outerSegment, innerSegment);
     }
 
-    public Polygon createPolygon(final Coordinate[] mergedPolygon) {
+    public Polygon createPolygon() {
         return geometryFactory.createPolygon(mergedPolygon);
     }
 
