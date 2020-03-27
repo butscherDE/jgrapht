@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ImportPBFTest {
     @Test
     public void importTest() {
-        final ImportPBF importPBF = new ImportPBF(Config.PBF_GERMANY);
+        final ImportPBF importPBF = new ImportPBF(Config.PBF_LUXEMBOURG);
 
         final RoadGraph graph;
         try {
@@ -36,8 +36,7 @@ public class ImportPBFTest {
     public void regionFeulenLuxembourg() {
         final long id = 1113660;
 
-
-        final ImportPBF importPBF = new ImportPBF(Config.PBF_GERMANY);
+        final ImportPBF importPBF = new ImportPBF(Config.PBF_LUXEMBOURG);
         try {
             importPBF.createGraph();
         } catch (FileNotFoundException e) {

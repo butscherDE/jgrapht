@@ -63,6 +63,6 @@ public class LearningTests {
         }
 
         final GeometryVisualizer visualizer = new GeometryVisualizer(collection);
-        visualizer.visualizeGraph(100_000);
+        visualizer.visualizeGraph(0);
     }
 }

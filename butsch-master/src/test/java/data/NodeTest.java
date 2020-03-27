@@ -62,4 +62,12 @@ class NodeTest {
 
         assertNotEquals(nodeA, nodeB);
     }
+
+    @Test
+    public void distance() {
+        final Node nodeA = new Node(0, 0.0, 1.0, 2);
+        final Node nodeB = new Node(1, 1.0, 1.0, 2);
+
+        assertEquals(1d, nodeA.euclideanDistance(nodeB), 0);
+    }
 }

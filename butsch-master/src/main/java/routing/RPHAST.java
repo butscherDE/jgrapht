@@ -6,6 +6,7 @@ import data.Path;
 import data.RoadCH;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.RPHASTManyToMany;
+import org.jgrapht.alg.util.Pair;
 import org.jgrapht.graph.GraphWalk;
 
 import java.util.*;
@@ -22,6 +23,22 @@ public class RPHAST implements RoutingAlgorithm {
     @Override
     public Path findPath(final Node source, final Node target) {
         return findPaths(Collections.singleton(source), Collections.singleton(target)).get(0);
+    }
+
+    public Map<Pair<Node, Node>, Path> findPathsAsMap(final Set<Node> sources, final Set<Node> targets) {
+        final List<Path> paths = findPaths(sources, targets);
+
+        final Map<Pair<Node, Node>, Path> pathMap = new HashMap<>();
+        final Iterator<Path> pathIterator = paths.iterator();
+        for (final Node source : sources) {
+            for (final Node target : targets) {
+                final Pair<Node, Node> keyNodePair = new Pair<>(source, target);
+                final Path path = pathIterator.next();
+                pathMap.put(keyNodePair, path);
+            }
+        }
+
+        return pathMap;
     }
 
     @Override

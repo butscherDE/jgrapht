@@ -1,5 +1,9 @@
 package data;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+
 import java.util.Objects;
 
 public class Node {
@@ -42,5 +46,12 @@ public class Node {
     @Override
     public String toString() {
         return id + ", " + longitude + ", " + latitude + ", " + elevation;
+    }
+
+    public double euclideanDistance(final Node other) {
+        final Coordinate thisCoordinate = new Coordinate(longitude, latitude, elevation);
+        final Coordinate otherCoordinate = new Coordinate(other.longitude, other.latitude, other.elevation);
+
+        return thisCoordinate.distance(otherCoordinate);
     }
 }
