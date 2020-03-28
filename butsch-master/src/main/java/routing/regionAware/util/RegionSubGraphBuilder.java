@@ -8,7 +8,10 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import util.BinaryHashFunction;
+import visualizations.GeometryVisualizer;
 
+import java.awt.*;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class RegionSubGraphBuilder {
@@ -66,7 +69,10 @@ public class RegionSubGraphBuilder {
     public void addNodesWhiteBlack() {
         for (final Node node : graph.vertexSet()) {
             final Geometry point = toPoint(node);
-            if (whiteRegion.contains(point) && !blackRegion.contains(point)) {
+
+            final boolean isWhiteContainingPoint = whiteRegion.contains(point);
+            final boolean isBlackContainingPoint = blackRegion.contains(point);
+            if (isWhiteContainingPoint && !isBlackContainingPoint) {
                 addNode(node);
             }
         }
