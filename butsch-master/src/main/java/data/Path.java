@@ -1,7 +1,9 @@
 package data;
 
 import org.jgrapht.GraphPath;
+import org.jgrapht.graph.GraphWalk;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Path {
@@ -37,5 +39,24 @@ public class Path {
 
     public double getWeight() {
         return path.getWeight();
+    }
+
+    public Path createMergedPath(final Path otherPath) {
+        if (!getEndVertex().equals(otherPath.getStartVertex())) {
+            throw new IllegalArgumentException("end and start vertex must be overlapping");
+        }
+
+        final List<Edge> edges = new LinkedList<>(getEdgeList());
+        edges.addAll(otherPath.getEdgeList());
+        final double combinedWeight = getWeight() + otherPath.getWeight();
+
+        final GraphWalk<Node, Edge> newWalk = new GraphWalk<>(this.path.getGraph(), getStartVertex(), otherPath.getEndVertex(),
+                                                              edges, combinedWeight);
+        return new Path(newWalk);
+    }
+
+    @Override
+    public String toString() {
+        return "(" + getStartVertex() + "-" + getEndVertex() + ")=" + path.toString();
     }
 }
