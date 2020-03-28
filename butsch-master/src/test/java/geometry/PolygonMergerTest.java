@@ -1,7 +1,6 @@
 package geometry;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -5249,24 +5248,22 @@ public class PolygonMergerTest {
     }
 
     private Coordinate[] getOuterCoordinates() {
-        final Coordinate[] outerPolygonCoords = new Coordinate[] {
+        return new Coordinate[] {
                 new Coordinate(-2,-2),
                 new Coordinate(-2,2),
                 new Coordinate(2,2),
                 new Coordinate(2,-2),
                 new Coordinate(-2,-2)
         };
-        return outerPolygonCoords;
     }
 
     private Coordinate[] getInnerCoordinates() {
-        final Coordinate[] innerPolygonCoords = new Coordinate[] {
+        return new Coordinate[] {
                 new Coordinate(-1, -1),
                 new Coordinate(-1, 1),
                 new Coordinate(1, 1),
                 new Coordinate(1, -1),
                 new Coordinate(-1, -1)
         };
-        return innerPolygonCoords;
     }
 }

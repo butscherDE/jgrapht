@@ -73,7 +73,7 @@ public class ImportPBF implements GraphImporter {
         return nodeRelations;
     }
 
-    private class HeaderPrinter implements Consumer<Header> {
+    private static class HeaderPrinter implements Consumer<Header> {
         @Override
         public void accept(final Header header) {
             System.out.println("Importing from source " + header.getSource());
@@ -191,13 +191,13 @@ public class ImportPBF implements GraphImporter {
         private void addEmptyRelation(final Map.Entry<Long, Relation> relationEntry) {
             final Long relationId = relationEntry.getKey();
             final String description = "INVALID";
-            final Map dummyMap = Collections.EMPTY_MAP;
-            final List dummyNodes = Collections.EMPTY_LIST;
+            @SuppressWarnings("unchecked") final Map<String, String> dummyMap = Collections.EMPTY_MAP;
+            @SuppressWarnings("unchecked") final List<Node> dummyNodes = Collections.EMPTY_LIST;
             nodeRelations.add(new NodeRelation(relationId, description, dummyMap, dummyNodes));
         }
     }
 
-    private class Completer implements Runnable {
+    private static class Completer implements Runnable {
         final StopWatchVerbose sw = new StopWatchVerbose("PBF Read");
 
         @Override
@@ -206,14 +206,14 @@ public class ImportPBF implements GraphImporter {
         }
     }
 
-    private class DummyBBox implements Consumer<BoundBox> {
+    private static class DummyBBox implements Consumer<BoundBox> {
         @Override
         public void accept(final BoundBox boundBox) {
 
         }
     }
 
-    private class DummyChangeSet implements Consumer<Long> {
+    private static class DummyChangeSet implements Consumer<Long> {
         @Override
         public void accept(final Long aLong) {
 

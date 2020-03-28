@@ -9,7 +9,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TwoOptPolygonGeneratorTest extends PolygonGeneratorTest {
-    private Random random  = new Random(42);
+    private final Random random  = new Random(42);
 
     @Test
     public void testSimplePolygon() {

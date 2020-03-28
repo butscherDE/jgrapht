@@ -45,6 +45,7 @@ public class ImportPBFTest {
 
         final List<NodeRelation> nodeRelations = importPBF.getNodeRelations();
         System.out.println(nodeRelations.size());
+        // noinspection unchecked
         assertTrue(nodeRelations.contains(new NodeRelation(id, "", Collections.EMPTY_MAP, Collections.EMPTY_LIST)));
 
         for (final NodeRelation nodeRelation : nodeRelations) {
@@ -369,7 +370,7 @@ public class ImportPBFTest {
                                              new Node(1618835437,0,0,0),
                                              new Node(1618835434,0,0,0),
                                              new Node(1618835422,0,0,0),
-                                             new Node(2186741378l,0,0,0),
+                                             new Node(2186741378L, 0, 0, 0),
                                              new Node(1618835416,0,0,0),
                                              new Node(1618835406,0,0,0),
                                              new Node(1618835403,0,0,0),
@@ -392,7 +393,7 @@ public class ImportPBFTest {
                                              new Node(1618835361,0,0,0),
                                              new Node(1618835369,0,0,0),
                                              new Node(1618835372,0,0,0),
-                                             new Node(2186741333l,0,0,0),
+                                             new Node(2186741333L, 0, 0, 0),
                                              new Node(1618835386,0,0,0),
                                              new Node(1618835388,0,0,0),
                                              new Node(1618835391,0,0,0),
@@ -1312,7 +1313,7 @@ public class ImportPBFTest {
                 new Node(1619047607,0,0,0),
                 new Node(1619047612,0,0,0),
                 new Node(1619047610,0,0,0),
-                new Node(4822225967l,0,0,0),
+                new Node(4822225967L, 0, 0, 0),
                 new Node(1619047603,0,0,0),
                 new Node(1619047594,0,0,0),
                 new Node(1619047592,0,0,0),

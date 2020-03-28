@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SuppressWarnings("SpellCheckingInspection")
 class ImportERPGraphTest {
     // TODO check for to few nodes/edges in metadata
     // TODO check IndexOutOfBounds when to few numbers in a line.
@@ -53,7 +54,7 @@ class ImportERPGraphTest {
     void verifyErrorHandlingOnMalformedNodeCount() {
         assertThrows(NumberFormatException.class, () -> {
             final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedNodeCount.txt");
-            final Graph graph = graphImporter.createGraph();
+            final RoadGraph graph = graphImporter.createGraph();
         });
     }
 
@@ -61,7 +62,7 @@ class ImportERPGraphTest {
     void verifyErrorHandlingOnMalformedEdgeCount() {
         assertThrows(NumberFormatException.class, () -> {
             final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedEdgeCount.txt");
-            final Graph graph = graphImporter.createGraph();
+            final RoadGraph graph = graphImporter.createGraph();
         });
     }
 
@@ -69,7 +70,7 @@ class ImportERPGraphTest {
     void verifyErrorHandlingOnMalformedNode() {
         assertThrows(NumberFormatException.class, () -> {
             final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedNode.txt");
-            final Graph graph = graphImporter.createGraph();
+            final RoadGraph graph = graphImporter.createGraph();
         });
     }
 
@@ -77,7 +78,7 @@ class ImportERPGraphTest {
     void verifyErrorHandlingOnMalformedEdge() {
         assertThrows(NumberFormatException.class, () -> {
             final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_malformedNodeCount.txt");
-            final Graph graph = graphImporter.createGraph();
+            final RoadGraph graph = graphImporter.createGraph();
         });
     }
 
@@ -85,7 +86,7 @@ class ImportERPGraphTest {
     void verifyErrorHandlingOnWrongEdgeCount() {
         assertThrows(NullPointerException.class, () -> {
             final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_wrongEdgeCount.txt");
-            final Graph graph = graphImporter.createGraph();
+            final RoadGraph graph = graphImporter.createGraph();
         });
     }
 
@@ -93,7 +94,7 @@ class ImportERPGraphTest {
     void verifyErrorHandlingOnMalformedWrongNodeCount() {
         assertThrows(NullPointerException.class, () -> {
             final GraphImporter graphImporter = new ImportERPGraph("C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d_wrongNodeCount.txt");
-            final Graph graph = graphImporter.createGraph();
+            final RoadGraph graph = graphImporter.createGraph();
         });
     }
 
@@ -102,7 +103,8 @@ class ImportERPGraphTest {
     }
 
     private void assertEdge(final Node source, final Node target, final double weight, final Graph graph) {
-        final DefaultWeightedEdge edge = (DefaultWeightedEdge) graph.getEdge(source, target);
+        @SuppressWarnings("unchecked") final DefaultWeightedEdge edge = (DefaultWeightedEdge) graph.getEdge(source, target);
+        //noinspection unchecked
         assertEquals(weight, graph.getEdgeWeight(edge));
     }
 }

@@ -55,6 +55,7 @@ public class ImportERPGraph implements GraphImporter {
         reader.close();
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     private void parseGraph(int numNodes, int numEdges) throws IOException {
         final List<Node> nodeList = new ArrayList<>(numNodes);
         for (int i = 0; i < numNodes; i++) {
@@ -137,13 +138,9 @@ public class ImportERPGraph implements GraphImporter {
         final int adjNode = Integer.parseInt(currentEdgeTokens[1]);
         final double cost = Double.parseDouble(currentEdgeTokens[2]);
 
-        try {
-            final Edge edge = graph.addEdge(nodes.get(baseNode), nodes.get(adjNode));
-            if (edge != null) {
-                graph.setEdgeWeight(edge, cost);
-            }
-        } catch (Exception e) {
-
+        final Edge edge = graph.addEdge(nodes.get(baseNode), nodes.get(adjNode));
+        if (edge != null) {
+            graph.setEdgeWeight(edge, cost);
         }
     }
 

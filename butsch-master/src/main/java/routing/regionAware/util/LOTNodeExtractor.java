@@ -1,15 +1,16 @@
 package routing.regionAware.util;
 
+import data.Edge;
+import data.Node;
 import data.Path;
+import data.RoadGraph;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.Pair;
-import data.Node;
-import data.Edge;
 
 import java.util.*;
 
 public class LOTNodeExtractor {
-    private final Graph graph;
+    private final RoadGraph graph;
     private final List<Node> viaPoints;
     private final Set<Node> entryExitPoints;
     private final Map<Pair<Node, Node>, Path> allPaths;
@@ -17,7 +18,7 @@ public class LOTNodeExtractor {
     private final Map<Node, List<Node>> viaPointToLOTNodes = new HashMap<>();
 
 
-    public LOTNodeExtractor(final Graph graph, final List<Node> viaPoints, final Set<Node> entryExitPoints,
+    public LOTNodeExtractor(final RoadGraph graph, final List<Node> viaPoints, final Set<Node> entryExitPoints,
                             final Map<Pair<Node, Node>, Path> allPaths) {
         this.graph = graph;
         this.viaPoints = viaPoints;
@@ -54,9 +55,9 @@ public class LOTNodeExtractor {
             final Node neighbor = (Node) graph.getEdgeSource(edge);
 
             if (isEntryExitPoint(neighbor)) {
-                final Path pathToNeighbor = allPaths.get(new Pair(viaPoint, neighbor));
+                final Path pathToNeighbor = allPaths.get(new Pair<>(viaPoint, neighbor));
                 final double distanceToNeighbor = pathToNeighbor.getWeight();
-                final Path pathToEntryExitPoint = allPaths.get(new Pair(viaPoint, entryExitPoint));
+                final Path pathToEntryExitPoint = allPaths.get(new Pair<>(viaPoint, entryExitPoint));
                 final double distanceToEntryExitPoint = pathToEntryExitPoint.getWeight();
 
                 longerToSomeNeighbor |= distanceToEntryExitPoint > distanceToNeighbor;

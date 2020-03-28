@@ -11,8 +11,6 @@ import java.util.*;
 
 public class GeometryVisualizer {
 	public static final Color BACKGROUND = Color.WHITE;
-	public static final Color EDGES = Color.BLACK;
-	private static final Color EDGES_HIGHLIGHTET = Color.RED;
 	public static final Color NODES = new Color(0, 0, 255);
 	public static final int MARGIN = 10;
 	public static final int NODE_SIZE = 4;
@@ -77,7 +75,7 @@ public class GeometryVisualizer {
 		try {
 			Thread.sleep(millisToSleep);
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 	}
 
@@ -91,7 +89,7 @@ public class GeometryVisualizer {
 			for (Coordinate coordinate : coordinates) {
 				final double x = (coordinate.getX() - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
 				final double y = (coordinate.getY() - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
-				g2d.fill(new Ellipse2D.Double(x - NODE_SIZE / 2, y - NODE_SIZE / 2, NODE_SIZE, NODE_SIZE));
+				g2d.fill(new Ellipse2D.Double(x - NODE_SIZE / 2d, y - NODE_SIZE / 2d, NODE_SIZE, NODE_SIZE));
 				g2d.drawString(coordinate.toString(), (float) x, (float) y);
 			}
 		}
@@ -150,12 +148,12 @@ public class GeometryVisualizer {
 	}
 
 	private static class ScaledCoordinates {
-		private int w;
-		private int h;
-		private double ratio;
-		private double originalRatio;
-		private double spreadY;
-		private double spreadX;
+		private final int w;
+		private final int h;
+		private final double ratio;
+		private final double originalRatio;
+		private final double spreadY;
+		private final double spreadX;
 		public double padX;
 		public double padY;
 		public double scale;
@@ -167,18 +165,6 @@ public class GeometryVisualizer {
 			this.originalRatio = originalRatio;
 			this.spreadY = spreadY;
 			this.spreadX = spreadX;
-		}
-
-		public double getPadX() {
-			return padX;
-		}
-
-		public double getPadY() {
-			return padY;
-		}
-
-		public double getScale() {
-			return scale;
 		}
 
 		public ScaledCoordinates invoke() {

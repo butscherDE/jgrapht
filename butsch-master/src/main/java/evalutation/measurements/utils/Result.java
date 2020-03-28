@@ -1,11 +1,12 @@
 package evalutation.measurements.utils;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class Result {
     private final String algorithm;
-    private final int startNode[];
-    private final int endNode[];
+    private final int[] startNode;
+    private final int[] endNode;
     public double runningTime;
     private List<Double> weights;
     public int numSettledNodes;
@@ -30,6 +31,7 @@ public class Result {
 
     @Override
     public String toString() {
-        return algorithm + "," + startNode + "," + endNode + "," + runningTime + "," + weights + "," + numSettledNodes;
+        return algorithm + "," + Arrays.toString(startNode) + "," + Arrays.toString(
+                endNode) + "," + runningTime + "," + weights + "," + numSettledNodes;
     }
 }

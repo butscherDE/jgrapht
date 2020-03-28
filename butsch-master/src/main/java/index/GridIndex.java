@@ -14,30 +14,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GridIndex implements Index {
-    private final Graph graph;
-    private final int longitudalGranularity;
+    private final RoadGraph graph;
     private final double longitudeCellSize;
     private final int longitudePrecision;
-    private final int latitudalGranularity;
     private final double latitudeCellSize;
     private final int latitudePrecision;
     private final GridCell[][] cells;
 
-    public GridIndex(final RoadGraph graph, final int longitudalGranularity, final int latitudalGranularity) {
+    public GridIndex(final RoadGraph graph, final int longitudeGranularity, final int latitudeGranularity) {
         this.graph = graph;
-        this.longitudalGranularity = longitudalGranularity;
-        this.longitudeCellSize = 360d / longitudalGranularity;
-        this.longitudePrecision = (int) Math.pow(10, precision(longitudalGranularity));
-        this.latitudalGranularity = latitudalGranularity;
-        this.latitudeCellSize = 180d / latitudalGranularity;
-        this.latitudePrecision = (int) Math.pow(10, precision(latitudalGranularity));
+        this.longitudeCellSize = 360d / longitudeGranularity;
+        this.longitudePrecision = (int) Math.pow(10, precision(longitudeGranularity));
+        this.latitudeCellSize = 180d / latitudeGranularity;
+        this.latitudePrecision = (int) Math.pow(10, precision(latitudeGranularity));
 
-        System.out.println(longitudalGranularity);
+        System.out.println(longitudeGranularity);
         System.out.println(longitudeCellSize);
-        System.out.println(latitudalGranularity);
+        System.out.println(latitudeGranularity);
         System.out.println(latitudeCellSize);
 
-        this.cells = new GridCell[longitudalGranularity][latitudalGranularity];
+        this.cells = new GridCell[longitudeGranularity][latitudeGranularity];
 
         StopWatchVerbose sw = new StopWatchVerbose("Index creation");
         initCells();
@@ -199,6 +195,7 @@ public class GridIndex implements Index {
         return intersectingCells;
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     private LineSegment[] getBoundingBoxLineSegments(final int gridCellLongitudeIndex, final int gridCellLatitudeIndex) {
         final LineSegment[] boundingBoxLineSegments = new LineSegment[4];
 
@@ -209,7 +206,7 @@ public class GridIndex implements Index {
         double cellUpperLeftLatitude = roundLatitude((gridCellLatitudeIndex + 1) * latitudeCellSize - 90);
 
         double cellLowerRightLongitude = roundLongitude((gridCellLongitudeIndex + 1) * longitudeCellSize -180);
-        double cellLowerRightLatitude = cellLowerLeftLatitude;
+        @SuppressWarnings("UnnecessaryLocalVariable") double cellLowerRightLatitude = cellLowerLeftLatitude;
 
         double cellUpperRightLongitude = cellLowerRightLongitude;
         double cellUpperRightLatitude = cellUpperLeftLatitude;
@@ -231,7 +228,7 @@ public class GridIndex implements Index {
         final CellHullCreator hullCreator = new CellHullCreator(coordinate);
 
         Node minNode = null;
-        Double minDistance = Double.POSITIVE_INFINITY;
+        double minDistance = Double.POSITIVE_INFINITY;
         while (minNode == null) {
             final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
@@ -266,15 +263,12 @@ public class GridIndex implements Index {
 
         double minDistance = Double.POSITIVE_INFINITY;
         Edge minEdge = null;
-//        System.out.println("###### " + coordinate);
-        while (minEdge == null) {
+        while (minEdge == null) //noinspection DuplicatedCode
+        {
             final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
             for (final GridCell gridCell : cellBlock) {
                 for (final Edge edge : gridCell.edges) {
-//                    if (coordinate.getX() == 48.701978833284116 && coordinate.getY() == 9.939465535867825) {
-//                        System.out.println("Testing " + edge + " for coordinate " + coordinate);
-//                    }
                     final double distance = getDistance(coordinate, edge);
 
                     if (distance < minDistance) {
@@ -286,14 +280,12 @@ public class GridIndex implements Index {
         }
 
         // reassure closest found
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 100; i++) //noinspection DuplicatedCode
+        {
             final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
             for (final GridCell gridCell : cellBlock) {
                 for (final Edge edge : gridCell.edges) {
-                    //                    if (coordinate.getX() == 48.701978833284116 && coordinate.getY() == 9.939465535867825) {
-                    //                        System.out.println("Testing " + edge + " for coordinate " + coordinate);
-                    //                    }
                     final double distance = getDistance(coordinate, edge);
 
                     if (distance < minDistance) {
@@ -380,7 +372,7 @@ public class GridIndex implements Index {
         return (int) (Math.log10(integer) + 1);
     }
 
-    private class GridCell {
+    private static class GridCell {
         final List<Node> nodes = new LinkedList<>();
         final List<Edge> edges = new LinkedList<>();
     }

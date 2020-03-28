@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
-public class QuickDijkstraEval {
+public class QuickDijkstraEval extends RoutingAlgorithmEvalStarter {
     private final static int NUM_RUNS = 100;
 
     public static void main(String[] args) {

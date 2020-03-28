@@ -23,9 +23,7 @@ public class GridIndexTest {
     private final RoadGraph graph;
 
     private final double longitudeMinBound;
-    private final double longitudeMaxBound;
     private final double latitudeMinBound;
-    private final double latitudeMaxBound;
     private final double longitudeRange;
     private final double latitudeRange;
 
@@ -37,7 +35,7 @@ public class GridIndexTest {
             double longitudeMinBound = Double.POSITIVE_INFINITY;
             double longitudeMaxBound = Double.NEGATIVE_INFINITY;
             double latitudeMinBound = Double.POSITIVE_INFINITY;
-            double latitudeMaxBound = Double.NEGATIVE_INFINITY;;
+            double latitudeMaxBound = Double.NEGATIVE_INFINITY;
             for (final Node node : graph.vertexSet()) {
                 longitudeMinBound = Math.min(node.longitude, longitudeMinBound);
                 longitudeMaxBound = Math.max(node.longitude, longitudeMaxBound);
@@ -46,9 +44,7 @@ public class GridIndexTest {
             }
 
             this.longitudeMinBound = longitudeMinBound;
-            this.longitudeMaxBound = longitudeMaxBound;
             this.latitudeMinBound = latitudeMinBound;
-            this.latitudeMaxBound = latitudeMaxBound;
 
             this.longitudeRange = longitudeMaxBound - longitudeMinBound;
             this.latitudeRange = latitudeMaxBound - latitudeMinBound;
@@ -87,17 +83,14 @@ public class GridIndexTest {
     private Node getClosestNodeSequentially(final Coordinate randomCoordinate) {
         final List<Node> nodeList = getNodes();
 
-        return Collections.min(nodeList, new Comparator<Node>() {
-            @Override
-            public int compare(final Node node1, final Node node2) {
-                final Coordinate coordinate1 = createCoordinate(node1);
-                final Coordinate coordinate2 = createCoordinate(node2);
+        return Collections.min(nodeList, (node1, node2) -> {
+            final Coordinate coordinate1 = createCoordinate(node1);
+            final Coordinate coordinate2 = createCoordinate(node2);
 
-                final double distance1 = coordinate1.distance(randomCoordinate);
-                final double distance2 = coordinate2.distance(randomCoordinate);
+            final double distance1 = coordinate1.distance(randomCoordinate);
+            final double distance2 = coordinate2.distance(randomCoordinate);
 
-                return Double.compare(distance1, distance2);
-            }
+            return Double.compare(distance1, distance2);
         });
     }
 
@@ -148,17 +141,14 @@ public class GridIndexTest {
     private Edge getClosestEdgeSequentially(final Coordinate coordinate) {
         final List<Edge> edges = getEdges();
 
-        return Collections.min(edges, new Comparator<Edge>() {
-            @Override
-            public int compare(final Edge edge1, final Edge edge2) {
-                final LineSegment lineSegment1 = getLineSegment(edge1);
-                final LineSegment lineSegment2 = getLineSegment(edge2);
+        return Collections.min(edges, (edge1, edge2) -> {
+            final LineSegment lineSegment1 = getLineSegment(edge1);
+            final LineSegment lineSegment2 = getLineSegment(edge2);
 
-                final double distance1 = lineSegment1.distance(coordinate);
-                final double distance2 = lineSegment2.distance(coordinate);
+            final double distance1 = lineSegment1.distance(coordinate);
+            final double distance2 = lineSegment2.distance(coordinate);
 
-                return Double.compare(distance1, distance2);
-            }
+            return Double.compare(distance1, distance2);
         });
     }
 

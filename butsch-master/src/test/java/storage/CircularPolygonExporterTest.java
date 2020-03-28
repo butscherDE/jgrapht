@@ -24,9 +24,9 @@ public class CircularPolygonExporterTest {
         }
 
         final List<Polygon> exportData = Arrays.asList(polygons);
-        final List<Polygon> reimportedPolygons = exAndReimportPolygons(exportData);
+        final List<Polygon> reImportedPolygons = exAndReimportPolygons(exportData);
 
-        assertEquals(Arrays.asList(polygons), reimportedPolygons);
+        assertEquals(Arrays.asList(polygons), reImportedPolygons);
     }
 
     private List<Polygon> exAndReimportPolygons(final List<Polygon> exportData) {
@@ -49,16 +49,16 @@ public class CircularPolygonExporterTest {
     }
 
     private List<Polygon> reimportExportedPolygons(final String path) {
-        final List<Polygon> reimportedPolygons;
+        final List<Polygon> reImportedPolygons;
         try {
             CircularPolygonImporter circularPolygonImporter = new CircularPolygonImporter(path);
-            reimportedPolygons = circularPolygonImporter.importPolygons();
+            reImportedPolygons = circularPolygonImporter.importPolygons();
         } catch (IOException e) {
             e.printStackTrace();
             fail();
             throw new IllegalStateException();
         }
-        return reimportedPolygons;
+        return reImportedPolygons;
     }
 
     private void cleanUp(final String path) {

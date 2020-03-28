@@ -21,9 +21,7 @@ public class ConvexLayers {
 
         final ArrayList<ConvexHull> chLayers = computeLayers(randomSortedCoordinates);
 
-        Geometry[] layers = convertToGeometryArray(chLayers);
-
-        return layers;
+        return convertToGeometryArray(chLayers);
     }
 
     private ArrayList<ConvexHull> computeLayers(Coordinate[] randomSortedCoordinates) {
@@ -102,7 +100,7 @@ public class ConvexLayers {
     }
 
     public static List<LineSegment> getLineSegments(final Collection<Coordinate> coordinates) {
-        final Coordinate[] coordinatesArr = (Coordinate[]) coordinates.toArray(new Coordinate[coordinates.size() + 1]);
+        final Coordinate[] coordinatesArr = coordinates.toArray(new Coordinate[coordinates.size() + 1]);
         coordinatesArr[coordinatesArr.length - 1] = coordinatesArr[0];
         final Geometry geometry = new GeometryFactory().createMultiPointFromCoords(coordinatesArr);
         return getLineSegments(geometry);

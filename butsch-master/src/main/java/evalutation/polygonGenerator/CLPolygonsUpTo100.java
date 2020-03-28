@@ -2,13 +2,12 @@ package evalutation.polygonGenerator;
 
 import evalutation.Config;
 import evalutation.polygonGenerator.utils.PolygonGeneratorStarter;
-import geometry.CLPolygonGenerator;
 import geometry.CLPolygonGeneratorFactory;
-import geometry.StarPolygonGeneratorFactory;
 
 import java.io.IOException;
 import java.util.Random;
 
+@SuppressWarnings("DuplicatedCode")
 public class CLPolygonsUpTo100 {
     private final static int NUM_POLYGONS = 10000;
     private final static int MAX_POINTS = 100;

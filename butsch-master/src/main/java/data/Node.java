@@ -1,8 +1,6 @@
 package data;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 
 import java.util.Objects;
 
@@ -31,11 +29,11 @@ public class Node {
     }
 
     public boolean equalPosition(final Node otherNode) {
-        boolean longEqual = longitude == otherNode.longitude;
-        boolean latiEqual = latitude == otherNode.latitude;
-        boolean elevEqual = elevation == otherNode.elevation;
+        boolean longitudeEqual = longitude == otherNode.longitude;
+        boolean latitudeEqual = latitude == otherNode.latitude;
+        boolean elevationEqual = elevation == otherNode.elevation;
 
-        return longEqual && latiEqual && elevEqual;
+        return longitudeEqual && latitudeEqual && elevationEqual;
     }
 
     @Override

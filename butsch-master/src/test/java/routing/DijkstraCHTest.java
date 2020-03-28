@@ -238,8 +238,7 @@ public class DijkstraCHTest {
 
     private static RoadCH getChGraph(final RoadGraph graph) {
         final CHPreprocessing chPreprocessing = new CHPreprocessing(graph);
-        final RoadCH roadCH = chPreprocessing.createCHGraph();
-        return roadCH;
+        return chPreprocessing.createCHGraph();
     }
 
     @Test

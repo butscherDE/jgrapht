@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class CircularPolygonImporter implements PolygonImporter{
     private final BufferedReader fileReader;
-    private GeometryFactory geometryFactory = new GeometryFactory();
+    private final GeometryFactory geometryFactory = new GeometryFactory();
 
     public CircularPolygonImporter(final String path) throws IOException {
         fileReader = new BufferedReader(new FileReader(path));
@@ -32,7 +32,7 @@ public class CircularPolygonImporter implements PolygonImporter{
     private List<Polygon> readPolygonsIn() throws IOException {
         final List<Polygon> polygons = new LinkedList<>();
 
-        skipHaeder();
+        skipHeader();
         final int numPolygons = readNumPolygons();
         for (int i = 0; i < numPolygons; i++) {
             polygons.add(readPolygon());
@@ -41,14 +41,14 @@ public class CircularPolygonImporter implements PolygonImporter{
         return polygons;
     }
 
-    private void skipHaeder() throws IOException {
+    private void skipHeader() throws IOException {
         fileReader.readLine();
         fileReader.readLine();
         fileReader.readLine();
     }
 
     private int readNumPolygons() throws IOException {
-        return Integer.valueOf(fileReader.readLine());
+        return Integer.parseInt(fileReader.readLine());
     }
 
     private Polygon readPolygon() throws IOException {
@@ -69,7 +69,7 @@ public class CircularPolygonImporter implements PolygonImporter{
         Pattern pattern = Pattern.compile("\\d+");
         Matcher matcher = pattern.matcher(line);
         matcher.find();
-        return Integer.valueOf(line.substring(matcher.start(), matcher.end()));
+        return Integer.parseInt(line.substring(matcher.start(), matcher.end()));
     }
 
     private String[] getCoordinateSubstrings(String line) {
@@ -84,8 +84,8 @@ public class CircularPolygonImporter implements PolygonImporter{
             final String strCoordinate = strCoordinates[i];
             String[] components = strCoordinate.split(",");
 
-            final double x = Double.valueOf(components[0]);
-            final double y = Double.valueOf(components[1]);
+            final double x = Double.parseDouble(components[0]);
+            final double y = Double.parseDouble(components[1]);
 
             coordinates[i] = new Coordinate(x, y);
         }

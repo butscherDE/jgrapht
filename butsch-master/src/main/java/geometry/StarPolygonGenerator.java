@@ -32,7 +32,7 @@ public class StarPolygonGenerator extends PolygonGenerator {
         return geometryFactory.createPolygon(randomCoordinates);
     }
 
-    private class AngularPointSorter implements Comparator {
+    private static class AngularPointSorter implements Comparator<Coordinate> {
         private final Coordinate centerCoordinate;
         private final Vector2D baseVector;
 
@@ -44,12 +44,9 @@ public class StarPolygonGenerator extends PolygonGenerator {
         }
 
         @Override
-        public int compare(final Object o1, final Object o2) {
-            final Coordinate coordinate1 = (Coordinate) o1;
-            final Coordinate coordinate2 = (Coordinate) o2;
-
-            final Vector2D vector1 = new Vector2D(centerCoordinate, coordinate1);
-            final Vector2D vector2 = new Vector2D(centerCoordinate, coordinate2);
+        public int compare(final Coordinate o1, final Coordinate o2) {
+            final Vector2D vector1 = new Vector2D(centerCoordinate, o1);
+            final Vector2D vector2 = new Vector2D(centerCoordinate, o2);
 
             final double angle1 = baseVector.angleTo(vector1);
             final double angle2 = baseVector.angleTo(vector2);

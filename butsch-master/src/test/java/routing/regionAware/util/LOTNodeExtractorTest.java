@@ -54,7 +54,7 @@ public class LOTNodeExtractorTest {
     @Test
     public void correctLotNodesForViaPoint0() {
         final List<Node> expectedLotNodesForViaPoint0 = createLotNodesForViaPoint0();
-        final List<Node> lotNodesForViaPoint0 = this.extractor.getLotNodesFor(graph.getVertex(0));
+        final List<Node> lotNodesForViaPoint0 = extractor.getLotNodesFor(graph.getVertex(0));
 
         assertEquals(expectedLotNodesForViaPoint0, lotNodesForViaPoint0);
     }
@@ -70,7 +70,7 @@ public class LOTNodeExtractorTest {
     public void correctLotNodesForViaPoint2() {
         final List<Node> lotNodesForViaPoint2 = createLotNodesForViaPoint2();
 
-        assertEquals(lotNodesForViaPoint2, this.extractor.getLotNodesFor(graph.getVertex(2)));
+        assertEquals(lotNodesForViaPoint2, extractor.getLotNodesFor(graph.getVertex(2)));
     }
 
     private List<Node> createLotNodesForViaPoint2() {
@@ -82,19 +82,22 @@ public class LOTNodeExtractorTest {
 
     @Test
     public void correctPathsViaPoint0() {
-        final List<Node> path0To28 = new ArrayList<>(Arrays.asList(new Node[] {graph.getVertex(0), graph.getVertex(1), graph.getVertex(28)}));
-        final List<Node> path0To44 = new ArrayList<>(Arrays.asList(new Node[] {graph.getVertex(0), graph.getVertex(7), graph.getVertex(44)}));
+        final List<Node> path0To28 = new ArrayList<>(Arrays.asList(graph.getVertex(0), graph.getVertex(1),
+                                                                   graph.getVertex(28)));
+        final List<Node> path0To44 = new ArrayList<>(Arrays.asList(graph.getVertex(0), graph.getVertex(7),
+                                                                   graph.getVertex(44)));
 
-        assertEquals(path0To28, this.extractor.getLotNodePathFor(graph.getVertex(0), graph.getVertex(28)).getVertexList());
-        assertEquals(path0To44, this.extractor.getLotNodePathFor(graph.getVertex(0), graph.getVertex(44)).getVertexList());
+        assertEquals(path0To28, extractor.getLotNodePathFor(graph.getVertex(0), graph.getVertex(28)).getVertexList());
+        assertEquals(path0To44, extractor.getLotNodePathFor(graph.getVertex(0), graph.getVertex(44)).getVertexList());
     }
 
     @Test
     public void correctPathsViaPoint2() {
-        final List<Node> path2To28 = new ArrayList<>(Arrays.asList(new Node[] {graph.getVertex(2), graph.getVertex(28)}));
-        final List<Node> path2To44 = new ArrayList<>(Arrays.asList(new Node[] {graph.getVertex(2), graph.getVertex(1), graph.getVertex(45)}));
+        final List<Node> path2To28 = new ArrayList<>(Arrays.asList(graph.getVertex(2), graph.getVertex(28)));
+        final List<Node> path2To44 = new ArrayList<>(Arrays.asList(graph.getVertex(2), graph.getVertex(1),
+                                                                   graph.getVertex(45)));
 
-        assertEquals(path2To28, this.extractor.getLotNodePathFor(graph.getVertex(2), graph.getVertex(28)).getVertexList());
-        assertEquals(path2To44, this.extractor.getLotNodePathFor(graph.getVertex(2), graph.getVertex(45)).getVertexList());
+        assertEquals(path2To28, extractor.getLotNodePathFor(graph.getVertex(2), graph.getVertex(28)).getVertexList());
+        assertEquals(path2To44, extractor.getLotNodePathFor(graph.getVertex(2), graph.getVertex(45)).getVertexList());
     }
 }

@@ -38,21 +38,19 @@ public class ConvexLayersTest {
     }
 
     private Coordinate[] getExpectedInnerCoordinates() {
-        final Coordinate[] expectedOuterCoordinates = new Coordinate[] {new Coordinate(-1,-1),
-                                                                        new Coordinate(-1, 1),
-                                                                        new Coordinate(1,1),
-                                                                        new Coordinate(1, -1),
-                                                                        new Coordinate(-1,-1)};
-        return expectedOuterCoordinates;
+        return new Coordinate[] {new Coordinate(-1, -1),
+                                 new Coordinate(-1, 1),
+                                 new Coordinate(1,1),
+                                 new Coordinate(1, -1),
+                                 new Coordinate(-1,-1)};
     }
 
     private Coordinate[] getExpectedOuterCoordinates() {
-        final Coordinate[] expectedInnerCoordinates = new Coordinate[] {new Coordinate(-2,-2),
-                                                                        new Coordinate(-2, 2),
-                                                                        new Coordinate(2, 2),
-                                                                        new Coordinate(2, -2),
-                                                                        new Coordinate(-2,-2)};
-        return expectedInnerCoordinates;
+        return new Coordinate[] {new Coordinate(-2, -2),
+                                 new Coordinate(-2, 2),
+                                 new Coordinate(2, 2),
+                                 new Coordinate(2, -2),
+                                 new Coordinate(-2,-2)};
     }
 
     @Test

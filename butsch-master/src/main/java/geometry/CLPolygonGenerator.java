@@ -1,11 +1,10 @@
 package geometry;
 
 import org.locationtech.jts.geom.*;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Polygon;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class CLPolygonGenerator extends PolygonGenerator {
     private final GeometryFactory geometryFactory = new GeometryFactory();
@@ -23,9 +22,6 @@ public class CLPolygonGenerator extends PolygonGenerator {
     }
 
     @Override
-    /**
-     * Creates random coordinates from the same convex layers.
-     */
     public Polygon createRandomSimplePolygon() {
         createRandomConvexLayers();
         mergeConvexLayersRandomly();
@@ -118,6 +114,7 @@ public class CLPolygonGenerator extends PolygonGenerator {
         return endVisibleLineSegments;
     }
 
+    @SuppressWarnings("RedundantIfStatement")
     private boolean isEndVisible(final LineSegment innerLineSegment, final List<LineSegment> innerLayerAsLineSegments) {
         final LineSegment[] endVisibilityCheckLines = getEndVisibilityCheckLines(outerLineSegment, innerLineSegment);
         final boolean[] isNotIntersected = areCheckLinesIntersectedByLayer(innerLineSegment, innerLayerAsLineSegments,
@@ -155,14 +152,14 @@ public class CLPolygonGenerator extends PolygonGenerator {
                                            final LineSegment innerLineThatShallNotBeIntersected) {
         final Coordinate intersection = possiblySightBlockingLine.intersection(checkLine);
         if (intersection != null) {
-            return !isIntersectionOnLineThatShouldntBeIntersected(innerLineThatShallNotBeIntersected, intersection);
+            return !isIntersectionOnLineThatShouldNotBeIntersected(innerLineThatShallNotBeIntersected, intersection);
         } else {
             return false;
         }
     }
 
-    private boolean isIntersectionOnLineThatShouldntBeIntersected(final LineSegment innerLineThatShallNotBeIntersected,
-                                                                  final Coordinate intersection) {
+    private boolean isIntersectionOnLineThatShouldNotBeIntersected(final LineSegment innerLineThatShallNotBeIntersected,
+                                                                   final Coordinate intersection) {
         return innerLineThatShallNotBeIntersected.distance(intersection) == 0.0;
     }
 

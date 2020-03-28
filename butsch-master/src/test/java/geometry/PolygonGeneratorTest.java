@@ -27,6 +27,7 @@ public class PolygonGeneratorTest {
         return false;
     }
 
+    @SuppressWarnings("SameParameterValue")
     int getNumPoints(final int numPoints) {
         if (numPoints < 3) {
             throw new IllegalArgumentException("Cannot create such a small number of points");

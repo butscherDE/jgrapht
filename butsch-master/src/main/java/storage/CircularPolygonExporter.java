@@ -25,7 +25,7 @@ public class CircularPolygonExporter implements PolygonExporter {
         fileWriter.close();
     }
     private void writeHeader(final int numPolygons) throws IOException {
-        fileWriter.write("Consecutive list of polygons with cooresponding coordinates.\n");
+        fileWriter.write("Consecutive list of polygons with corresponding coordinates.\n");
         fileWriter.write("Start and end point are always equal\n");
         fileWriter.write("Number represents number of points inclusive start/endpoint duplicate. First number is the number of polygons.\n");
         fileWriter.write(numPolygons + "\n");

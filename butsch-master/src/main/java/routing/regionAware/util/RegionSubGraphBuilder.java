@@ -8,15 +8,12 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import util.BinaryHashFunction;
-import visualizations.GeometryVisualizer;
 
-import java.awt.*;
-import java.util.Arrays;
 import java.util.Collection;
 
 public class RegionSubGraphBuilder {
     private final BinaryHashFunction<Node> isNodeInRegion = new BinaryHashFunction<>();
-    private GeometryFactory geometryFactory = new GeometryFactory();
+    private final GeometryFactory geometryFactory = new GeometryFactory();
     private RoadGraph graph;
     private RoadGraph subGraph;
     private Polygon whiteRegion;

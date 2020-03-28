@@ -43,11 +43,9 @@ public class RPHAST implements RoutingAlgorithm {
 
     @Override
     public List<Path> findPaths(final Set<Node> sources, final Set<Node> targets) {
-        final RPHASTManyToMany<Node, Edge> rphast = new RPHASTManyToMany<Node, Edge>(ch.getCh(), targets, enableBacktrack);
+        final RPHASTManyToMany<Node, Edge> rphast = new RPHASTManyToMany<>(ch.getCh(), targets, enableBacktrack);
 
-        List<Path> pathPaths = getPaths(sources, targets, rphast);
-
-        return pathPaths;
+        return getPaths(sources, targets, rphast);
     }
 
     private List<Path> getPaths(final Set<Node> sources, final Set<Node> targets,
@@ -55,8 +53,7 @@ public class RPHAST implements RoutingAlgorithm {
         List<GraphPath<Node, Edge>> paths = rphast.getPaths(sources);
 
         if (enableBacktrack) {
-            List<Path> pathPaths = convertToPaths(paths, sources, targets);
-            return pathPaths;
+            return convertToPaths(paths, sources, targets);
         } else {
             return Collections.emptyList();
         }

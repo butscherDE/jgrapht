@@ -119,7 +119,7 @@ public class PolygonMerger {
     private void addAllInnerCoordinates() {
         final LineSegment[] linesToConnectInnerAndOuter = getLinesToConnectInnerAndOuter();
         int innerIterationStartIndex = getIndexOfEntryPoint(linesToConnectInnerAndOuter[0]);
-        int newInnerIterationExitIndex = getIndexOfExitPoint(linesToConnectInnerAndOuter, 1);
+        int newInnerIterationExitIndex = getIndexOfExitPoint(linesToConnectInnerAndOuter);
 
         if (isStartBeforeExit(innerIterationStartIndex, newInnerIterationExitIndex)) {
             addInnerCoordinatesBackward(innerIterationStartIndex);
@@ -140,8 +140,8 @@ public class PolygonMerger {
         return innerCoordinates.indexOf(innerEntryPoint);
     }
 
-    private int getIndexOfExitPoint(final LineSegment[] linesToConnectInnerAndOuter, final int i) {
-        final Coordinate innerExitPoint = linesToConnectInnerAndOuter[i].p1;
+    private int getIndexOfExitPoint(final LineSegment[] linesToConnectInnerAndOuter) {
+        final Coordinate innerExitPoint = linesToConnectInnerAndOuter[1].p1;
         return innerCoordinates.indexOf(innerExitPoint);
     }
 
@@ -220,14 +220,14 @@ public class PolygonMerger {
     private boolean isIntersectionProduced(final LineSegment possiblySightBlockingLine, final LineSegment checkLine) {
         final Coordinate intersection = possiblySightBlockingLine.intersection(checkLine);
         if (intersection != null) {
-            return !isIntersectionOnLineThatShouldntBeIntersected(innerChosen, intersection);
+            return !isIntersectionOnLineThatShouldNotBeIntersected(innerChosen, intersection);
         } else {
             return false;
         }
     }
 
-    private boolean isIntersectionOnLineThatShouldntBeIntersected(final LineSegment innerLineThatShallNotBeIntersected,
-                                                                  final Coordinate intersection) {
+    private boolean isIntersectionOnLineThatShouldNotBeIntersected(final LineSegment innerLineThatShallNotBeIntersected,
+                                                                   final Coordinate intersection) {
         return innerLineThatShallNotBeIntersected.distance(intersection) == 0.0;
     }
 

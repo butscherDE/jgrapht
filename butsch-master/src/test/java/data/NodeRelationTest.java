@@ -30,7 +30,7 @@ public class NodeRelationTest {
 
     @BeforeEach
     public void setNodeRelationFromNodeIds() {
-        final List<Long> nodeIds = new LinkedList<>(Arrays.asList(0l, 1l, 2l));
+        final List<Long> nodeIds = new LinkedList<>(Arrays.asList(0L, 1L, 2L));
 
         final RoadGraph graph = new RoadGraph(Edge.class);
         graph.addVertex(new Node(0, 0, 0, 0));

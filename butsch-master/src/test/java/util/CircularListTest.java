@@ -68,7 +68,7 @@ public class CircularListTest {
     public void testCircularIteratorOutOfBounds() {
         final List<Integer> list = getIntegers();
 
-        assertThrows(IndexOutOfBoundsException.class, () -> {list.listIterator(6);});
+        assertThrows(IndexOutOfBoundsException.class, () -> list.listIterator(6));
     }
 
     @Test

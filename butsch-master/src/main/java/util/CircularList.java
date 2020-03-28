@@ -2,7 +2,7 @@ package util;
 
 import java.util.*;
 
-public class CircularList<T extends Object> implements List<T> {
+public class CircularList<T> implements List<T> {
     private final List<T> list;
 
     public CircularList(final List<T> list) {
@@ -120,25 +120,25 @@ public class CircularList<T extends Object> implements List<T> {
             list.listIterator(index);
         }
 
-        return new ListIterator<T>() {
+        return new ListIterator<>() {
             boolean restarted = false;
             ListIterator<T> iterator = list.listIterator(index);
-            int popedElems = 0;
-            final int maxElemsToPop = list.size();
+            int poppedElements = 0;
+            final int maxElementsToPop = list.size();
 
             @Override
             public boolean hasNext() {
-                return popedElems < maxElemsToPop;
+                return poppedElements < maxElementsToPop;
             }
 
             @Override
             public T next() {
                 if (iterator.hasNext()) {
-                    popedElems++;
+                    poppedElements++;
                     return iterator.next();
                 } else if (hasNext()) {
                     iterator = list.listIterator(0);
-                    popedElems++;
+                    poppedElements++;
                     return iterator.next();
                 } else {
                     throw new NoSuchElementException("There are no more elements");
@@ -147,17 +147,17 @@ public class CircularList<T extends Object> implements List<T> {
 
             @Override
             public boolean hasPrevious() {
-                return popedElems > (maxElemsToPop * -1);
+                return poppedElements > (maxElementsToPop * -1);
             }
 
             @Override
             public T previous() {
                 if (iterator.hasPrevious()) {
-                    popedElems--;
+                    poppedElements--;
                     return iterator.previous();
                 } else if (hasPrevious()) {
                     iterator = list.listIterator(list.size());
-                    popedElems--;
+                    poppedElements--;
                     return iterator.previous();
                 } else {
                     throw new NoSuchElementException("There are no more elements");

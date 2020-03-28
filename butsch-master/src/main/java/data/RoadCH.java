@@ -26,11 +26,11 @@ public class RoadCH {
         return (RoadCHGraph) ch.getContractionGraph();
     }
 
-    public ContractionVertex getContractionVertex(final Node node) {
+    public ContractionVertex<Node> getContractionVertex(final Node node) {
         return ch.getContractionMapping().get(node);
     }
 
-    public List<Edge> unpack(final ContractionEdge chEdge) {
+    public List<Edge> unpack(final ContractionEdge<Edge> chEdge) {
         final LinkedList<Node> vertices = new LinkedList<>();
         final LinkedList<Edge> edges = new LinkedList<>();
 

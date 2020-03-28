@@ -1,5 +1,6 @@
 package evalutation;
 
+@SuppressWarnings("SpellCheckingInspection")
 public class Config {
     public final static boolean VERBOSE = true;
     // ERP style data
