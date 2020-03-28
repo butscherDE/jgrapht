@@ -29,7 +29,7 @@ public class CHPreprocessingTest {
     }
 
     @Test
-    public void startPreproc() {
+    public void startPreprocessing() {
         Set<Node> graphNodes = graph.vertexSet();
         Set<Node> chNodes = roadCH.getGraph().vertexSet();
 

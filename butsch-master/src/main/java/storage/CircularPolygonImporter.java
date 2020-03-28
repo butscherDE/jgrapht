@@ -75,7 +75,7 @@ public class CircularPolygonImporter implements PolygonImporter{
     private String[] getCoordinateSubstrings(String line) {
         int startOfPolygonChain = line.indexOf('{');
         line = line.substring(startOfPolygonChain + 2, line.length() - 2);
-        return line.split("\\],\\[");
+        return line.split("],\\[");
     }
 
     private Coordinate[] fillCoordinates(final String[] strCoordinates, final int numPolygonPoints) {

@@ -171,6 +171,7 @@ public class CLPolygonGenerator extends PolygonGenerator {
                                  new LineSegment(outerLineSegment.p1, innerLineSegment.p1)};
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean isIntersecting(final LineSegment ls1, final LineSegment ls2) {
         final Coordinate intersection = ls1.intersection(ls2);
         return intersection != null;

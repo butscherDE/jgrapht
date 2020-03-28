@@ -357,15 +357,13 @@ public class GridIndex implements Index {
     private double roundLongitude(final double longitude) {
         final double leftShiftedLongitude = longitude * longitudePrecision;
         final double roundedLongitude = Math.round(leftShiftedLongitude);
-        final double rightShiftedLongitude = roundedLongitude / longitudePrecision;
-        return rightShiftedLongitude;
+        return roundedLongitude / longitudePrecision;
     }
 
     private double roundLatitude(final double latitude) {
         final double leftShiftedLatitude = latitude * latitudePrecision;
         final double roundedLatitude = Math.round(leftShiftedLatitude);
-        final double rightShiftedLatitude = roundedLatitude / latitudePrecision;
-        return rightShiftedLatitude;
+        return roundedLatitude / latitudePrecision;
     }
 
     private int precision(final int integer) {

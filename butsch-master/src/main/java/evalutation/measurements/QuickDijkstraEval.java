@@ -47,6 +47,7 @@ public class QuickDijkstraEval extends RoutingAlgorithmEvalStarter {
         }
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     private static Result[][] measure(final RoadGraph graph, SimpleRoutingAlgorithmFactory[] algorithms, int[][] startNodes,
                                       int[][] endNodes) {
         final MeasureSuite ms = execMeasurement(graph, algorithms, startNodes, endNodes);
