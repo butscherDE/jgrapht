@@ -7,11 +7,11 @@ import org.jgrapht.alg.util.Pair;
 import java.util.Map;
 
 public class RouteCandidate implements Comparable<RouteCandidate> {
-    private final Path startToRegionEntry;
-    private final Path regionEntryToRegionExit;
-    private final Path regionExitToEnd;
-    private final Path directRouteStartEnd;
-    private final Path mergedPath;
+    final Path startToRegionEntry;
+    final Path regionEntryToRegionExit;
+    final Path regionExitToEnd;
+    final Path directRouteStartEnd;
+    final Path mergedPath;
 
     public RouteCandidate(final Node startNode, final Node endNode, final Node regionEntryNode,
                           final Node regionExitNode, final Map<Pair<Node, Node>, Path> allPaths) {
@@ -31,11 +31,11 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
     }
 
     public double getTime() {
-        return mergedPath.getWeight();
+        return mergedPath.getTime();
     }
 
     public double getTimeInROI() {
-        return regionEntryToRegionExit.getWeight();
+        return regionEntryToRegionExit.getTime();
     }
 
     public double getGain() {
@@ -43,19 +43,12 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
     }
 
     public double getDetourTime() {
-        return getTime() - directRouteStartEnd.getWeight();
+        return getTime() - directRouteStartEnd.getTime();
     }
 
     @Override
     public int compareTo(RouteCandidate o) {
-        final double gainDifference = this.getGain() - o.getGain();
-        if (gainDifference < 0) {
-            return -1;
-        } else if (gainDifference == 0) {
-            return 0;
-        } else {
-            return 1;
-        }
+        return Double.compare(this.getGain(), o.getGain());
     }
 
     @Override

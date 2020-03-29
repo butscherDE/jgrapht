@@ -138,6 +138,17 @@ public class PathTest {
     }
 
     @Test
+    public void time() {
+        final double expectedTestPath1Weight = 16;
+        final double expectedTestPath2Weight = 18;
+        final double expectedMergedWeight = expectedTestPath1Weight + expectedTestPath2Weight;
+
+        assertEquals(expectedTestPath1Weight, testPath1.getTime());
+        assertEquals(expectedTestPath2Weight, testPath2.getTime());
+        assertEquals(expectedMergedWeight, merged.getTime());
+    }
+
+    @Test
     public void selfIntersecting() {
         assertTrue(selfIntersectingPaths[0].isSelfIntersecting());
         assertTrue(selfIntersectingPaths[1].isSelfIntersecting());

@@ -87,6 +87,10 @@ public class Path {
         }
     }
 
+    public double getTime() {
+        return getWeight();
+    }
+
     @Override
     public String toString() {
         return "(" + getStartVertex() + "-" + getEndVertex() + ")=" + path.toString();
