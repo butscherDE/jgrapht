@@ -79,6 +79,14 @@ public class Path {
         return hashFunction.get(getEndVertex());
     }
 
+    public boolean isFound() {
+        if (getStartVertex().equals(getEndVertex())) {
+            return true;
+        } else {
+            return getLength() > 0;
+        }
+    }
+
     @Override
     public String toString() {
         return "(" + getStartVertex() + "-" + getEndVertex() + ")=" + path.toString();

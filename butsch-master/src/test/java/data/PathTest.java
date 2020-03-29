@@ -5,9 +5,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import util.PolygonRoutingTestGraph;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -151,5 +149,28 @@ public class PathTest {
         assertFalse(testPath1.isSelfIntersecting());
         assertFalse(testPath2.isSelfIntersecting());
         assertFalse(merged.isSelfIntersecting());
+    }
+
+    @Test
+    public void pathFound() {
+        final RoadGraph graph = GRAPH_MOCKER.graph;
+        final Node startAndEndVertex = graph.getVertex(0);
+        final Path zeroLengthValidPath = new Path(graph, startAndEndVertex, startAndEndVertex, Collections.emptyList(), 0);
+
+        assertTrue(selfIntersectingPaths[0].isFound());
+        assertTrue(selfIntersectingPaths[1].isFound());
+        assertTrue(selfIntersectingPaths[2].isFound());
+        assertTrue(testPath1.isFound());
+        assertTrue(testPath2.isFound());
+        assertTrue(merged.isFound());
+        assertTrue(zeroLengthValidPath.isFound());
+    }
+
+    @Test
+    public void pathNotFound() {
+        final RoadGraph graph = GRAPH_MOCKER.graph;
+        final Node startNode = graph.getVertex(0);
+        final Node endNode = graph.getVertex(6);
+        final Path unfoundPath = new Path(graph, startNode, endNode, Collections.emptyList(), Double.MAX_VALUE);
     }
 }
