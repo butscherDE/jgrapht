@@ -172,5 +172,7 @@ public class PathTest {
         final Node startNode = graph.getVertex(0);
         final Node endNode = graph.getVertex(6);
         final Path unfoundPath = new Path(graph, startNode, endNode, Collections.emptyList(), Double.MAX_VALUE);
+
+        assertFalse(unfoundPath.isFound());
     }
 }
