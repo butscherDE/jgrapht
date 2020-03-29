@@ -9,41 +9,73 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PathTest {
     private final static PolygonRoutingTestGraph GRAPH_MOCKER = new PolygonRoutingTestGraph();
     private static Path testPath1;
     private static Path testPath2;
     private static Path merged;
+    private static Path[] selfIntersectingPaths;
 
     @BeforeAll
     public static void initiateTestPaths() {
-        initiateTestPath1();
-        initiateTestPath2();
-        initiateMergedPath();
+        setInitiateTestPath1();
+        setInitiateTestPath2();
+        setInitiateMergedPath();
+        setSelfIntersectingPaths();
     }
 
-    private static void initiateTestPath1() {
+    private static void setInitiateTestPath1() {
         final RoadGraph graph = GRAPH_MOCKER.graph;
         final List<Edge> edges = new LinkedList<>(Arrays.asList(graph.getEdge(graph.getVertex(0), graph.getVertex(1)),
                                                                 graph.getEdge(graph.getVertex(1), graph.getVertex(2))));
         final double combinedWeight = graph.getEdgeWeight(edges.get(0)) + graph.getEdgeWeight(edges.get(1));
 
-        testPath1 = new Path(new GraphWalk<>(graph, graph.getVertex(0), graph.getVertex(2), edges, combinedWeight));
+        testPath1 = new Path(graph, graph.getVertex(0), graph.getVertex(2), edges, combinedWeight);
     }
 
-    private static void initiateTestPath2() {
+    private static void setInitiateTestPath2() {
         final RoadGraph graph = GRAPH_MOCKER.graph;
         final List<Edge> edges = new LinkedList<>(Arrays.asList(graph.getEdge(graph.getVertex(2), graph.getVertex(3)),
                                                                 graph.getEdge(graph.getVertex(3), graph.getVertex(4))));
         final double combinedWeight = graph.getEdgeWeight(edges.get(0)) + graph.getEdgeWeight(edges.get(1));
 
-        testPath2 = new Path(new GraphWalk<>(graph, graph.getVertex(2), graph.getVertex(4), edges, combinedWeight));
+        testPath2 = new Path(graph, graph.getVertex(2), graph.getVertex(4), edges, combinedWeight);
     }
 
-    private static void initiateMergedPath() {
+    private static void setInitiateMergedPath() {
         merged = testPath1.createMergedPath(testPath2);
+    }
+
+    private static void setSelfIntersectingPaths() {
+        final RoadGraph graph = GRAPH_MOCKER.graph;
+        final List<Edge> selfIntersecting1 = new LinkedList<>(
+                Arrays.asList(graph.getEdge(graph.getVertex(0), graph.getVertex(1)),
+                              graph.getEdge(graph.getVertex(1), graph.getVertex(7)),
+                              graph.getEdge(graph.getVertex(7), graph.getVertex(0)))
+        );
+        final List<Edge> selfIntersecting2 = new LinkedList<>(
+                Arrays.asList(graph.getEdge(graph.getVertex(0), graph.getVertex(1)),
+                              graph.getEdge(graph.getVertex(1), graph.getVertex(2)),
+                              graph.getEdge(graph.getVertex(2), graph.getVertex(3)),
+                              graph.getEdge(graph.getVertex(3), graph.getVertex(29)),
+                              graph.getEdge(graph.getVertex(29), graph.getVertex(28)),
+                              graph.getEdge(graph.getVertex(28), graph.getVertex(1)),
+                              graph.getEdge(graph.getVertex(1), graph.getVertex(2)))
+        );
+        final List<Edge> selfIntersecting3 = new LinkedList<>(
+                Arrays.asList(graph.getEdge(graph.getVertex(0), graph.getVertex(1)),
+                              graph.getEdge(graph.getVertex(1), graph.getVertex(7)),
+                              graph.getEdge(graph.getVertex(7), graph.getVertex(0)),
+                              graph.getEdge(graph.getVertex(0), graph.getVertex(1)))
+        );
+
+        selfIntersectingPaths = new Path[] {
+                new Path(graph, graph.getVertex(0), graph.getVertex(0), selfIntersecting1, 0),
+                new Path(graph, graph.getVertex(0), graph.getVertex(2), selfIntersecting2, 0),
+                new Path(graph, graph.getVertex(0), graph.getVertex(1), selfIntersecting3, 0)
+        };
     }
 
     @Test
@@ -105,5 +137,19 @@ public class PathTest {
         assertEquals(expectedTestPath1Weight, testPath1.getWeight());
         assertEquals(expectedTestPath2Weight, testPath2.getWeight());
         assertEquals(expectedMergedWeight, merged.getWeight());
+    }
+
+    @Test
+    public void selfIntersecting() {
+        assertTrue(selfIntersectingPaths[0].isSelfIntersecting());
+        assertTrue(selfIntersectingPaths[1].isSelfIntersecting());
+        assertTrue(selfIntersectingPaths[2].isSelfIntersecting());
+    }
+
+    @Test
+    public void notSelfIntersecting() {
+        assertFalse(testPath1.isSelfIntersecting());
+        assertFalse(testPath2.isSelfIntersecting());
+        assertFalse(merged.isSelfIntersecting());
     }
 }

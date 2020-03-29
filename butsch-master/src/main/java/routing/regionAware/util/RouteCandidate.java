@@ -11,7 +11,7 @@ public class RouteCandidate {
     private final Path regionEntryToRegionExit;
     private final Path regionExitToEnd;
     private final Path directRouteStartEnd;
-    private Path mergedPath = null;
+    private final Path mergedPath;
 
     public RouteCandidate(final Node startNode, final Node endNode, final Node regionEntryNode,
                           final Node regionExitNode, final Map<Pair<Node, Node>, Path> allPaths) {
@@ -19,24 +19,14 @@ public class RouteCandidate {
         this.regionEntryToRegionExit = allPaths.get(new Pair<>(regionEntryNode, regionExitNode));
         this.regionExitToEnd = allPaths.get(new Pair<>(regionExitNode, endNode));
         this.directRouteStartEnd = allPaths.get(new Pair<>(startNode, endNode));
+        this.mergedPath = startToRegionEntry.createMergedPath(regionEntryToRegionExit).createMergedPath(regionExitToEnd);
     }
 
     public Path getMergedPath() {
-//        mergePathIfNotDone();
-
         return this.mergedPath;
     }
 
-    private void mergePath() {
-//        Path completePathCandidate = new PathMerge(queryGraph, algoOpts.getWeighting());
-//
-//        completePathCandidate.addPath(startToDetourEntry);
-//        completePathCandidate.addPath(detourEntryToDetourExit);
-//        completePathCandidate.addPath(detourExitToEnd);
-//
-//        completePathCandidate.setFromNode(startNodeID);
-//        completePathCandidate.extract();
-//
-//        this.mergedPath = completePathCandidate;
+    public boolean isDetourSelfIntersecting() {
+        return mergedPath.isSelfIntersecting();
     }
 }

@@ -2,6 +2,8 @@ package data;
 
 import org.jgrapht.GraphPath;
 import org.jgrapht.graph.GraphWalk;
+import util.BinaryHashFunction;
+
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,8 +11,13 @@ import java.util.List;
 public class Path {
     final GraphPath<Node, Edge> path;
 
-    public Path(final GraphPath<Node, Edge> path) {
+    public Path(GraphPath<Node, Edge> path) {
         this.path = path;
+    }
+
+    public Path(final RoadGraph graph, final Node startNode, final Node endNode, final List<Edge> edgeList,
+                final double weight) {
+        this.path = new GraphWalk<>(graph, startNode, endNode, edgeList, weight);
     }
 
     public List<Edge> getEdgeList() {
@@ -50,9 +57,26 @@ public class Path {
         edges.addAll(otherPath.getEdgeList());
         final double combinedWeight = getWeight() + otherPath.getWeight();
 
-        final GraphWalk<Node, Edge> newWalk = new GraphWalk<>(this.path.getGraph(), getStartVertex(), otherPath.getEndVertex(),
-                                                              edges, combinedWeight);
-        return new Path(newWalk);
+        return new Path((RoadGraph) this.path.getGraph(), getStartVertex(), otherPath.getEndVertex(), edges, combinedWeight);
+    }
+
+    public boolean isSelfIntersecting() {
+        return containsDuplicateVertices();
+    }
+
+    public boolean containsDuplicateVertices() {
+        final BinaryHashFunction<Node> hashFunction = new BinaryHashFunction();
+
+        for (final Edge edge : path.getEdgeList()) {
+            final Node node = getGraph().getEdgeSource(edge);
+            if (hashFunction.get(node)) {
+                return true;
+            } else {
+                hashFunction.set(node, true);
+            }
+        }
+
+        return hashFunction.get(getEndVertex());
     }
 
     @Override
