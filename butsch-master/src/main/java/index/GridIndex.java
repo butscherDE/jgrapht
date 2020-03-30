@@ -4,6 +4,7 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import evalutation.StopWatchVerbose;
+import geometry.BoundingBox;
 import org.jgrapht.Graph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
@@ -431,6 +432,54 @@ public class GridIndex implements Index {
 
         private void addRightColumn(final int y) {
             cellBlock.add(getCellByIndex(longitudeEndIndex, y));
+        }
+    }
+
+    @Override
+    public List<Node> queryNodes(final BoundingBox limiter) {
+        final int minLongitudeIndex = getLongitudeIndex(limiter.minLongitude);
+        final int maxLongitudeIndex = getLongitudeIndex(limiter.maxLongitude);
+        final int minLatitudeIndex = getLatitudeIndex(limiter.minLatitude);
+        final int maxLatitudeIndex = getLatitudeIndex(limiter.maxLatitude);
+
+        final List<Node> nodesInLimiter = new LinkedList<>();
+        addBorderCellNodes(limiter, minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex,
+                           nodesInLimiter);
+        addInnerCellNodes(minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex, nodesInLimiter);
+
+        return nodesInLimiter;
+    }
+    public void addBorderCellNodes(final BoundingBox limiter, final int minLongitudeIndex, final int maxLongitudeIndex,
+                                   final int minLatitudeIndex, final int maxLatitudeIndex,
+                                   final List<Node> nodesInLimiter) {
+        for (int x = minLongitudeIndex; x <= maxLongitudeIndex; x++) {
+            nodesInLimiter.addAll(getNodesInLimiter(cells[x][minLatitudeIndex].nodes, limiter));
+            nodesInLimiter.addAll(getNodesInLimiter(cells[x][maxLatitudeIndex].nodes, limiter));
+        }
+        for (int y = minLatitudeIndex; y <= maxLatitudeIndex; y++) {
+            nodesInLimiter.addAll(getNodesInLimiter(cells[minLongitudeIndex][y].nodes, limiter));
+            nodesInLimiter.addAll(getNodesInLimiter(cells[maxLongitudeIndex][y].nodes, limiter));
+        }
+    }
+
+    private List<Node> getNodesInLimiter(final List<Node> nodesToFilter, final BoundingBox limiter) {
+        final List<Node> nodesInLimiter = new LinkedList<>();
+
+        for (final Node node : nodesToFilter) {
+            if (limiter.contains(node.getPoint())) {
+                nodesInLimiter.add(node);
+            }
+        }
+
+        return nodesInLimiter;
+    }
+
+    public void addInnerCellNodes(final int minLongitudeIndex, final int maxLongitudeIndex, final int minLatitudeIndex,
+                                  final int maxLatitudeIndex, final List<Node> nodesInLimiter) {
+        for (int x = minLongitudeIndex + 1; x < maxLongitudeIndex; x++) {
+            for (int y = minLatitudeIndex + 1; y < maxLatitudeIndex; y++) {
+                nodesInLimiter.addAll(cells[x][y].nodes);
+            }
         }
     }
 }
