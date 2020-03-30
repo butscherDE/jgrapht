@@ -1,7 +1,10 @@
 package geometry;
 
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.Polygon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -212,5 +215,23 @@ public class BoundingBoxTest {
         groundTruth.add(new LineSegment(1, -1, -1, -1));
 
         assertEquals(groundTruth, testBoxLineSegments);
+    }
+
+    @Test
+    public void createFromPolygon() {
+        final Coordinate[] polygonCoordinates = new Coordinate[] {
+                new Coordinate(0, -1),
+                new Coordinate(1, 0),
+                new Coordinate(0, 1),
+                new Coordinate(-1, 0),
+                new Coordinate(0, -1)
+        };
+        final Polygon polygon = new GeometryFactory().createPolygon(polygonCoordinates);
+        final BoundingBox boundingBox = BoundingBox.createFrom(polygon);
+
+        assertEquals(-1, boundingBox.minLongitude);
+        assertEquals(1, boundingBox.maxLongitude);
+        assertEquals(-1, boundingBox.minLatitude);
+        assertEquals(1, boundingBox.maxLatitude);
     }
 }
