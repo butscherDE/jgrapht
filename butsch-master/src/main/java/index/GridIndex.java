@@ -9,10 +9,7 @@ import org.jgrapht.Graph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class GridIndex implements Index {
     private final RoadGraph graph;
@@ -436,22 +433,23 @@ public class GridIndex implements Index {
     }
 
     @Override
-    public List<Node> queryNodes(final BoundingBox limiter) {
+    public Set<Node> queryNodes(final BoundingBox limiter) {
         final int minLongitudeIndex = getLongitudeIndex(limiter.minLongitude);
         final int maxLongitudeIndex = getLongitudeIndex(limiter.maxLongitude);
         final int minLatitudeIndex = getLatitudeIndex(limiter.minLatitude);
         final int maxLatitudeIndex = getLatitudeIndex(limiter.maxLatitude);
 
-        final List<Node> nodesInLimiter = new LinkedList<>();
+        final Set<Node> nodesInLimiter = new LinkedHashSet<>();
         addBorderCellNodes(limiter, minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex,
                            nodesInLimiter);
         addInnerCellNodes(minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex, nodesInLimiter);
 
         return nodesInLimiter;
     }
+
     public void addBorderCellNodes(final BoundingBox limiter, final int minLongitudeIndex, final int maxLongitudeIndex,
                                    final int minLatitudeIndex, final int maxLatitudeIndex,
-                                   final List<Node> nodesInLimiter) {
+                                   final Set<Node> nodesInLimiter) {
         for (int x = minLongitudeIndex; x <= maxLongitudeIndex; x++) {
             nodesInLimiter.addAll(getNodesInLimiter(cells[x][minLatitudeIndex].nodes, limiter));
             nodesInLimiter.addAll(getNodesInLimiter(cells[x][maxLatitudeIndex].nodes, limiter));
@@ -462,8 +460,8 @@ public class GridIndex implements Index {
         }
     }
 
-    private List<Node> getNodesInLimiter(final List<Node> nodesToFilter, final BoundingBox limiter) {
-        final List<Node> nodesInLimiter = new LinkedList<>();
+    private Set<Node> getNodesInLimiter(final List<Node> nodesToFilter, final BoundingBox limiter) {
+        final Set<Node> nodesInLimiter = new LinkedHashSet<>();
 
         for (final Node node : nodesToFilter) {
             if (limiter.contains(node.getPoint())) {
@@ -475,7 +473,7 @@ public class GridIndex implements Index {
     }
 
     public void addInnerCellNodes(final int minLongitudeIndex, final int maxLongitudeIndex, final int minLatitudeIndex,
-                                  final int maxLatitudeIndex, final List<Node> nodesInLimiter) {
+                                  final int maxLatitudeIndex, final Set<Node> nodesInLimiter) {
         for (int x = minLongitudeIndex + 1; x < maxLongitudeIndex; x++) {
             for (int y = minLatitudeIndex + 1; y < maxLatitudeIndex; y++) {
                 nodesInLimiter.addAll(cells[x][y].nodes);

@@ -176,19 +176,16 @@ public class GridIndexTest {
 
         final List<Node> expectedNodeList = new LinkedList<>();
         for (final Node node : graph.vertexSet()) {
-            if (node.longitude >= minLatitude && node.longitude <= maxLongitude && node.latitude >= minLatitude && node.latitude <= maxLatitude) {
+            if (node.longitude > minLongitude && node.longitude < maxLongitude && node.latitude > minLatitude && node.latitude < maxLatitude) {
                 expectedNodeList.add(node);
             }
         }
 
         final BoundingBox limiter = new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
-        final List<Node> actualNodeList = gridIndex.queryNodes(limiter);
+        final List<Node> actualNodeList = new LinkedList<>(gridIndex.queryNodes(limiter));
 
         Collections.sort(expectedNodeList);
         Collections.sort(actualNodeList);
-
-        System.out.println(expectedNodeList.size());
-        System.out.println(actualNodeList.size());
 
         assertEquals(expectedNodeList, actualNodeList);
     }
