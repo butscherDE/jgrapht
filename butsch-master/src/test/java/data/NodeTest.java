@@ -2,6 +2,9 @@ package data;
 
 
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,5 +72,14 @@ class NodeTest {
         final Node nodeB = new Node(1, 1.0, 1.0, 2);
 
         assertEquals(1d, nodeA.euclideanDistance(nodeB), 0);
+    }
+
+    @Test
+    public void getPoint() {
+        final Coordinate expectedCoordinate = new Coordinate(0, 1, 2);
+        final Geometry expectedPoint = new GeometryFactory().createPoint(expectedCoordinate);
+        final Node nodeA = new Node(0, 0.0, 1.0, 2);
+
+        assertEquals(expectedPoint, nodeA.getPoint());
     }
 }

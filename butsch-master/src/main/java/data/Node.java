@@ -1,10 +1,13 @@
 package data;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 
 import java.util.Objects;
 
 public class Node {
+    private static GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     public final long id;
 
     public final double longitude;
@@ -51,5 +54,10 @@ public class Node {
         final Coordinate otherCoordinate = new Coordinate(other.longitude, other.latitude, other.elevation);
 
         return thisCoordinate.distance(otherCoordinate);
+    }
+
+    // TODO think about converting Node to a subclass of Coordinate
+    public Geometry getPoint() {
+        return GEOMETRY_FACTORY.createPoint(new Coordinate(longitude, latitude, elevation));
     }
 }
