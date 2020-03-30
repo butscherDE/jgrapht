@@ -12,6 +12,7 @@ import storage.ImportERPGraph;
 
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -176,17 +177,34 @@ public class GridIndexTest {
 
         final List<Node> expectedNodeList = new LinkedList<>();
         for (final Node node : graph.vertexSet()) {
-            if (node.longitude > minLongitude && node.longitude < maxLongitude && node.latitude > minLatitude && node.latitude < maxLatitude) {
+            if (node.id % 2 == 1 && node.longitude > minLongitude && node.longitude < maxLongitude && node.latitude > minLatitude && node.latitude < maxLatitude) {
                 expectedNodeList.add(node);
             }
         }
 
         final BoundingBox limiter = new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
-        final List<Node> actualNodeList = new LinkedList<>(gridIndex.queryNodes(limiter));
+        final OddIdVisitor oddIdVisitor = new OddIdVisitor();
+        gridIndex.queryNodes(limiter, oddIdVisitor);
+        final List<Node> actualNodeList = oddIdVisitor.getNodes();
 
         Collections.sort(expectedNodeList);
         Collections.sort(actualNodeList);
 
         assertEquals(expectedNodeList, actualNodeList);
+    }
+
+    private class OddIdVisitor implements Consumer<Node> {
+        private final Set<Node> nodes = new LinkedHashSet<>();
+
+        @Override
+        public void accept(final Node node) {
+            if (node.id % 2 == 1) {
+                nodes.add(node);
+            }
+        }
+
+        public List<Node> getNodes() {
+            return new LinkedList<>(nodes);
+        }
     }
 }
