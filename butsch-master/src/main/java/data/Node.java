@@ -4,9 +4,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 
+import java.util.Comparator;
 import java.util.Objects;
 
-public class Node {
+public class Node implements Comparable<Node> {
     private static GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     public final long id;
 
@@ -59,5 +60,20 @@ public class Node {
     // TODO think about converting Node to a subclass of Coordinate
     public Geometry getPoint() {
         return GEOMETRY_FACTORY.createPoint(new Coordinate(longitude, latitude, elevation));
+    }
+
+    @Override
+    public int compareTo(final Node o) {
+        final int longitudeCompare = Double.compare(longitude, o.longitude);
+        final int latitudeCompare = Double.compare(latitude, o.latitude);
+        final int elevationCompare = Double.compare(elevation, o.elevation);
+
+        if (longitudeCompare != 0) {
+            return longitudeCompare;
+        } else if (latitudeCompare != 0) {
+            return latitudeCompare;
+        } else {
+            return elevationCompare;
+        }
     }
 }

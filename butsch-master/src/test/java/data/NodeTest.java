@@ -82,4 +82,61 @@ class NodeTest {
 
         assertEquals(expectedPoint, nodeA.getPoint());
     }
+
+    @Test
+    public void compareSmaller1() {
+        final Node nodeSmaller1 = new Node(0, 10, 10, 10);
+        final Node compareNode = new Node(0, 20, 20, 20);
+
+        assertEquals(-1, nodeSmaller1.compareTo(compareNode));
+
+    }
+
+    @Test
+    public void compareSmaller2() {
+        final Node nodeSmaller2 = new Node(0, 20, 10, 10);
+        final Node compareNode = new Node(0, 20, 20, 20);
+
+        assertEquals(-1, nodeSmaller2.compareTo(compareNode));
+    }
+
+    @Test
+    public void compareSmaller3() {
+        final Node nodeSmaller3 = new Node(0, 20, 20, 10);
+        final Node compareNode = new Node(0, 20, 20, 20);
+
+        assertEquals(-1, nodeSmaller3.compareTo(compareNode));
+    }
+
+    @Test
+    public void compareEqual() {
+        final Node nodeEqual = new Node(0, 20, 20, 20);
+        final Node compareNode = new Node(0, 20, 20, 20);
+
+        assertEquals(0, nodeEqual.compareTo(compareNode));
+    }
+
+    @Test
+    public void compareGreater1() {
+        final Node nodeGreater1 = new Node(0, 20, 20, 30);
+        final Node compareNode = new Node(0, 20, 20, 20);
+
+        assertEquals(1, nodeGreater1.compareTo(compareNode));
+    }
+
+    @Test
+    public void compareGreater2() {
+        final Node nodeGreater2 = new Node(0, 20, 30, 30);
+        final Node compareNode = new Node(0, 20, 20, 20);
+
+        assertEquals(1, nodeGreater2.compareTo(compareNode));
+    }
+
+    @Test
+    public void compareGreater3() {
+        final Node nodeGreater3 = new Node(0, 30, 30, 30);
+        final Node compareNode = new Node(0, 20, 20, 20);
+
+        assertEquals(1, nodeGreater3.compareTo(compareNode));
+    }
 }
