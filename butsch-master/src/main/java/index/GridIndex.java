@@ -38,26 +38,6 @@ public class GridIndex implements Index {
         StopWatchVerbose sw = new StopWatchVerbose("Index creation");
         initCells();
         sw.printTimingIfVerbose();
-
-//        int c = 0;
-//        int min = Integer.MAX_VALUE;
-//        int max = Integer.MIN_VALUE;
-//        final Set<Edge> allEdgesUnique = new LinkedHashSet<>();
-//        for (final GridCell[] cell : cells) {
-//            for (final GridCell gridCell : cell) {
-//                final int numEdges = gridCell.edges.size();
-//                c += numEdges;
-//                min = Math.min(min, numEdges);
-//                max = Math.max(max, numEdges);
-//                for (final Edge edge : gridCell.edges) {
-//                    allEdgesUnique.add(edge);
-//                }
-//            }
-//        }
-//        System.out.println("Num unique edges " + allEdgesUnique.size());
-//        System.out.println("Num edges in index: " + c);
-//        System.out.println("Smallest cell: " + min);
-//        System.out.println("Largest cell: " + max);
     }
 
     private void initCells() {
