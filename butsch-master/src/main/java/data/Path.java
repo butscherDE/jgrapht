@@ -83,7 +83,7 @@ public class Path {
         if (getStartVertex().equals(getEndVertex())) {
             return true;
         } else {
-            return getLength() > 0;
+            return getWeight() < Double.MAX_VALUE;
         }
     }
 
