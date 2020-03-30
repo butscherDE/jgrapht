@@ -118,7 +118,6 @@ public class RouteCandidateListTest {
         final Node exitNode = graph.getVertex(29);
 
         final Map<Pair<Node, Node>, Path> alteredPaths = getInvalidatedPathMap(graph, startNode, entryNode);
-        System.out.println(alteredPaths.get(new Pair<>(startNode, entryNode)));
         final RouteCandidate testingCandidate = new RouteCandidate(startNode, endNode, entryNode, exitNode, alteredPaths);
 
         illegalCandidateNotAdded(testingCandidate);
