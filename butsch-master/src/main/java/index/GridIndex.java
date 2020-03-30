@@ -10,6 +10,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 public class GridIndex implements Index {
     private final RoadGraph graph;
@@ -433,7 +434,15 @@ public class GridIndex implements Index {
     }
 
     @Override
-    public Set<Node> queryNodes(final BoundingBox limiter) {
+    public void queryNodes(final BoundingBox limiter, final Consumer<Node> visitor) {
+        final Set<Node> nodesInLimiter = getNodesInLimiter(limiter);
+
+        for (final Node node : nodesInLimiter) {
+            visitor.accept(node);
+        }
+    }
+
+    public Set<Node> getNodesInLimiter(final BoundingBox limiter) {
         final int minLongitudeIndex = getLongitudeIndex(limiter.minLongitude);
         final int maxLongitudeIndex = getLongitudeIndex(limiter.maxLongitude);
         final int minLatitudeIndex = getLatitudeIndex(limiter.minLatitude);
@@ -443,7 +452,6 @@ public class GridIndex implements Index {
         addBorderCellNodes(limiter, minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex,
                            nodesInLimiter);
         addInnerCellNodes(minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex, nodesInLimiter);
-
         return nodesInLimiter;
     }
 
