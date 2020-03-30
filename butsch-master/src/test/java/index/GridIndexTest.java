@@ -4,6 +4,7 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import evalutation.Config;
+import geometry.BoundingBox;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
@@ -164,5 +165,31 @@ public class GridIndexTest {
         final Coordinate adjCoordinate = createCoordinate(adjNode);
 
         return new LineSegment(baseCoordinate, adjCoordinate);
+    }
+
+    @Test
+    public void query() {
+        final double minLongitude = 48.725;
+        final double maxLongitude = 48.775;
+        final double minLatitude = 9.725;
+        final double maxLatitude = 9.775;
+
+        final List<Node> expectedNodeList = new LinkedList<>();
+        for (final Node node : graph.vertexSet()) {
+            if (node.longitude >= minLatitude && node.longitude <= maxLongitude && node.latitude >= minLatitude && node.latitude <= maxLatitude) {
+                expectedNodeList.add(node);
+            }
+        }
+
+        final BoundingBox limiter = new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
+        final List<Node> actualNodeList = gridIndex.queryNodes(limiter);
+
+        Collections.sort(expectedNodeList);
+        Collections.sort(actualNodeList);
+
+        System.out.println(expectedNodeList.size());
+        System.out.println(actualNodeList.size());
+
+        assertEquals(expectedNodeList, actualNodeList);
     }
 }
