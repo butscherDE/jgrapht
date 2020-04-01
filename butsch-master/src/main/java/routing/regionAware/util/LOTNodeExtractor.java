@@ -80,16 +80,20 @@ public class LOTNodeExtractor {
                 final Node neighbor = graph.getEdgeSource(edge);
 
                 if (isEntryExitPoint(neighbor)) {
-                    final Path pathNeighbor = getNeighborPath(viaNode, neighbor);
-                    final double distanceToNeighbor = pathNeighbor.getWeight();
-                    final Path pathEntryExitPoint = getEntryExitNodePath(viaNode, entryExitNode);
-                    final double distanceToEntryExitPoint = pathEntryExitPoint.getWeight();
-
-                    longerToSomeNeighbor |= distanceToEntryExitPoint > distanceToNeighbor;
+                    longerToSomeNeighbor |= isLongerToNeighbor(viaNode, entryExitNode, neighbor);
                 }
             }
 
             return !longerToSomeNeighbor;
+        }
+
+        private boolean isLongerToNeighbor(final Node viaNode, final Node entryExitNode, final Node neighbor) {
+            final Path pathNeighbor = getNeighborPath(viaNode, neighbor);
+            final double distanceToNeighbor = pathNeighbor.getWeight();
+            final Path pathEntryExitPoint = getEntryExitNodePath(viaNode, entryExitNode);
+            final double distanceToEntryExitPoint = pathEntryExitPoint.getWeight();
+
+            return distanceToEntryExitPoint > distanceToNeighbor;
         }
 
         abstract Path getNeighborPath(final Node viaPoint, final Node neighbor);
