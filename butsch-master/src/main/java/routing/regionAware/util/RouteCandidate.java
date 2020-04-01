@@ -73,10 +73,10 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
     }
 
     public boolean isLegalCandidate() {
-        return isAllSubpathsValid();
+        return isAllSubPathsValid();
     }
 
-    private boolean isAllSubpathsValid() {
+    private boolean isAllSubPathsValid() {
         boolean allValid = true;
         allValid &= isSubPathValid(this.startToRegionEntry);
         allValid &= isSubPathValid(this.regionEntryToRegionExit);
