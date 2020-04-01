@@ -52,33 +52,8 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
     }
 
     public double getTimeInROI() {
-//        final Iterator<Node> vertices = regionEntryToRegionExit.getVertexList().iterator();
-//        final Iterator<Edge> edges = regionEntryToRegionExit.getEdgeList().iterator();
-//
-//        double timeInROI = 0d;
-//        Node lastVertex = vertices.next();
-//        for (int i = 0; i < regionEntryToRegionExit.getEdgeList().size(); i++) {
-//            final Node nextVertex = vertices.next();
-//            final Edge nextEdge = edges.next();
-//
-//            if (isEdgeInRegion(lastVertex, nextVertex)) {
-//                final double edgeWeight = graph.getEdgeWeight(nextEdge);
-//                timeInROI += edgeWeight;
-//            }
-//
-//            lastVertex = nextVertex;
-//        }
-//
-//        return timeInROI;
         return regionEntryToRegionExit.getWeight();
     }
-
-//    private boolean isEdgeInRegion(final Node baseNode, final Node adjNode) {
-//        final Geometry basePoint = baseNode.getPoint();
-//        final Geometry adjPoint = adjNode.getPoint();
-//
-//        return region.contains(basePoint) && region.contains(adjPoint);
-//    }
 
     public double getGain() {
         return getTimeInROI() / (getDetourTime() + 1);
