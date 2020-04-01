@@ -4,9 +4,14 @@ import data.Node;
 import data.Path;
 import org.jgrapht.alg.util.Pair;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class RouteCandidate implements Comparable<RouteCandidate> {
+    public final Node startNode;
+    public final Node endNode;
+    public final Node regionEntryNode;
+    public final Node regionExitNode;
     final Path startToRegionEntry;
     final Path regionEntryToRegionExit;
     final Path regionExitToEnd;
@@ -15,6 +20,10 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
 
     public RouteCandidate(final Node startNode, final Node endNode, final Node regionEntryNode,
                           final Node regionExitNode, final Map<Pair<Node, Node>, Path> allPaths) {
+        this.startNode = startNode;
+        this.endNode = endNode;
+        this.regionEntryNode = regionEntryNode;
+        this.regionExitNode = regionExitNode;
         this.startToRegionEntry = allPaths.get(new Pair<>(startNode, regionEntryNode));
         this.regionEntryToRegionExit = allPaths.get(new Pair<>(regionEntryNode, regionExitNode));
         this.regionExitToEnd = allPaths.get(new Pair<>(regionExitNode, endNode));
