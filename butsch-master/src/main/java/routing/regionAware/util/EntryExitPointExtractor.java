@@ -5,25 +5,25 @@ import data.Node;
 import data.RoadGraph;
 import geometry.BoundingBox;
 import index.GridIndex;
+import index.Index;
 import org.locationtech.jts.geom.Polygon;
 
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class EntryExitPointExtractor {
     private final Polygon region;
     private final RoadGraph graph;
-    private final GridIndex gridIndex;
+    private final Index gridIndex;
 
-    public EntryExitPointExtractor(final Polygon region, final RoadGraph graph, final GridIndex gridIndex) {
+    public EntryExitPointExtractor(final Polygon region, final RoadGraph graph, final Index gridIndex) {
         this.region = region;
         this.graph = graph;
         this.gridIndex = gridIndex;
     }
 
-    public List<Node> extract() {
+    public Set<Node> extract() {
         final EntryExitNodeVisitor entryExitNodeVisitor = new EntryExitNodeVisitor(graph, region);
         final BoundingBox boundingBox = BoundingBox.createFrom(region);
         gridIndex.queryNodes(boundingBox, entryExitNodeVisitor);
@@ -73,8 +73,8 @@ public class EntryExitPointExtractor {
             return region.contains(node.getPoint());
         }
 
-        public List<Node> getEntryExitNodes() {
-            return new LinkedList<>(entryExitNodes);
+        public Set<Node> getEntryExitNodes() {
+            return entryExitNodes;
         }
     }
 }
