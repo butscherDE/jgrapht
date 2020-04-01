@@ -53,20 +53,15 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
                 for (final Node entryNode : entryExitNodes) {
                     for (final Node exitNode : entryExitNodes) {
                         final RouteCandidate candidate = new RouteCandidate(source, target, entryNode, exitNode, allPathsNonBacktracked);
-                        if ((candidate.regionEntryNode.id == 28 && candidate.regionExitNode.id == 29) ||
-                             candidate.regionEntryNode.id == 45 && candidate.regionExitNode.id == 30) {
-                            System.out.println("Gain: " + candidate.getGain());
-                            System.out.println("In ROI: " + candidate.getTimeInROI());
-                            System.out.println("Time: " + candidate.getTime());
-                            System.out.println("Detour Time: " + candidate.getDetourTime());
-                        }
                         routeCandidates.add(candidate);
                     }
                 }
 
-                routeCandidates.pruneDominatedCandidateRoutes();
-                routeCandidates.sortByGainAscending();
-                final RouteCandidate bestCandidate = routeCandidates.get(0);
+//                System.out.println(routeCandidates.getMaxGainCandidate());
+//                routeCandidates.pruneDominatedCandidateRoutes();
+//                routeCandidates.sortByGainAscending();
+//                final RouteCandidate bestCandidate = routeCandidates.get(0);
+                final RouteCandidate bestCandidate = routeCandidates.getMaxGainCandidate();
                 optimalCandidates.add(bestCandidate);
             }
         }
