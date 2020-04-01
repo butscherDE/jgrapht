@@ -47,14 +47,14 @@ public class RegionSubGraphBuilder {
         return subGraph;
     }
 
-    public void addWhitelistNodes() {
+    private void addWhitelistNodes() {
         for (final Node node : whitelist) {
             subGraph.addVertex(node);
             isNodeInRegion.set(node, true);
         }
     }
 
-    public void addNodesWhite() {
+    private void addNodesWhite() {
         for (final Node node : graph.vertexSet()) {
             final Geometry point = toPoint(node);
             if (whiteRegion.contains(point)) {
@@ -63,7 +63,7 @@ public class RegionSubGraphBuilder {
         }
     }
 
-    public void addNodesWhiteBlack() {
+    private void addNodesWhiteBlack() {
         for (final Node node : graph.vertexSet()) {
             final Geometry point = toPoint(node);
 
@@ -75,12 +75,12 @@ public class RegionSubGraphBuilder {
         }
     }
 
-    public void addNode(final Node node) {
+    private void addNode(final Node node) {
         isNodeInRegion.set(node, true);
         subGraph.addVertex(node);
     }
 
-    public void addEdges() {
+    private void addEdges() {
         for (final Edge edge : graph.edgeSet()) {
             final Node sourceNode = graph.getEdgeSource(edge);
             final Node targetNode = graph.getEdgeTarget(edge);
