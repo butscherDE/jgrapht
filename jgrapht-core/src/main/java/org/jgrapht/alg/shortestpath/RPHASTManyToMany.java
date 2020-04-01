@@ -152,7 +152,6 @@ public class RPHASTManyToMany<V, E> {
                 paths.add(backtrackPath(source, target));
             }
         } else {
-//            return Collections.emptyList();
             for (final V target : targets) {
                 final V sourceVertex = source.vertex;
                 final List<E> emptyEdgeList = Collections.emptyList();
