@@ -21,19 +21,25 @@ public class LOTNodeExtractorTest {
     @BeforeAll
     public static void createDefaultTestCase() {
         graph = graphMocker.graph;
-        Set<Node> viaPoints = createViaPoints(graph);
+        final Node startNode = getStartNode();
+        final Node endNode = getEndNode();
+        Set<Node> viaPoints = new LinkedHashSet<>(Arrays.asList(startNode, endNode));
         Set<Node> entryExitPoints = createEntryExitPoints(graph);
+        Set<Node> allPoints = new LinkedHashSet<>();
+        allPoints.addAll(viaPoints);
+        allPoints.addAll(entryExitPoints);
         final RPHAST rphast = new RPHAST(graphMocker.ch, true);
 
-        final Map<Pair<Node, Node>, Path> paths = rphast.findPathsAsMap(viaPoints, entryExitPoints);
-        extractor = new LOTNodeExtractor(graph, new LinkedList<>(viaPoints), entryExitPoints, paths);
+        final Map<Pair<Node, Node>, Path> paths = rphast.findPathsAsMap(allPoints, allPoints);
+        extractor = new LOTNodeExtractor(graph, startNode, endNode, entryExitPoints, paths);
     }
 
-    private static Set<Node> createViaPoints(final RoadGraph graph) {
-        final Set<Node> viaPoints = new LinkedHashSet<>();
-        viaPoints.add(graph.getVertex(0));
-        viaPoints.add(graph.getVertex(2));
-        return viaPoints;
+    private static Node getStartNode() {
+        return graph.getVertex(0);
+    }
+
+    private static Node getEndNode() {
+        return graph.getVertex(2);
     }
 
     private static Set<Node> createEntryExitPoints(final RoadGraph graph) {

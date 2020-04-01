@@ -7,6 +7,7 @@ import data.RoadGraph;
 import org.jgrapht.alg.util.Pair;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Polygon;
 import routing.RPHAST;
 import util.PolygonRoutingTestGraph;
 
@@ -17,6 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RouteCandidateListTest {
     private final static PolygonRoutingTestGraph GRAPH_MOCKER = PolygonRoutingTestGraph.DEFAULT_INSTANCE;
+    private static RoadGraph GRAPH = GRAPH_MOCKER.graph;
+    private static Polygon REGION = GRAPH_MOCKER.polygon;
+
     private final RouteCandidateList<RouteCandidate> candidateList = new RouteCandidateList<>();
     private static Map<Pair<Node, Node>, Path> allPaths;
 
@@ -58,7 +62,7 @@ public class RouteCandidateListTest {
     public void assertCorrectTopThreeRoutes() {
         addTestingCandidates();
         this.candidateList.pruneDominatedCandidateRoutes();
-        this.candidateList.sortByGainAscending();
+        this.candidateList.sortByGainNonAscending();
 
         List<Path> topCandidates = this.candidateList.getFirstN(3);
 
@@ -79,7 +83,7 @@ public class RouteCandidateListTest {
         final Node exitNode = graph.getVertex(29);
 
         final Map<Pair<Node, Node>, Path> alteredPaths = getInvalidatedPathMap(graph, startNode, entryNode);
-        final RouteCandidate testingCandidate = new RouteCandidate(startNode, endNode, entryNode, exitNode, alteredPaths);
+        final RouteCandidate testingCandidate = new RouteCandidate(REGION, graph, startNode, endNode, entryNode, exitNode, alteredPaths);
 
         illegalCandidateNotAdded(testingCandidate);
     }
@@ -95,7 +99,7 @@ public class RouteCandidateListTest {
         final Node exitNode = graph.getVertex(29);
 
         final Map<Pair<Node, Node>, Path> alteredPaths = getInvalidatedPathMap(graph, entryNode, exitNode);
-        final RouteCandidate testingCandidate = new RouteCandidate(startNode, endNode, entryNode, exitNode, alteredPaths);
+        final RouteCandidate testingCandidate = new RouteCandidate(REGION, graph, startNode, endNode, entryNode, exitNode, alteredPaths);
 
         illegalCandidateNotAdded(testingCandidate);
     }
@@ -111,7 +115,7 @@ public class RouteCandidateListTest {
         final Node exitNode = graph.getVertex(29);
 
         final Map<Pair<Node, Node>, Path> alteredPaths = getInvalidatedPathMap(graph, exitNode, endNode);
-        final RouteCandidate testingCandidate = new RouteCandidate(startNode, endNode, entryNode, exitNode, alteredPaths);
+        final RouteCandidate testingCandidate = new RouteCandidate(REGION, graph, startNode, endNode, entryNode, exitNode, alteredPaths);
 
         illegalCandidateNotAdded(testingCandidate);
     }
@@ -146,7 +150,7 @@ public class RouteCandidateListTest {
         final Node entryNode = graph.getVertex(29);
         final Node exitNode = graph.getVertex(28);
 
-        return new RouteCandidate(startNode, endNode, entryNode, exitNode, allPaths);
+        return new RouteCandidate(REGION, graph, startNode, endNode, entryNode, exitNode, allPaths);
     }
 
     @Test
@@ -169,7 +173,7 @@ public class RouteCandidateListTest {
 
         RouteCandidateMocker(final double polygonRouteTime, final double timeInRoi, final double directTime,
                              final String name, final Map<Pair<Node, Node>, Path> allPaths) {
-            super(GRAPH_MOCKER.graph.getVertex(0), GRAPH_MOCKER.graph.getVertex(3), GRAPH_MOCKER.graph.getVertex(1),
+            super(REGION, GRAPH, GRAPH_MOCKER.graph.getVertex(0), GRAPH_MOCKER.graph.getVertex(3), GRAPH_MOCKER.graph.getVertex(1),
                   GRAPH_MOCKER.graph.getVertex(2), allPaths);
 
             this.polygonRouteTime = polygonRouteTime;

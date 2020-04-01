@@ -11,6 +11,7 @@ import routing.DijkstraCH;
 import routing.RPHAST;
 import routing.RoutingAlgorithm;
 import routing.regionAware.util.EntryExitPointExtractor;
+import routing.regionAware.util.LOTNodeExtractor;
 import routing.regionAware.util.RouteCandidate;
 import routing.regionAware.util.RouteCandidateList;
 
@@ -24,8 +25,10 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
     private final RoadCH regionCH;
     private final Map<Pair<Node, Node>, Path> allPathsNonBacktracked = new HashMap();
     final Set<Node> entryExitNodes;
+    LOTNodeExtractor lotNodeExtractor;
 
-    public AbstractRegion(final RoadGraph globalGraph, final RoadCH globalCH, final Index globalIndex, final Polygon region) {
+    public AbstractRegion(final RoadGraph globalGraph, final RoadCH globalCH, final Index globalIndex,
+                          final Polygon region) {
         this.globalGraph = globalGraph;
         this.globalCH = globalCH;
         this.globalIndex = globalIndex;
@@ -49,27 +52,29 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
         final List<RouteCandidate> optimalCandidates = new ArrayList<>(numPaths);
         for (final Node source : sources) {
             for (final Node target : targets) {
+                lotNodeExtractor = new LOTNodeExtractor(globalGraph, source, target, entryExitNodes,
+                                                        allPathsNonBacktracked);
+
+
                 final RouteCandidateList<RouteCandidate> routeCandidates = new RouteCandidateList<>();
-                for (final Node entryNode : entryExitNodes) {
-                    for (final Node exitNode : entryExitNodes) {
-                        final RouteCandidate candidate = new RouteCandidate(source, target, entryNode, exitNode, allPathsNonBacktracked);
+                for (final Node entryNode : lotNodeExtractor.getLotNodesFor(source)) {
+                    for (final Node exitNode : lotNodeExtractor.getLotNodesFor(target)) {
+                        final RouteCandidate candidate = new RouteCandidate(region, globalGraph, source, target,
+                                                                            entryNode, exitNode,
+                                                                            allPathsNonBacktracked);
                         routeCandidates.add(candidate);
                     }
                 }
 
-//                System.out.println(routeCandidates.getMaxGainCandidate());
-//                routeCandidates.pruneDominatedCandidateRoutes();
-//                routeCandidates.sortByGainAscending();
-//                final RouteCandidate bestCandidate = routeCandidates.get(0);
-                final RouteCandidate bestCandidate = routeCandidates.getMaxGainCandidate();
+                System.out.println(routeCandidates.getMaxGainCandidate());
+                routeCandidates.sortByTimeInROIDescending();
+                routeCandidates.pruneDominatedCandidateRoutes();
+                routeCandidates.pruneLowerQuantileInROI();
+                routeCandidates.sortByGainNonAscending();
+                final RouteCandidate bestCandidate = routeCandidates.get(0);
                 optimalCandidates.add(bestCandidate);
             }
         }
-
-        System.out.println("Gain: " + optimalCandidates.get(0).getGain());
-        System.out.println("In ROI: " + optimalCandidates.get(0).getTimeInROI());
-        System.out.println("Time: " + optimalCandidates.get(0).getTime());
-        System.out.println("Detour Time: " + optimalCandidates.get(0).getDetourTime());
 
         // TODO use rphast or dijkstra depending on how many sources and targets. Where is the break even point?
         final DijkstraCH dijkstraCHGlobal = new DijkstraCH(globalCH, true);

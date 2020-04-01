@@ -5,6 +5,7 @@ import org.jgrapht.alg.util.Pair;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Polygon;
 import routing.RPHAST;
 import util.PolygonRoutingTestGraph;
 
@@ -14,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RouteCandidateTest {
     private final static PolygonRoutingTestGraph GRAPH_MOCKER = PolygonRoutingTestGraph.DEFAULT_INSTANCE;
+    private static RoadGraph GRAPH = GRAPH_MOCKER.graph;
+    private static Polygon REGION = GRAPH_MOCKER.polygon;
 
     private static Map<Pair<Node, Node>, Path> allPaths;
     private static RouteCandidate smallerSimpleCandidate;
@@ -34,33 +37,28 @@ public class RouteCandidateTest {
 
     @BeforeEach
     public void setSmallerSimpleCandidate() {
-        final RoadGraph graph = GRAPH_MOCKER.graph;
-        smallerSimpleCandidate = new RouteCandidate(graph.getVertex(0), graph.getVertex(4), graph.getVertex(28),
-                                                    graph.getVertex(29), allPaths);
+        smallerSimpleCandidate = new RouteCandidate(REGION, GRAPH, GRAPH.getVertex(0), GRAPH.getVertex(4), GRAPH.getVertex(28),
+                                                    GRAPH.getVertex(29), allPaths);
     }
 
     @BeforeEach
     public void setGreaterSimpleCandidate() {
-        final RoadGraph graph = GRAPH_MOCKER.graph;
-        greaterSimpleCandidate = new RouteCandidate(graph.getVertex(0), graph.getVertex(4), graph.getVertex(28),
-                                                    graph.getVertex(9), allPaths);
+        greaterSimpleCandidate = new RouteCandidate(REGION, GRAPH, GRAPH.getVertex(0), GRAPH.getVertex(4), GRAPH.getVertex(28),
+                                                    GRAPH.getVertex(9), allPaths);
     }
 
 
     @BeforeEach
     public void setSelfIntersectingTour() {
-        final RoadGraph graph = GRAPH_MOCKER.graph;
-        selfIntersectingTour = new RouteCandidate(graph.getVertex(0), graph.getVertex(4), graph.getVertex(29),
-                                                     graph.getVertex(28), allPaths);
+        selfIntersectingTour = new RouteCandidate(REGION, GRAPH, GRAPH.getVertex(0), GRAPH.getVertex(4), GRAPH.getVertex(29),
+                                                  GRAPH.getVertex(28), allPaths);
     }
 
     @Test
     public void validateMergedPath() {
-        final RoadGraph graph = GRAPH_MOCKER.graph;
-
         final List<Node> expectedVertexList = new LinkedList<>(
-                Arrays.asList(graph.getVertex(0), graph.getVertex(1), graph.getVertex(28), graph.getVertex(29),
-                              graph.getVertex(3), graph.getVertex(4)));
+                Arrays.asList(GRAPH.getVertex(0), GRAPH.getVertex(1), GRAPH.getVertex(28), GRAPH.getVertex(29),
+                              GRAPH.getVertex(3), GRAPH.getVertex(4)));
         final List<Node> vertexList = smallerSimpleCandidate.getMergedPath().getVertexList();
 
         assertEquals(expectedVertexList, vertexList);
@@ -83,18 +81,15 @@ public class RouteCandidateTest {
 
     @Test
     public void getTime() {
-
         final double expectedTime = getSummedEdgeCost(smallerSimpleCandidate.getMergedPath());
 
         assertEquals(expectedTime, smallerSimpleCandidate.getTime());
     }
 
     public double getSummedEdgeCost(final Path path) {
-        final RoadGraph graph = GRAPH_MOCKER.graph;
-
         double edgeCostSum = 0;
         for (final Edge edge : path.getEdgeList()) {
-            edgeCostSum += graph.getEdgeWeight(edge);
+            edgeCostSum += GRAPH.getEdgeWeight(edge);
         }
         return edgeCostSum;
     }
@@ -149,15 +144,13 @@ public class RouteCandidateTest {
 
     @Test
     public void isNotLegalCandidate() {
-        final RoadGraph graph = GRAPH_MOCKER.graph;
+        final Node vertex0 = GRAPH.getVertex(0);
+        final Node vertex28 = GRAPH.getVertex(28);
+        final Node vertex29 = GRAPH.getVertex(29);
+        final Node vertex4 = GRAPH.getVertex(4);
+        final HashMap<Pair<Node, Node>, Path> customPaths = getAllPathsWith0to28InvalidPath(GRAPH, vertex0, vertex28);
 
-        final Node vertex0 = graph.getVertex(0);
-        final Node vertex28 = graph.getVertex(28);
-        final Node vertex29 = graph.getVertex(29);
-        final Node vertex4 = graph.getVertex(4);
-        final HashMap<Pair<Node, Node>, Path> customPaths = getAllPathsWith0to28InvalidPath(graph, vertex0, vertex28);
-
-        final RouteCandidate routeCandidate = new RouteCandidate(vertex0, vertex4, vertex28, vertex29, customPaths);
+        final RouteCandidate routeCandidate = new RouteCandidate(REGION, GRAPH, vertex0, vertex4, vertex28, vertex29, customPaths);
         assertFalse(routeCandidate.isLegalCandidate());
     }
 

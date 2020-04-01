@@ -11,7 +11,7 @@ public class RouteCandidateList<T extends RouteCandidate> {
         this.setCandidates(new ArrayList<T>());
     }
 
-    public void sortByGainAscending() {
+    public void sortByGainNonAscending() {
         Collections.sort(this.candidates);
     }
 
@@ -56,7 +56,6 @@ public class RouteCandidateList<T extends RouteCandidate> {
     }
 
     public void pruneDominatedCandidateRoutes() {
-        this.sortByTimeInROIDescending();
         int currentPruningCandidateIndex = 1;
         while (indexInCandidateBounds(currentPruningCandidateIndex)) {
             RouteCandidate currentPruningCandidate = this.candidates.get(currentPruningCandidateIndex);
@@ -128,5 +127,12 @@ public class RouteCandidateList<T extends RouteCandidate> {
 
     public RouteCandidate getMaxGainCandidate() {
         return Collections.max(candidates, Comparator.comparingDouble(RouteCandidate::getGain));
+    }
+
+    public void pruneLowerQuantileInROI() {
+        // Assumes that routeCandidates was already sorted descending to roi distance after pruning dominated route candidates
+        final int endIndex = (int) (size() * 0.75) + 1;
+
+        candidates = candidates.subList(0, endIndex);
     }
 }

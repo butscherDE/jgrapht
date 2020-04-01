@@ -155,8 +155,8 @@ public class RPHASTManyToMany<V, E> {
             for (final V target : targets) {
                 final V sourceVertex = source.vertex;
                 final List<E> emptyEdgeList = Collections.emptyList();
-                final Double precalculatedCost = cost.get(getChVertex(target));
-                paths.add(new GraphWalk<V, E>(graph, sourceVertex, target, emptyEdgeList, precalculatedCost));
+                final Double preCalculatedCost = cost.get(getChVertex(target));
+                paths.add(new GraphWalk<V, E>(graph, sourceVertex, target, emptyEdgeList, preCalculatedCost));
             }
         }
 
