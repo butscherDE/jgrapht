@@ -4,7 +4,6 @@ import data.Node;
 import data.Path;
 import org.jgrapht.alg.util.Pair;
 
-import java.util.Collections;
 import java.util.Map;
 
 public class RouteCandidate implements Comparable<RouteCandidate> {
@@ -79,14 +78,14 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
 
     private boolean isAllSubpathsValid() {
         boolean allValid = true;
-        allValid &= isSubpathValid(this.startToRegionEntry);
-        allValid &= isSubpathValid(this.regionEntryToRegionExit);
-        allValid &= isSubpathValid(this.regionExitToEnd);
+        allValid &= isSubPathValid(this.startToRegionEntry);
+        allValid &= isSubPathValid(this.regionEntryToRegionExit);
+        allValid &= isSubPathValid(this.regionExitToEnd);
 
         return allValid;
     }
 
-    private static boolean isSubpathValid(final Path path) {
+    private static boolean isSubPathValid(final Path path) {
         if (path != null) {
             return path.isFound();
         } else {
