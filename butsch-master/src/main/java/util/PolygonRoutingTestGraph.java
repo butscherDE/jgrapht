@@ -1,6 +1,7 @@
 package util;
 
 import data.*;
+import index.GridIndex;
 import org.jgrapht.alg.util.Pair;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -20,6 +21,7 @@ public class PolygonRoutingTestGraph {
     public RoadGraph graph;
     public RoadCH ch;
     public Polygon polygon;
+    public GridIndex gridIndex;
 
     public PolygonRoutingTestGraph() {
         this(getDefaultNodeList(), getDefaultEdgeList());
@@ -32,6 +34,7 @@ public class PolygonRoutingTestGraph {
         this.createTestPolygon();
         this.createTestGraph();
         this.createPolygonTestGraphWithCh();
+        this.createTestIndex();
     }
 
     private void createPolygonTestGraphWithCh() {
@@ -346,5 +349,9 @@ public class PolygonRoutingTestGraph {
         final Node edgeSourceNode = graph.getEdgeSource(edge);
         final Node edgeTargetNode = graph.getEdgeTarget(edge);
         return edgeSourceNode.id == baseNode && edgeTargetNode.id == adjNode;
+    }
+
+    private void createTestIndex() {
+        gridIndex = new GridIndex(graph, 720, 360);
     }
 }
