@@ -52,11 +52,7 @@ public class RPHAST implements RoutingAlgorithm {
                                 final RPHASTManyToMany<Node, Edge> rphast) {
         List<GraphPath<Node, Edge>> paths = rphast.getPaths(sources);
 
-//        if (enableBacktrack) {
-            return convertToPaths(paths, sources, targets);
-//        } else {
-//            return Collections.emptyList();
-//        }
+        return convertToPaths(paths, sources, targets);
     }
 
     private List<Path> convertToPaths(final List<GraphPath<Node, Edge>> paths, final Set<Node> sources,
