@@ -35,51 +35,12 @@ public class RouteCandidateListTest {
     private void addTestingCandidates() {
         this.candidateList.clear();
 
-        //        Path startToDetourEntry = new Path();
-        //        Path detourEntryToDetourExit = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        Path detourExitToEnd = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
         this.candidateList.add(new RouteCandidateMocker(3, 6, 1, "a", allPaths));
-
-        //        startToDetourEntry = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourEntryToDetourExit = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourExitToEnd = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        this.candidateList.add(new RouteCandidateMocker(2, 3, 1, "b", startToDetourEntry,
-        //                                                        detourEntryToDetourExit, detourExitToEnd, null));
         this.candidateList.add(new RouteCandidateMocker(2, 3, 1, "b", allPaths));
-        //
-        //        startToDetourEntry = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourEntryToDetourExit = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourExitToEnd = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        this.candidateList.add(new RouteCandidateMocker(6, 6, 5, "c", startToDetourEntry,
-        //                                                        detourEntryToDetourExit, detourExitToEnd, null));
         this.candidateList.add(new RouteCandidateMocker(6, 6, 5, "c", allPaths));
-        //
-        //        startToDetourEntry = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourEntryToDetourExit = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourExitToEnd = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        this.candidateList.add(new RouteCandidateMocker(4, 5, 3, "d", startToDetourEntry,
-        //                                                        detourEntryToDetourExit, detourExitToEnd, null));
         this.candidateList.add(new RouteCandidateMocker(4, 5, 3, "d", allPaths));
-        //
-        //        startToDetourEntry = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourEntryToDetourExit = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourExitToEnd = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        this.candidateList.add(new RouteCandidateMocker(8, 4, 6, "e", startToDetourEntry,
-        //                                                        detourEntryToDetourExit, detourExitToEnd, null));
         this.candidateList.add(new RouteCandidateMocker(8, 4, 6, "e", allPaths));
-        //
-        //        startToDetourEntry = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourEntryToDetourExit = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourExitToEnd = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        this.candidateList.add(new RouteCandidateMocker(6, 1, 3, "f", startToDetourEntry,
-        //                                                        detourEntryToDetourExit, detourExitToEnd, null));
         this.candidateList.add(new RouteCandidateMocker(6, 1, 3, "f", allPaths));
-        //
-        //        startToDetourEntry = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourEntryToDetourExit = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        detourExitToEnd = new Path(graphMocker.graph, graphMocker.weighting).setFound(true);
-        //        this.candidateList.add(new RouteCandidateMocker(7, 1, 6, "g", startToDetourEntry,
-        //                                                        detourEntryToDetourExit, detourExitToEnd, null));
         this.candidateList.add(new RouteCandidateMocker(7, 1, 6, "g", allPaths));
     }
 
@@ -186,6 +147,18 @@ public class RouteCandidateListTest {
         final Node exitNode = graph.getVertex(28);
 
         return new RouteCandidate(startNode, endNode, entryNode, exitNode, allPaths);
+    }
+
+    @Test
+    public void getMaxGainCandidate() {
+        addTestingCandidates();
+
+        final double expectedMaxGain = 3.0;
+
+        final RouteCandidate maxGainCandidate = candidateList.getMaxGainCandidate();
+        final double actualMaxGain = maxGainCandidate.getGain();
+
+        assertEquals(expectedMaxGain, actualMaxGain, 0);
     }
 
     class RouteCandidateMocker extends RouteCandidate {

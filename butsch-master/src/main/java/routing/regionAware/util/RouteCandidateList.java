@@ -125,4 +125,8 @@ public class RouteCandidateList<T extends RouteCandidate> {
     void setCandidates(List<T> candidates) {
         this.candidates = candidates;
     }
+
+    public RouteCandidate getMaxGainCandidate() {
+        return Collections.max(candidates, Comparator.comparingDouble(RouteCandidate::getGain));
+    }
 }
