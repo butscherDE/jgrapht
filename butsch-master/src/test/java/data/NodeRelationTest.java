@@ -111,4 +111,19 @@ public class NodeRelationTest {
 
         return new GeometryFactory().createPolygon(coordinates);
     }
+
+    @Test
+    public void testToString() {
+        final List<Node> list = Arrays.asList(new Node(0,0,0,0),
+                                              new Node(1,1,1,1),
+                                              new Node(2,2,2,2));
+        final NodeRelation nodeRelation = new NodeRelation(1, "desc", Collections.emptyMap(), list);
+
+        final String expectedString = "NodeRelation(1): [" + list.get(0).toString() + ", "
+                                                          + list.get(1).toString() + ", "
+                                                          + list.get(2).toString() + "]";
+        final String actualString = nodeRelation.toString();
+
+        assertEquals(expectedString, actualString);
+    }
 }
