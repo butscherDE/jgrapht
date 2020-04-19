@@ -193,7 +193,7 @@ public class GridIndexTest {
         assertEquals(expectedNodeList, actualNodeList);
     }
 
-    private class OddIdVisitor implements Consumer<Node> {
+    private class OddIdVisitor implements Index.IndexVisitor<Node> {
         private final Set<Node> nodes = new LinkedHashSet<>();
 
         @Override

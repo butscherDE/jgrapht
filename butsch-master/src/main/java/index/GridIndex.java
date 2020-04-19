@@ -5,12 +5,10 @@ import data.Node;
 import data.RoadGraph;
 import evalutation.StopWatchVerbose;
 import geometry.BoundingBox;
-import org.jgrapht.Graph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class GridIndex implements Index {
     private final RoadGraph graph;
@@ -26,11 +24,6 @@ public class GridIndex implements Index {
         this.longitudePrecision = (int) Math.pow(10, precision(longitudeGranularity));
         this.latitudeCellSize = 180d / latitudeGranularity;
         this.latitudePrecision = (int) Math.pow(10, precision(latitudeGranularity));
-
-        System.out.println(longitudeGranularity);
-        System.out.println(longitudeCellSize);
-        System.out.println(latitudeGranularity);
-        System.out.println(latitudeCellSize);
 
         this.cells = new GridCell[longitudeGranularity][latitudeGranularity];
 
@@ -434,12 +427,33 @@ public class GridIndex implements Index {
     }
 
     @Override
-    public void queryNodes(final BoundingBox limiter, final Consumer<Node> visitor) {
+    public void queryNodes(final BoundingBox limiter, final IndexVisitor visitor) {
         final Set<Node> nodesInLimiter = getNodesInLimiter(limiter);
 
-        for (final Node node : nodesInLimiter) {
-            visitor.accept(node);
+        if (visitor instanceof GridIndexVisitor) {
+            final GridIndexVisitor gridIndexVisitor = (GridIndexVisitor) visitor;
+            for (final Node node : nodesInLimiter) {
+                final BoundingBox boundingBox = getBoundingBoxOfCell(node);
+
+                gridIndexVisitor.accept(node, boundingBox);
+            }
+        } else {
+            for (final Node node : nodesInLimiter) {
+                visitor.accept(node);
+            }
         }
+    }
+
+    public BoundingBox getBoundingBoxOfCell(final Node node) {
+        final int longitudeIndex = getLongitudeIndex(node.longitude);
+        final int latitudeIndex = getLatitudeIndex(node.latitude);
+
+        final double minLongitude = longitudeIndex * longitudeCellSize;
+        final double maxLongitude = (longitudeIndex + 1) * longitudeCellSize;
+        final double minLatitude = latitudeIndex * longitudeCellSize;
+        final double maxLatitude = (latitudeIndex + 1) * longitudeCellSize;
+
+        return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
     }
 
     public Set<Node> getNodesInLimiter(final BoundingBox limiter) {
@@ -487,5 +501,9 @@ public class GridIndex implements Index {
                 nodesInLimiter.addAll(cells[x][y].nodes);
             }
         }
+    }
+
+    public interface GridIndexVisitor<T> extends IndexVisitor<T> {
+        abstract void accept(T entity, BoundingBox cell);
     }
 }
