@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CSVColumnExImportTest {
-    private static String TEST_PATH = System.getProperty("user.dir");
+    private static String TEST_PATH = System.getProperty("user.dir") + "\\csvimportexporttest.csv";
 
     @Test
     public void exAndImport() {
@@ -61,7 +61,7 @@ public class CSVColumnExImportTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        System.out.println(TEST_PATH);
         final CsvColumnImporter importer = new CsvColumnImporter(TEST_PATH, ',');
         assertThrows(IllegalStateException.class, () -> importer.importData());
     }
