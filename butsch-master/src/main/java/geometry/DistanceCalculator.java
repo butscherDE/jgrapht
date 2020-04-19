@@ -13,7 +13,7 @@ public class DistanceCalculator {
 
     }
 
-    private static double area(final BoundingBox boundingBox, final Unit unit) {
+    public static double area(final BoundingBox boundingBox, final Unit unit) {
         final Coordinate lowerLeft = new Coordinate(boundingBox.minLongitude, boundingBox.minLatitude);
         final Coordinate lowerRight = new Coordinate(boundingBox.maxLongitude, boundingBox.minLatitude);
         final Coordinate upperLeft = new Coordinate(boundingBox.minLongitude, boundingBox.maxLatitude);
@@ -24,7 +24,7 @@ public class DistanceCalculator {
         return lengthX * lengthY;
     }
 
-    private static double distance(final Coordinate start, final Coordinate end, final Unit unit) {
+    public static double distance(final Coordinate start, final Coordinate end, final Unit unit) {
         if (start.equals(end)) {
             return 0;
         } else {
