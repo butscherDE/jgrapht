@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 
 public class CsvColumnImporter implements CsvImporter {
     private final String path;
@@ -20,34 +19,57 @@ public class CsvColumnImporter implements CsvImporter {
 
     public List<List<String>> importData() throws IOException {
         final BufferedReader fileReader = new BufferedReader(new FileReader(path));
+        final int numColumns = readHeader(fileReader);
+        readElements(fileReader, numColumns);
+        fileReader.close();
 
+        return elements;
+    }
+
+    public int readHeader(final BufferedReader fileReader) throws IOException {
         final String headerLine = fileReader.readLine();
         headers = headerLine.split(String.valueOf(delimiter));
-        final int numColumns = headers.length;
+        return headers.length;
+    }
 
+    public void readElements(final BufferedReader fileReader, final int numColumns) throws IOException {
+        getElementsDataStructure(numColumns);
+        addDataFromFile(fileReader, numColumns);
+    }
+
+    public void getElementsDataStructure(final int numColumns) {
         elements = new ArrayList<>(numColumns);
         for (int i = 0; i < numColumns; i++) {
             elements.add(new LinkedList<>());
         }
+    }
 
-        String currentLine = fileReader.readLine();;
+    public void addDataFromFile(final BufferedReader fileReader, final int numColumns) throws IOException {
+        String currentLine = fileReader.readLine();
         do {
             final String[] splitLine = currentLine.split(String.valueOf(delimiter));
 
-            if (splitLine.length != numColumns) {
-                throw new InputMismatchException("Mismatch between number of headers and number of elements in a row");
-            }
+            failOnLineWithWrongNumberOfColumns(numColumns, splitLine);
+            addLineData(splitLine);
 
-            for (int i = 0; i < elements.size(); i++) {
-                elements.get(i).add(splitLine[i]);
-            }
+            currentLine = fileReader.readLine();
+        } while (isFileNotEnded(currentLine));
+    }
 
-            currentLine = fileReader.readLine();;
-        } while (currentLine != null && !currentLine.equals(""));
+    public void failOnLineWithWrongNumberOfColumns(final int numColumns, final String[] splitLine) {
+        if (splitLine.length != numColumns) {
+            throw new InputMismatchException("Mismatch between number of headers and number of elements in a row");
+        }
+    }
 
-        fileReader.close();
+    public void addLineData(final String[] splitLine) {
+        for (int i = 0; i < elements.size(); i++) {
+            elements.get(i).add(splitLine[i]);
+        }
+    }
 
-        return elements;
+    public boolean isFileNotEnded(final String currentLine) {
+        return currentLine != null && !currentLine.equals("");
     }
 
     public String[] getHeaders() {
