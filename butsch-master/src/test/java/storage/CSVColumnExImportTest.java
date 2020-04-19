@@ -53,7 +53,9 @@ public class CSVColumnExImportTest {
 
     @Test
     public void getHeadersCalledToEarly() {
-        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, new String[0], Collections.emptyList(), ',');
+        final String[] headers = new String[] {"abc"};
+        final List<List<Object>> elements = Arrays.asList(Arrays.asList("abc"));
+        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ',');
         try {
             dumper.dump();
         } catch (IOException e) {

@@ -8,8 +8,8 @@ public class CsvColumnImporter implements CsvImporter {
     private final String path;
     private final char delimiter;
 
-    private String[] headers;
-    private List<Object>[] elements;
+    private String[] headers = null;
+    private List<Object>[] elements = null;
 
     public CsvColumnImporter(final String path, final char delimiter) {
         this.path = path;
@@ -27,6 +27,10 @@ public class CsvColumnImporter implements CsvImporter {
     }
 
     public String[] getHeaders() {
-        return null;
+        if (headers == null) {
+            throw new IllegalStateException("Call importData() first");
+        }
+
+        return headers;
     }
 }
