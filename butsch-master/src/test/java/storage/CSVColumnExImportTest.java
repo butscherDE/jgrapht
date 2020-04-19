@@ -1,6 +1,5 @@
 package storage;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,9 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,16 +19,25 @@ public class CSVColumnExImportTest {
 
     @Test
     public void exAndImport() {
-        final String[] headers = new String[] {"test_int", "test_double", "test_string", "test_abstract"};
+        final String[] headers = getHeaders();
+        final List<List<Object>> elements = getElements();
+        dump(headers, elements);
+        reImportAndCheck(headers, elements);
+    }
 
+    public String[] getHeaders() {
+        return new String[]{"test_int", "test_double", "test_string", "test_abstract"};
+    }
+
+    public List<List<Object>> getElements() {
         final List<Object> integers = Arrays.asList(1, 2, 3);
         final List<Object> doubles = Arrays.asList(0.4, 2.1, 3.7);
         final List<Object> strings = Arrays.asList("abc", "def", "ghi");
-        final List<Object> abstracts = Arrays.asList(new Coordinate(0, 0),
-                                                     new Coordinate(1,1),
-                                                     new Coordinate(2,2));
-        final List<List<Object>> elements = Arrays.asList(integers, doubles, strings, abstracts);
+        final List<Object> abstracts = Arrays.asList(new Coordinate(0, 0), new Coordinate(1, 1), new Coordinate(2, 2));
+        return Arrays.asList(integers, doubles, strings, abstracts);
+    }
 
+    public void dump(final String[] headers, final List<List<Object>> elements) {
         final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ';');
         try {
             dumper.dump();
@@ -38,7 +45,9 @@ public class CSVColumnExImportTest {
             e.printStackTrace();
             fail();
         }
+    }
 
+    public void reImportAndCheck(final String[] headers, final List<List<Object>> elements) {
         final CsvColumnImporter importer = new CsvColumnImporter(TEST_PATH, ';');
         try {
             final List<List<String>> reImportedElements = importer.importData();
@@ -55,26 +64,10 @@ public class CSVColumnExImportTest {
     }
 
     public List<List<Object>> convertReimportedElements(final List<List<String>> reImportedElements) {
-        final List<Object> reImportedIntegers = new LinkedList<>();
-        for (final String reImportedElement : reImportedElements.get(0)) {
-            reImportedIntegers.add(Integer.valueOf(reImportedElement));
-        }
-        final List<Object> reImportedDoubles = new LinkedList<>();
-        for (final String reImportedElement : reImportedElements.get(1)) {
-            reImportedDoubles.add(Double.valueOf(reImportedElement));
-        }
-        final List<Object> reImportedStrings = new LinkedList<>();
-        for (final String reImportedElement : reImportedElements.get(2)) {
-            reImportedStrings.add(reImportedElement);
-        }
-        final List<Object> reImportedCoordinates = new LinkedList<>();
-        for (final String reImportedElement : reImportedElements.get(3)) {
-            reImportedCoordinates.add(parseCoordinate(reImportedElement));
-        }
-        return Arrays.asList(reImportedIntegers,
-                             reImportedDoubles,
-                             reImportedStrings,
-                             reImportedCoordinates);
+        return Arrays.asList(reImportedElements.get(0).stream().map(Integer::valueOf).collect(Collectors.toList()),
+                             reImportedElements.get(1).stream().map(Double::valueOf).collect(Collectors.toList()),
+                             reImportedElements.get(2).stream().collect(Collectors.toList()),
+                             reImportedElements.get(3).stream().map((a) -> parseCoordinate(a)).collect(Collectors.toList()));
     }
 
     @Test
@@ -85,33 +78,40 @@ public class CSVColumnExImportTest {
     private Coordinate parseCoordinate(final String coordinateString) {
         final String cutString = coordinateString.substring(1, coordinateString.length() - 1);
 
-        final String[] coordinatesString = cutString.split(", ");
-        final double[] coordinates = new double[] {Double.valueOf(coordinatesString[0]),
-                                                   Double.valueOf(coordinatesString[1]),
-                                                   Double.valueOf(coordinatesString[2])};
+        final String[] split = cutString.split(", ");
+        final List<Double> doubleCoords = Arrays.stream(split).map(Double::valueOf).collect(Collectors.toList());
 
-        return new Coordinate(coordinates[0], coordinates[1], coordinates[2]);
+        return new Coordinate(doubleCoords.get(0), doubleCoords.get(1), doubleCoords.get(2));
     }
 
     @Test
     public void getHeadersCalledToEarly() {
-        final String[] headers = new String[] {"abc"};
-        final List<List<Object>> elements = Arrays.asList(Arrays.asList("abc"));
+        prepareDummyFile();
+
+        final CsvColumnImporter importer = new CsvColumnImporter(TEST_PATH, ',');
+        assertThrows(IllegalStateException.class, () -> importer.getHeaders());
+    }
+
+    public void prepareDummyFile() {
+        final String[] headers = new String[]{""};
+        final List<List<Object>> elements = Arrays.asList(Arrays.asList(""));
+
+        dumpDummyFile(headers, elements);
+    }
+
+    public void dumpDummyFile(final String[] headers, final List<List<Object>> elements) {
         final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ';');
         try {
             dumper.dump();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(TEST_PATH);
-        final CsvColumnImporter importer = new CsvColumnImporter(TEST_PATH, ',');
-        assertThrows(IllegalStateException.class, () -> importer.getHeaders());
     }
 
     @Test
     public void unequalSizedObjects() {
-        final String[] headers = new String[] {"test1", "test2"};
-        final List<List<Object>> elements = Arrays.asList(Arrays.asList(0,1), Arrays.asList(1));
+        final String[] headers = new String[]{"test1", "test2"};
+        final List<List<Object>> elements = Arrays.asList(Arrays.asList(0, 1), Arrays.asList(1));
 
         final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ';');
         assertThrows(IllegalArgumentException.class, () -> dumper.dump());
@@ -119,8 +119,8 @@ public class CSVColumnExImportTest {
 
     @Test
     public void unequalHeadersVsColumnNumbers() {
-        final String[] headers = new String[] {"abc"};
-        final List<List<Object>> elements = Arrays.asList(Arrays.asList(0,1), Arrays.asList(1,2));
+        final String[] headers = new String[]{"abc"};
+        final List<List<Object>> elements = Arrays.asList(Arrays.asList(0, 1), Arrays.asList(1, 2));
 
         final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ';');
         assertThrows(IllegalArgumentException.class, () -> dumper.dump());
