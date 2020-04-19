@@ -26,9 +26,10 @@ public class EntryExitPointExtractor {
     public Set<Node> extract() {
         final EntryExitNodeVisitor entryExitNodeVisitor = new EntryExitNodeVisitor(graph, region);
         final BoundingBox boundingBox = BoundingBox.createFrom(region);
-        gridIndex.queryNodes(boundingBox, entryExitNodeVisitor);
+        //gridIndex.queryNodes(boundingBox, entryExitNodeVisitor);
+        throw new UnsupportedOperationException("fix the query on index first");
 
-        return entryExitNodeVisitor.getEntryExitNodes();
+//        return entryExitNodeVisitor.getEntryExitNodes();
     }
 
     private class EntryExitNodeVisitor implements Consumer<Node> {

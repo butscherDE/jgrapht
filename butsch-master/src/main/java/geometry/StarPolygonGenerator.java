@@ -23,12 +23,11 @@ public class StarPolygonGenerator extends PolygonGenerator {
 
         final ConvexHull convexHull = new ConvexHull(randomCoordinates, geometryFactory);
         final Coordinate[] convexHullCoordinates = convexHull.getConvexHull().getCoordinates();
-        final Coordinate randomCoordinateOnHull = convexHullCoordinates[random.nextInt(convexHullCoordinates.length)];
+        final Coordinate randomCoordinateOnHull = convexHullCoordinates[random.nextInt(convexHullCoordinates.length)]; // TODO points mustnt only be coordinates defining the hull
 
         final AngularPointSorter sorter = new AngularPointSorter(randomCoordinateOnHull);
         Arrays.sort(randomCoordinates, 0, numPoints, sorter);
         randomCoordinates[numPoints] = randomCoordinates[0];
-
         return geometryFactory.createPolygon(randomCoordinates);
     }
 

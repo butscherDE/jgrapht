@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class BoundingBox extends Polygon {
@@ -65,6 +66,39 @@ public class BoundingBox extends Polygon {
         ));
 
         return lineSegments;
+    }
+
+    public boolean isContainedBy(final Polygon polygon) {
+        final GeometryFactory gf = new GeometryFactory();
+
+        final boolean minMinContained = polygon.contains(gf.createPoint(new Coordinate(minLongitude, minLatitude)));
+        final boolean minMaxContained = polygon.contains(gf.createPoint(new Coordinate(minLongitude, maxLatitude)));
+        final boolean maxMinContained = polygon.contains(gf.createPoint(new Coordinate(maxLongitude, minLatitude)));
+        final boolean maxMaxContained = polygon.contains(gf.createPoint(new Coordinate(maxLongitude, maxLatitude)));
+
+        return minMinContained && minMaxContained && maxMinContained && maxMaxContained;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        final BoundingBox that = (BoundingBox) o;
+        return Double.compare(that.minLongitude, minLongitude) == 0 && Double.compare(that.maxLongitude,
+                                                                                      maxLongitude) == 0 && Double.compare(
+                that.minLatitude, minLatitude) == 0 && Double.compare(that.maxLatitude, maxLatitude) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), minLongitude, maxLongitude, minLatitude, maxLatitude);
     }
 
     private static class MinMaxLongLat implements Consumer<Coordinate> {
