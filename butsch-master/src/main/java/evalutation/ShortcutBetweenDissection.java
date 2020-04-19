@@ -30,6 +30,7 @@ public class ShortcutBetweenDissection {
         final List<Integer> numNodesInArea = new LinkedList<>();
         int c = 0;
         for (final NodeRelation nodeRelation : nodeRelations) {
+            final StopWatchVerbose sw = new StopWatchVerbose("relation processing");
             if (nodeRelation.nodes.size() > 2) {
                 final Polygon relationPolygon = nodeRelation.toPolygon();
                 final BoundingBox relationBoundingBox = BoundingBox.createFrom(relationPolygon);
@@ -41,6 +42,7 @@ public class ShortcutBetweenDissection {
             }
 
             System.out.println(c++ + " / " + nodeRelations.size());
+            sw.printTimingIfVerbose();
         }
 
         System.out.println(numNodesInArea.stream().reduce(0, Integer::sum) / numNodesInArea.size());
