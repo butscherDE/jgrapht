@@ -17,6 +17,8 @@ public class CsvColumnDumper implements CsvDumper {
     }
 
     public void dump() throws IOException {
-
+        if (headers.length != elements.size()) {
+            throw new IllegalArgumentException("Number of headers must be equal to number of element columns");
+        }
     }
 }
