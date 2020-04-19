@@ -22,7 +22,7 @@ public class ShortcutBetweenDissection {
         final ImportPBF importPBF = new ImportPBF(Config.PBF_LUXEMBOURG);
         final RoadGraph graph = importPBF.createGraph();
         final List<NodeRelation> nodeRelations = importPBF.getNodeRelations();
-        final Index index = new GridIndex(graph, 3600 * 4, 3600 * 4);
+        final Index index = new GridIndex(graph, 3600, 3600);
 
         final NodeRelation max = Collections.max(nodeRelations, Comparator.comparingInt(a -> a.nodes.size()));
         System.out.println(max.nodes.size());

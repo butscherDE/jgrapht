@@ -343,8 +343,9 @@ public class GridIndex implements Index {
     }
 
     private static class GridCell {
-        final List<Node> nodes = new ArrayList<>();
-        final List<Edge> edges = new ArrayList<>();
+        // Initial size = 0 because in various szenarios most cells are empty.
+        final List<Node> nodes = new ArrayList<>(0);
+        final List<Edge> edges = new ArrayList<>(0);
     }
 
     private class CellHullCreator {
