@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,15 +41,56 @@ public class CSVColumnExImportTest {
 
         final CsvColumnImporter importer = new CsvColumnImporter(TEST_PATH, ',');
         try {
-            final List<List<Object>> reimportedElements = importer.importData();
-            final String[] reimportedHeaders = importer.getHeaders();
+            final List<List<String>> reImportedElements = importer.importData();
+            final String[] reImportedHeaders = importer.getHeaders();
 
-            assertArrayEquals(headers, reimportedHeaders);
-            assertEquals(elements, reimportedElements);
+            final List<List<Object>> reImportedElementsConverted = convertReimportedElements(reImportedElements);
+
+            assertArrayEquals(headers, reImportedHeaders);
+            assertEquals(elements, reImportedElementsConverted);
         } catch (IOException e) {
             e.printStackTrace();
             fail();
         }
+    }
+
+    public List<List<Object>> convertReimportedElements(final List<List<String>> reImportedElements) {
+        final List<Object> reImportedIntegers = new LinkedList<>();
+        for (final String reImportedElement : reImportedElements.get(0)) {
+            reImportedIntegers.add(Integer.valueOf(reImportedElement));
+        }
+        final List<Object> reImportedDoubles = new LinkedList<>();
+        for (final String reImportedElement : reImportedElements.get(1)) {
+            reImportedDoubles.add(Double.valueOf(reImportedElement));
+        }
+        final List<Object> reImportedStrings = new LinkedList<>();
+        for (final String reImportedElement : reImportedElements.get(1)) {
+            reImportedDoubles.add(reImportedElement);
+        }
+        final List<Object> reImportedCoordinates = new LinkedList<>();
+        for (final String reImportedElement : reImportedElements.get(3)) {
+            reImportedDoubles.add(parseCoordinate(reImportedElement));
+        }
+        return Arrays.asList(reImportedIntegers,
+                             reImportedDoubles,
+                             reImportedStrings,
+                             reImportedCoordinates);
+    }
+
+    @Test
+    public void deleteThis() {
+        System.out.println(new Coordinate(0.0, 1.2));
+    }
+
+    private Coordinate parseCoordinate(final String coordinateString) {
+        final String cutString = coordinateString.substring(0, coordinateString.length() - 1);
+
+        final String[] coordinatesString = cutString.split(", ");
+        final double[] coordinates = new double[] {Double.valueOf(coordinatesString[0]),
+                                                   Double.valueOf(coordinatesString[1]),
+                                                   Double.valueOf(coordinatesString[2])};
+
+        return new Coordinate(coordinates[0], coordinates[1], coordinates[2]);
     }
 
     @Test

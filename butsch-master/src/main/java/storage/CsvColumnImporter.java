@@ -16,7 +16,7 @@ public class CsvColumnImporter implements CsvImporter {
         this.delimiter = delimiter;
     }
 
-    public List<List<Object>> importData() throws IOException {
+    public List<List<String>> importData() throws IOException {
         final FileReader fileReader = new FileReader(path);
 
 
