@@ -52,18 +52,8 @@ public class ShortcutBetweenDissection {
                 latitudeLength.add(DistanceCalculator.distance(lowerLeft, upperLeft, DistanceCalculator.Unit.METRIC));
                 areas.add(DistanceCalculator.area(relationBoundingBox, DistanceCalculator.Unit.METRIC));
 
-                System.out.println(c++ + " / " +
-                                   nodeRelations.size() + ", " +
-                                   numNodesInArea.get(numNodesInArea.size() - 1) + ", " +
-                                   longitudeLength.get(longitudeLength.size() - 1) + ", " +
-                                   latitudeLength.get(latitudeLength.size() - 1) + ", " +
-                                   areas.get(areas.size() - 1) + " km²");
+                System.out.println(c++ + " / " + nodeRelations.size());
                 sw.printTimingIfVerbose();
-            }
-
-
-            if (c > 10) {
-                break;
             }
         }
 
