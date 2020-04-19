@@ -21,42 +21,86 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class ShortcutBetweenDissection {
+    private static List<NodeRelation> nodeRelations;
+    private static Index index;
+    private static List<Object> numNodesInArea;
+    private static List<Object> longitudeLength;
+    private static List<Object> latitudeLength;
+    private static List<Object> areas;
+
     public static void main(String[] args) throws FileNotFoundException {
+        prepareFields();
+        extractData();
+
+        dump();
+    }
+
+    public static void prepareFields() throws FileNotFoundException {
+        prepareRelationsAndIndex();
+        prepareDataStorages();
+    }
+
+    public static void prepareRelationsAndIndex() throws FileNotFoundException {
         final ImportPBF importPBF = new ImportPBF(Config.PBF_LUXEMBOURG);
         final RoadGraph graph = importPBF.createGraph();
-        final List<NodeRelation> nodeRelations = importPBF.getNodeRelations();
-        final Index index = new GridIndex(graph, 3600, 3600);
+        nodeRelations = importPBF.getNodeRelations();
+        index = new GridIndex(graph, 3600, 3600);
+    }
 
-        final NodeRelation max = Collections.max(nodeRelations, Comparator.comparingInt(a -> a.nodes.size()));
-        System.out.println(max.nodes.size());
+    public static void prepareDataStorages() {
+        numNodesInArea = new ArrayList<>(nodeRelations.size());
+        longitudeLength = new ArrayList<>(nodeRelations.size());
+        latitudeLength = new ArrayList<>(nodeRelations.size());
+        areas = new ArrayList<>(nodeRelations.size());
+    }
 
-        final List<Object> numNodesInArea = new ArrayList<>(nodeRelations.size());
-        final List<Object> longitudeLength = new ArrayList<>(nodeRelations.size());
-        final List<Object> latitudeLength = new ArrayList<>(nodeRelations.size());
-        final List<Object> areas = new ArrayList<>(nodeRelations.size());
+    public static void extractData() {
         int c = 0;
         for (final NodeRelation nodeRelation : nodeRelations) {
             final StopWatchVerbose sw = new StopWatchVerbose("relation processing");
             if (nodeRelation.nodes.size() > 2) {
                 final Polygon relationPolygon = nodeRelation.toPolygon();
                 final BoundingBox relationBoundingBox = BoundingBox.createFrom(relationPolygon);
+                final PolygonNodeLogger visitor = findContainedNodes(relationPolygon, relationBoundingBox);
 
-                final PolygonNodeLogger visitor = new PolygonNodeLogger(relationPolygon);
-                index.queryNodes(relationBoundingBox, visitor);
-
-                numNodesInArea.add(visitor.nodes.size());
-                final Coordinate lowerLeft = new Coordinate(relationBoundingBox.minLongitude, relationBoundingBox.minLatitude);
-                final Coordinate lowerRight = new Coordinate(relationBoundingBox.maxLongitude, relationBoundingBox.minLatitude);
-                final Coordinate upperLeft = new Coordinate(relationBoundingBox.minLongitude, relationBoundingBox.maxLatitude);
-                longitudeLength.add(DistanceCalculator.distance(lowerLeft, lowerRight, DistanceCalculator.Unit.METRIC));
-                latitudeLength.add(DistanceCalculator.distance(lowerLeft, upperLeft, DistanceCalculator.Unit.METRIC));
-                areas.add(DistanceCalculator.area(relationBoundingBox, DistanceCalculator.Unit.METRIC));
+                addData(relationBoundingBox, visitor);
 
                 System.out.println(c++ + " / " + nodeRelations.size() + ", id: " + nodeRelation.id);
                 sw.printTimingIfVerbose();
             }
         }
+    }
 
+    public static PolygonNodeLogger findContainedNodes(final Polygon relationPolygon,
+                                                       final BoundingBox relationBoundingBox) {
+        final PolygonNodeLogger visitor = new PolygonNodeLogger(relationPolygon);
+        index.queryNodes(relationBoundingBox, visitor);
+        return visitor;
+    }
+
+    public static void addData(final BoundingBox relationBoundingBox, final PolygonNodeLogger visitor) {
+        addNumNodesInArea(visitor);
+        addLengths(relationBoundingBox);
+        addArea(relationBoundingBox);
+    }
+
+    public static void addNumNodesInArea(final PolygonNodeLogger visitor) {
+        numNodesInArea.add(visitor.nodes.size());
+    }
+
+    public static void addLengths(final BoundingBox relationBoundingBox) {
+        final Coordinate lowerLeft = new Coordinate(relationBoundingBox.minLongitude, relationBoundingBox.minLatitude);
+        final Coordinate lowerRight = new Coordinate(relationBoundingBox.maxLongitude, relationBoundingBox.minLatitude);
+        final Coordinate upperLeft = new Coordinate(relationBoundingBox.minLongitude, relationBoundingBox.maxLatitude);
+        longitudeLength.add(DistanceCalculator.distance(lowerLeft, lowerRight, DistanceCalculator.Unit.METRIC));
+        latitudeLength.add(DistanceCalculator.distance(lowerLeft, upperLeft, DistanceCalculator.Unit.METRIC));
+    }
+
+    public static void addArea(final BoundingBox relationBoundingBox) {
+        areas.add(DistanceCalculator.area(relationBoundingBox, DistanceCalculator.Unit.METRIC));
+    }
+
+    public static void dump() {
         final String[] headers = {"id", "numNodes", "longitudeLength", "latitudeLength", "squareKilometer"};
         final AtomicInteger id = new AtomicInteger(0);
         final List<Object> ids = numNodesInArea.stream().map((a) -> id.getAndIncrement()).collect(Collectors.toList());
