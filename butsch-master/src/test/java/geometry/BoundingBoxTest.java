@@ -1,12 +1,10 @@
 package geometry;
 
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineSegment;
-import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -233,5 +231,52 @@ public class BoundingBoxTest {
         assertEquals(1, boundingBox.maxLongitude);
         assertEquals(-1, boundingBox.minLatitude);
         assertEquals(1, boundingBox.maxLatitude);
+    }
+
+    @Test
+    public void containsPoint() {
+        final BoundingBox boundingBox = new BoundingBox(0d, 1d, 0d, 1d);
+
+        final List<Point> insidePoints = getInsidePoints();
+        final List<Point> outsidePoints = getOutsidePoints();
+
+        insidePoints.stream().forEach((a) -> assertTrue(boundingBox.contains(a)));
+        outsidePoints.stream().forEach((a) -> assertFalse(boundingBox.contains(a)));
+    }
+
+    public List<Point> getInsidePoints() {
+        final GeometryFactory gf = new GeometryFactory();
+        return Arrays.asList(
+                    gf.createPoint(new Coordinate(0.5, 0.5)),
+                    gf.createPoint(new Coordinate(0, 0)),
+                    gf.createPoint(new Coordinate(0, 0.5)),
+                    gf.createPoint(new Coordinate(0, 1)),
+                    gf.createPoint(new Coordinate(0.5, 0)),
+                    gf.createPoint(new Coordinate(0.5, 0.5)),
+                    gf.createPoint(new Coordinate(0.5, 1)),
+                    gf.createPoint(new Coordinate(1, 0)),
+                    gf.createPoint(new Coordinate(1, 0.5)),
+                    gf.createPoint(new Coordinate(1, 1)));
+    }
+
+    public List<Point> getOutsidePoints() {
+        final GeometryFactory gf = new GeometryFactory();
+        return Arrays.asList(
+                    gf.createPoint(new Coordinate(-1, -1)),
+                    gf.createPoint(new Coordinate(-1, 0)),
+                    gf.createPoint(new Coordinate(-1, 0.5)),
+                    gf.createPoint(new Coordinate(-1, 1)),
+                    gf.createPoint(new Coordinate(-1, 2)),
+                    gf.createPoint(new Coordinate(2, -1)),
+                    gf.createPoint(new Coordinate(2, 0)),
+                    gf.createPoint(new Coordinate(2, 0.5)),
+                    gf.createPoint(new Coordinate(2, 1)),
+                    gf.createPoint(new Coordinate(2, 2)),
+                    gf.createPoint(new Coordinate(0, -1)),
+                    gf.createPoint(new Coordinate(0.5, -1)),
+                    gf.createPoint(new Coordinate(1, -1)),
+                    gf.createPoint(new Coordinate(0, 2)),
+                    gf.createPoint(new Coordinate(0.5, 2)),
+                    gf.createPoint(new Coordinate(1, 2)));
     }
 }

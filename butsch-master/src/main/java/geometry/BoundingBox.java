@@ -75,6 +75,26 @@ public class BoundingBox extends Polygon {
     }
 
     @Override
+    public boolean contains(final Geometry g) {
+        if (g instanceof Point) {
+            return containsPoint(g);
+        } else {
+            return super.contains(g);
+        }
+    }
+
+    public boolean containsPoint(final Geometry g) {
+        final Coordinate coordinate = g.getCoordinate();
+
+        final boolean aboveMinLongitude = coordinate.getX() >= minLongitude;
+        final boolean belowMaxLongitude = coordinate.getX() <= maxLongitude;
+        final boolean aboveMinLatitude = coordinate.getY() >= minLatitude;
+        final boolean belowMinLatitude = coordinate.getY() <= maxLatitude;
+
+        return aboveMinLongitude && belowMaxLongitude && aboveMinLatitude && belowMinLatitude;
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
