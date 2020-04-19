@@ -31,7 +31,7 @@ public class CSVColumnExImportTest {
                                                      new Coordinate(2,2));
         final List<List<Object>> elements = Arrays.asList(integers, doubles, strings, abstracts);
 
-        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ',');
+        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ';');
         try {
             dumper.dump();
         } catch (IOException e) {
@@ -39,7 +39,7 @@ public class CSVColumnExImportTest {
             fail();
         }
 
-        final CsvColumnImporter importer = new CsvColumnImporter(TEST_PATH, ',');
+        final CsvColumnImporter importer = new CsvColumnImporter(TEST_PATH, ';');
         try {
             final List<List<String>> reImportedElements = importer.importData();
             final String[] reImportedHeaders = importer.getHeaders();
@@ -64,12 +64,12 @@ public class CSVColumnExImportTest {
             reImportedDoubles.add(Double.valueOf(reImportedElement));
         }
         final List<Object> reImportedStrings = new LinkedList<>();
-        for (final String reImportedElement : reImportedElements.get(1)) {
-            reImportedDoubles.add(reImportedElement);
+        for (final String reImportedElement : reImportedElements.get(2)) {
+            reImportedStrings.add(reImportedElement);
         }
         final List<Object> reImportedCoordinates = new LinkedList<>();
         for (final String reImportedElement : reImportedElements.get(3)) {
-            reImportedDoubles.add(parseCoordinate(reImportedElement));
+            reImportedCoordinates.add(parseCoordinate(reImportedElement));
         }
         return Arrays.asList(reImportedIntegers,
                              reImportedDoubles,
@@ -83,7 +83,7 @@ public class CSVColumnExImportTest {
     }
 
     private Coordinate parseCoordinate(final String coordinateString) {
-        final String cutString = coordinateString.substring(0, coordinateString.length() - 1);
+        final String cutString = coordinateString.substring(1, coordinateString.length() - 1);
 
         final String[] coordinatesString = cutString.split(", ");
         final double[] coordinates = new double[] {Double.valueOf(coordinatesString[0]),
@@ -97,7 +97,7 @@ public class CSVColumnExImportTest {
     public void getHeadersCalledToEarly() {
         final String[] headers = new String[] {"abc"};
         final List<List<Object>> elements = Arrays.asList(Arrays.asList("abc"));
-        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ',');
+        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ';');
         try {
             dumper.dump();
         } catch (IOException e) {
@@ -105,7 +105,7 @@ public class CSVColumnExImportTest {
         }
         System.out.println(TEST_PATH);
         final CsvColumnImporter importer = new CsvColumnImporter(TEST_PATH, ',');
-        assertThrows(IllegalStateException.class, () -> importer.importData());
+        assertThrows(IllegalStateException.class, () -> importer.getHeaders());
     }
 
     @Test
@@ -113,7 +113,7 @@ public class CSVColumnExImportTest {
         final String[] headers = new String[] {"test1", "test2"};
         final List<List<Object>> elements = Arrays.asList(Arrays.asList(0,1), Arrays.asList(1));
 
-        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ',');
+        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ';');
         assertThrows(IllegalArgumentException.class, () -> dumper.dump());
     }
 
@@ -122,13 +122,13 @@ public class CSVColumnExImportTest {
         final String[] headers = new String[] {"abc"};
         final List<List<Object>> elements = Arrays.asList(Arrays.asList(0,1), Arrays.asList(1,2));
 
-        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ',');
+        final CsvColumnDumper dumper = new CsvColumnDumper(TEST_PATH, headers, elements, ';');
         assertThrows(IllegalArgumentException.class, () -> dumper.dump());
     }
 
     @Test
     public void pathDoesNotExist() {
-        final CsvColumnImporter importer = new CsvColumnImporter("C:\\liewrhjkh\\wlkiehn\\iej.csv", ',');
+        final CsvColumnImporter importer = new CsvColumnImporter("C:\\liewrhjkh\\wlkiehn\\iej.csv", ';');
 
         Assertions.assertThrows(FileNotFoundException.class, () -> importer.importData());
     }
