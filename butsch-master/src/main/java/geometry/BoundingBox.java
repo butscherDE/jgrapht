@@ -56,16 +56,11 @@ public class BoundingBox extends Polygon {
 
     public List<LineSegment> getLineSegmentRepresentation() {
         final Coordinate[] coordinates = getCoordinates();
-        final List<LineSegment> lineSegments = new ArrayList<>(Arrays.asList(
-                new LineSegment[] {
-                        new LineSegment(coordinates[0], coordinates[1]),
-                        new LineSegment(coordinates[1], coordinates[2]),
-                        new LineSegment(coordinates[2], coordinates[3]),
-                        new LineSegment(coordinates[3], coordinates[4])
-                }
-        ));
 
-        return lineSegments;
+        return new ArrayList<>(Arrays.asList(new LineSegment(coordinates[0], coordinates[1]),
+                                             new LineSegment(coordinates[1], coordinates[2]),
+                                             new LineSegment(coordinates[2], coordinates[3]),
+                                             new LineSegment(coordinates[3], coordinates[4])));
     }
 
     public boolean isContainedBy(final Polygon polygon) {
