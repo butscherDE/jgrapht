@@ -1,5 +1,6 @@
 package storage;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -16,6 +17,12 @@ public class CsvColumnImporter implements CsvImporter {
     }
 
     public List<List<Object>> importData() throws IOException {
+        final FileReader fileReader = new FileReader(path);
+
+
+
+        fileReader.close();
+
         return null;
     }
 
