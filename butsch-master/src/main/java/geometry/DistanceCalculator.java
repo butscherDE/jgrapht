@@ -2,10 +2,6 @@ package geometry;
 
 import org.locationtech.jts.geom.Coordinate;
 
-import java.util.*;
-import java.lang.*;
-import java.io.*;
-
 /**
  * https://www.geodatasource.com/developers/java
  */
