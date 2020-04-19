@@ -52,7 +52,7 @@ public class ShortcutBetweenDissection {
                 latitudeLength.add(DistanceCalculator.distance(lowerLeft, upperLeft, DistanceCalculator.Unit.METRIC));
                 areas.add(DistanceCalculator.area(relationBoundingBox, DistanceCalculator.Unit.METRIC));
 
-                System.out.println(c++ + " / " + nodeRelations.size());
+                System.out.println(c++ + " / " + nodeRelations.size() + ", id: " + nodeRelation.id);
                 sw.printTimingIfVerbose();
             }
         }
