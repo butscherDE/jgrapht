@@ -12,8 +12,8 @@ public class Config {
     public final static String POLYGON_PATH = "C:\\Users\\Daniel\\Documents\\masterpolygons\\";
 
     // PBF files
-    public static final String PBF_FREIBURG = "D:\\graphhopper\\freiburg-regbez-latest.osm.pbf";
-    public static final String PBF_TUEBINGEN = "D:\\graphhopper\\tuebingen-regbez-latest.osm.pbf";
-    public static final String PBF_LUXEMBOURG = "D:\\graphhopper\\luxembourg-latest.osm.pbf";
-    public static final String PBF_GERMANY = "C:\\Users\\Administrator\\Documents\\pbffiles\\germany-latest.osm.pbf";
+    public static final String PBF_FREIBURG = "C:\\pbffiles\\freiburg-regbez-latest.osm.pbf";
+    public static final String PBF_TUEBINGEN = "C:\\pbffiles\\tuebingen-regbez-latest.osm.pbf";
+    public static final String PBF_LUXEMBOURG = "C:\\pbffiles\\luxembourg-latest.osm.pbf";
+    public static final String PBF_GERMANY = "C:\\pbffiles\\germany-latest.osm.pbf";
 }
