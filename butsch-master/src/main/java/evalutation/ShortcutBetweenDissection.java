@@ -4,6 +4,7 @@ import data.NodeRelation;
 import data.RoadGraph;
 import data.Node;
 import geometry.BoundingBox;
+import geometry.DistanceCalculator;
 import index.GridIndex;
 import index.Index;
 import org.locationtech.jts.geom.Geometry;
@@ -11,10 +12,7 @@ import org.locationtech.jts.geom.Polygon;
 import storage.ImportPBF;
 import util.BinaryHashFunction;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.io.FileNotFoundException;
 
 public class ShortcutBetweenDissection {
@@ -27,7 +25,8 @@ public class ShortcutBetweenDissection {
         final NodeRelation max = Collections.max(nodeRelations, Comparator.comparingInt(a -> a.nodes.size()));
         System.out.println(max.nodes.size());
 
-        final List<Integer> numNodesInArea = new LinkedList<>();
+        final List<Integer> numNodesInArea = new ArrayList<>(nodeRelations.size());
+        final List<Double> areas = new ArrayList<>(nodeRelations.size());
         int c = 0;
         for (final NodeRelation nodeRelation : nodeRelations) {
             final StopWatchVerbose sw = new StopWatchVerbose("relation processing");
@@ -39,6 +38,7 @@ public class ShortcutBetweenDissection {
                 index.queryNodes(relationBoundingBox, visitor);
 
                 numNodesInArea.add(visitor.nodes.size());
+                areas.add(DistanceCalculator.area(relationBoundingBox, DistanceCalculator.Unit.METRIC));
             }
 
             System.out.println(c++ + " / " + nodeRelations.size());
