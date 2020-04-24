@@ -59,12 +59,13 @@ public class ShortcutBetweenDissection {
         for (final NodeRelation nodeRelation : nodeRelations) {
             final StopWatchVerbose sw = new StopWatchVerbose("relation processing");
             if (nodeRelation.nodes.size() > 2) {
-                final Polygon relationPolygon = nodeRelation.toPolygon();
-                final BoundingBox relationBoundingBox = BoundingBox.createFrom(relationPolygon);
-                final PolygonNodeLogger visitor = findContainedNodes(relationPolygon, relationBoundingBox);
+                if (c >= 209) {
+                    final Polygon relationPolygon = nodeRelation.toPolygon();
+                    final BoundingBox relationBoundingBox = BoundingBox.createFrom(relationPolygon);
+                    final PolygonNodeLogger visitor = findContainedNodes(relationPolygon, relationBoundingBox);
 
-                addData(relationBoundingBox, visitor);
-
+                    addData(relationBoundingBox, visitor);
+                }
                 System.out.println(c++ + " / " + nodeRelations.size() + ", id: " + nodeRelation.id);
                 sw.printTimingIfVerbose();
             }
@@ -102,10 +103,22 @@ public class ShortcutBetweenDissection {
 
     public static void dump() {
         final String[] headers = {"id", "numNodes", "longitudeLength", "latitudeLength", "squareKilometer"};
-        final AtomicInteger id = new AtomicInteger(0);
-        final List<Object> ids = numNodesInArea.stream().map((a) -> id.getAndIncrement()).collect(Collectors.toList());
-        final List<List<Object>> elements = Arrays.asList(ids, numNodesInArea, longitudeLength, latitudeLength, areas);
+        final List<Object> ids = buildIds();
+        final List<List<Object>> elements = buildElements(ids);
 
+        writeOut(headers, elements);
+    }
+
+    public static List<Object> buildIds() {
+        final AtomicInteger id = new AtomicInteger(0);
+        return numNodesInArea.stream().map((a) -> id.getAndIncrement()).collect(Collectors.toList());
+    }
+
+    public static List<List<Object>> buildElements(final List<Object> ids) {
+        return Arrays.asList(ids, numNodesInArea, longitudeLength, latitudeLength, areas);
+    }
+
+    public static void writeOut(final String[] headers, final List<List<Object>> elements) {
         final CsvColumnDumper dumper = new CsvColumnDumper(Config.PBF_LUXEMBOURG_STATS, headers, elements, ';');
         try {
             dumper.dump();
@@ -118,16 +131,18 @@ public class ShortcutBetweenDissection {
         private final BinaryHashFunction<BoundingBox> isCellContained = new BinaryHashFunction<>();
         final List<Node> nodes = new LinkedList<>();
         final Polygon polygon;
+        final BoundingBox boundingBox;
 
         public PolygonNodeLogger(final Polygon polygon) {
             this.polygon = polygon;
+            this.boundingBox = BoundingBox.createFrom(polygon);
         }
 
         @Override
         public void accept(final Node node) {
             final Geometry point = node.getPoint();
 
-            if (polygon.contains(point)) {
+            if (boundingBox.contains(point) && polygon.contains(point)) {
                 nodes.add(node);
             }
         }
