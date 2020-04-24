@@ -68,7 +68,7 @@ public class ShortcutBetweenDissection {
 
                     addData(relationBoundingBox, visitor);
 //                }
-                System.out.println(c++ + " / " + nodeRelations.size() + ", id: " + nodeRelation.id + ", num nodes: " + numNodesInArea.get(numNodesInArea.size() - 1));
+                System.out.println(c++ + " / " + nodeRelations.size() + ", id: " + nodeRelation.id + ", num nodes: " + numNodesInArea.get(numNodesInArea.size() - 1) + ", polyComplexity: " + nodeRelation.nodes.size());
                 sw.printTimingIfVerbose();
             }
         }

@@ -20,7 +20,7 @@ public class PolygonContainsChecker {
         final Coordinate[] coordinates = polygon.getCoordinates();
 
         final List<LineSegment> lineSegments = createLineSegments(coordinates);
-        Collections.sort(lineSegments, Comparator.comparingDouble(a -> a.getCoordinate(0).x));
+        Collections.sort(lineSegments, Comparator.comparingDouble(a -> a.getCoordinate(1).x));
 
         return lineSegments;
     }
@@ -62,11 +62,15 @@ public class PolygonContainsChecker {
     }
 
     private boolean contains(final Coordinate coordinate) {
-        final int startIndex = 0; //getLeftMostPossiblyIntersectingLineSegment(coordinate);
-        final int intersectionCount = getIntersectionCount(coordinate, startIndex);
-        final boolean containedByRayCast = intersectionCount % 2 == 1;
+        final int startIndex = getLeftMostPossiblyIntersectingLineSegment(coordinate);
+        if (startIndex >= polygon.size()) {
+            return false;
+        } else {
+            final int intersectionCount = getIntersectionCount(coordinate, startIndex);
+            final boolean containedByRayCast = intersectionCount % 2 == 1;
 
-        return containedByRayCast;
+            return containedByRayCast;
+        }
     }
 
     public LineSegment getRay(final Coordinate coordinate) {
@@ -75,8 +79,10 @@ public class PolygonContainsChecker {
 
     public int getLeftMostPossiblyIntersectingLineSegment(final Coordinate coordinate) {
         final LineSegment searchKey = new LineSegment(coordinate, coordinate);
-        final Comparator<LineSegment> xComparator = Comparator.comparingDouble(a -> a.getCoordinate(0).x);
-        return Collections.binarySearch(polygon, searchKey, xComparator);
+        final Comparator<LineSegment> xComparator = Comparator.comparingDouble(a -> a.getCoordinate(1).x);
+        final int index = Collections.binarySearch(polygon, searchKey, xComparator);
+        final int nonNegativeIndex = index < 0 ? (index + 1) * (-1) : index;
+        return nonNegativeIndex;
     }
 
     public int getIntersectionCount(final Coordinate coordinate, final int startIndex) {
