@@ -136,7 +136,9 @@ public class ImportPBF implements GraphImporter {
             final Map<String, String> tags = relation.getTags();
             final String type = tags.get("type");
             final String landuse = tags.get("landuse");
-            if ((type != null && type.equals("boundary")) || (landuse != null) && landuse.equals("forest")) {
+            if ((type != null && type.equals("boundary")) ||
+                (landuse != null) && landuse.equals("forest") ||
+                (type != null) && type.equals("multipolygon")) {
                 relations.put(relation.getId(), relation);
             }
         }
@@ -146,22 +148,24 @@ public class ImportPBF implements GraphImporter {
 
             for (final Map.Entry<Long, Relation> relationEntry : relations.entrySet()) {
                 try {
-                    getRelation(nodeRelations, relationEntry);
-                } catch (NullPointerException e) {
-                    addEmptyRelation(relationEntry);
+                    final NodeRelation relation = getRelation(relationEntry);
+                    nodeRelations.add(relation);
+                } catch (NullPointerException | NoSuchElementException e) {
+                    System.err.println("Relation " + relationEntry.getValue().getId() + " could not be processed because of invalid data.");
                 }
             }
 
             return nodeRelations;
         }
 
-        private void getRelation(final List<NodeRelation> nodeRelations,
-                                 final Map.Entry<Long, Relation> relationEntry) {
+        private NodeRelation getRelation(final Map.Entry<Long, Relation> relationEntry) {
             final Relation relation = relationEntry.getValue();
             final List<Long> nodeIds = recurseToFindNodes(relation);
 
-            nodeRelations.add(NodeRelation.createFromNodeIds(relation.getId(), relation.getInfo().toString(),
-                                                             relation.getTags(), nodeIds, graph));
+            final NodeRelation newRelation = NodeRelation.createFromNodeIds(relation.getId(),
+                                                                            relation.getInfo().toString(),
+                                                                            relation.getTags(), nodeIds, graph);
+            return newRelation;
         }
 
         private List<Long> recurseToFindNodes(final Relation relation) {

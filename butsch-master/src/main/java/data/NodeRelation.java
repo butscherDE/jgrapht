@@ -24,7 +24,13 @@ public class NodeRelation {
         final List<Node> nodes = new LinkedList<>();
 
         for (final Long nodeId : nodeIds) {
-            nodes.add(graph.getVertex(nodeId));
+            final Node vertex = graph.getVertex(nodeId);
+
+            if (vertex != null) {
+                nodes.add(vertex);
+            } else {
+                throw new NoSuchElementException("Vertex " + nodeId + " was not found in the graph.");
+            }
         }
 
         return new NodeRelation(id, description, tags, nodes);

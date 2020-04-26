@@ -60,17 +60,14 @@ public class ShortcutBetweenDissection {
         int c = 0;
         for (final NodeRelation nodeRelation : nodeRelations) {
             final StopWatchVerbose sw = new StopWatchVerbose("relation processing");
-            if (nodeRelation.nodes.size() > 2) {
-//                if (c >= 209) {
-                    final Polygon relationPolygon = nodeRelation.toPolygon();
-                    final BoundingBox relationBoundingBox = BoundingBox.createFrom(relationPolygon);
-                    final PolygonNodeLogger visitor = findContainedNodes(relationPolygon, relationBoundingBox);
+            final Polygon relationPolygon = nodeRelation.toPolygon();
+            final BoundingBox relationBoundingBox = BoundingBox.createFrom(relationPolygon);
+            final PolygonNodeLogger visitor = findContainedNodes(relationPolygon, relationBoundingBox);
 
-                    addData(relationBoundingBox, visitor);
-//                }
-                System.out.println(c++ + " / " + nodeRelations.size() + ", id: " + nodeRelation.id + ", num nodes: " + numNodesInArea.get(numNodesInArea.size() - 1) + ", polyComplexity: " + nodeRelation.nodes.size());
-                sw.printTimingIfVerbose();
-            }
+            addData(relationBoundingBox, visitor);
+            System.out.println(c++ + " / " + nodeRelations.size() + ", id: " + nodeRelation.id + ", num nodes: " + numNodesInArea
+                    .get(numNodesInArea.size() - 1) + ", polyComplexity: " + nodeRelation.nodes.size());
+            sw.printTimingIfVerbose();
         }
     }
 
