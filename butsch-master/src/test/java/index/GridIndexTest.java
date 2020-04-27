@@ -13,8 +13,7 @@ import storage.ImportERPGraph;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GridIndexTest {
     private final static int INTENSITY = 1000;
@@ -181,7 +180,7 @@ public class GridIndexTest {
         }
 
         final BoundingBox limiter = new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
-        final OddIdVisitor oddIdVisitor = new OddIdVisitor();
+        final OddIdVisitor oddIdVisitor = new OddIdVisitor(limiter);
         gridIndex.queryNodes(limiter, oddIdVisitor);
         final List<Node> actualNodeList = oddIdVisitor.getNodes();
 
@@ -189,16 +188,29 @@ public class GridIndexTest {
         Collections.sort(actualNodeList);
 
         assertEquals(expectedNodeList, actualNodeList);
+        assertTrue(oddIdVisitor.acceptCounts < graph.vertexSet().size());
     }
 
     private class OddIdVisitor implements Index.IndexVisitor<Node> {
         private final Set<Node> nodes = new LinkedHashSet<>();
+        private final BoundingBox boundingBox;
+        public int acceptCounts = 0;
+
+        public OddIdVisitor(final BoundingBox boundingBox) {
+            this.boundingBox = boundingBox;
+        }
 
         @Override
         public void accept(final Node node) {
-            if (node.id % 2 == 1) {
+            if (node.id % 2 == 1 &&
+                node.longitude >= boundingBox.minLongitude &&
+                node.longitude <= boundingBox.maxLongitude &&
+                node.latitude >= boundingBox.minLatitude &&
+                node.latitude <= boundingBox.maxLatitude) {
                 nodes.add(node);
             }
+
+            acceptCounts++;
         }
 
         public List<Node> getNodes() {
