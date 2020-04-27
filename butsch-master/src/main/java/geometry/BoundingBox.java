@@ -44,7 +44,8 @@ public class BoundingBox extends Polygon {
     }
 
     public static BoundingBox createFrom(final RoadGraph roadGraph) {
-        final Set<Node> vertices = roadGraph.vertexSet();
+        final List<Node> vertices = new LinkedList<>(roadGraph.vertexSet());
+        vertices.remove(RoadGraph.INVALID_NODE);
 
         final Node minLongitude = Collections.min(vertices, Comparator.comparingDouble(a -> a.longitude));
         final Node maxLongitude = Collections.max(vertices, Comparator.comparingDouble(a -> a.longitude));

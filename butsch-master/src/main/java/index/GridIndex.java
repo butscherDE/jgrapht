@@ -58,7 +58,8 @@ public class GridIndex implements Index {
             final double longitude = node.longitude;
             final double latitude = node.latitude;
 
-            getCell(longitude, latitude).nodes.add(node);
+            final GridCell cell = getCell(longitude, latitude);
+            cell.nodes.add(node);
         }
     }
 
@@ -352,6 +353,28 @@ public class GridIndex implements Index {
         // Initial size = 0 because in various szenarios most cells are empty.
         final List<Node> nodes = new ArrayList<>(0);
         final List<Edge> edges = new ArrayList<>(0);
+
+        @Override
+        public String toString() {
+            return "GridCell{" + "nodes=" + nodes + ", edges=" + edges + '}';
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            final GridCell gridCell = (GridCell) o;
+            return Objects.equals(nodes, gridCell.nodes) && Objects.equals(edges, gridCell.edges);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(nodes, edges);
+        }
     }
 
     private class CellHullCreator {
