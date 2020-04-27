@@ -166,7 +166,7 @@ public class GridIndexTest {
     }
 
     @Test
-    public void query() {
+    public void queryNodes() {
         final double minLongitude = 48.725;
         final double maxLongitude = 48.775;
         final double minLatitude = 9.725;
@@ -189,6 +189,49 @@ public class GridIndexTest {
 
         assertEquals(expectedNodeList, actualNodeList);
         assertTrue(oddIdVisitor.acceptCounts < graph.vertexSet().size());
+    }
+
+    @Test
+    public void queryEdges() {
+        final double minLongitude = 48.75;
+        final double maxLongitude = 48.75;
+        final double minLatitude = 9.75;
+        final double maxLatitude = 9.75;
+        final BoundingBox limiter = new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
+
+        final List<Edge> expectedNodeList = new LinkedList<>();
+        for (final Edge edge : graph.edgeSet()) {
+            final Node edgeSource = graph.getEdgeSource(edge);
+            final Node edgeTarget = graph.getEdgeTarget(edge);
+            if (limiter.contains(edgeSource.getPoint()) || limiter.contains(edgeTarget.getPoint())) {
+                expectedNodeList.add(edge);
+            }
+        }
+
+        final EdgeVisitor edgeVisitor = new EdgeVisitor(limiter);
+        gridIndex.queryEdges(limiter, edgeVisitor);
+        final List<Edge> actualNodeList = edgeVisitor.getEdges();
+
+        ;
+        Collections.sort(expectedNodeList, compareEdges());
+        Collections.sort(actualNodeList, compareEdges());
+
+        assertEquals(expectedNodeList, actualNodeList);
+        assertTrue(edgeVisitor.acceptCounts < graph.vertexSet().size());
+    }
+
+    public Comparator<Edge> compareEdges() {
+        return (a, b) -> {
+            final Node aSource = graph.getEdgeSource(a);
+            final Node aTarget = graph.getEdgeTarget(a);
+            final Node bSource = graph.getEdgeSource(b);
+            final Node bTarget = graph.getEdgeTarget(b);
+
+            final List<Node> listA = Arrays.asList(aSource, aTarget);
+            final List<Node> listB = Arrays.asList(bSource, bTarget);
+
+            return Collections.min(listA).compareTo(Collections.min(listB));
+        };
     }
 
     private class OddIdVisitor implements Index.IndexVisitor<Node> {
@@ -215,6 +258,30 @@ public class GridIndexTest {
 
         public List<Node> getNodes() {
             return new LinkedList<>(nodes);
+        }
+    }
+
+    private class EdgeVisitor implements Index.IndexVisitor<Edge> {
+        private final Set<Edge> edges = new LinkedHashSet<>();
+        private final BoundingBox boundingBox;
+        public int acceptCounts = 0;
+
+        public EdgeVisitor(final BoundingBox boundingBox) {
+            this.boundingBox = boundingBox;
+        }
+
+        @Override
+        public void accept(final Edge entity) {
+            final Node edgeSource = graph.getEdgeSource(entity);
+            final Node edgeTarget = graph.getEdgeTarget(entity);
+
+            if (boundingBox.contains(edgeSource.getPoint()) || boundingBox.contains(edgeTarget.getPoint())) {
+                edges.add(entity);
+            }
+        }
+
+        public List<Edge> getEdges() {
+            return new LinkedList<>(edges);
         }
     }
 }

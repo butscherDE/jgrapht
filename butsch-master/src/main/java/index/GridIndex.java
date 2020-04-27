@@ -9,7 +9,9 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GridIndex implements Index {
     private final static double LONGITUDE_RANGE = 360d;
@@ -211,13 +213,13 @@ public class GridIndex implements Index {
     private LineSegment[] getBoundingBoxLineSegments(final int gridCellLongitudeIndex, final int gridCellLatitudeIndex) {
         final LineSegment[] boundingBoxLineSegments = new LineSegment[4];
 
-        double cellLowerLeftLongitude = gridCellLongitudeIndex * longitudeCellSize - (-1) * indexBounds.minLongitude;
-        double cellLowerLeftLatitude = gridCellLatitudeIndex * latitudeCellSize - (-1) * indexBounds.minLatitude;
+        double cellLowerLeftLongitude = getCellLongitudeStart(gridCellLongitudeIndex);
+        double cellLowerLeftLatitude = getCellLatitudeStart(gridCellLatitudeIndex);
 
         double cellUpperLeftLongitude = cellLowerLeftLongitude;
-        double cellUpperLeftLatitude = (gridCellLatitudeIndex + 1) * latitudeCellSize - (-1) * indexBounds.minLatitude;
+        double cellUpperLeftLatitude = getCellLatitudeStart(gridCellLatitudeIndex + 1);
 
-        double cellLowerRightLongitude = (gridCellLongitudeIndex + 1) * longitudeCellSize - (-1) * indexBounds.minLongitude;
+        double cellLowerRightLongitude = getCellLongitudeStart(gridCellLongitudeIndex + 1);
         double cellLowerRightLatitude = cellLowerLeftLatitude;
 
         double cellUpperRightLongitude = cellLowerRightLongitude;
@@ -229,6 +231,14 @@ public class GridIndex implements Index {
         boundingBoxLineSegments[3] = new LineSegment(cellLowerRightLongitude, cellLowerRightLatitude, cellLowerLeftLongitude, cellLowerLeftLatitude);
 
         return boundingBoxLineSegments;
+    }
+
+    private double getCellLongitudeStart(final int gridCellLongitudeIndex) {
+        return gridCellLongitudeIndex * longitudeCellSize - (-1) * indexBounds.minLongitude;
+    }
+
+    private double getCellLatitudeStart(final int gridCellLatitudeIndex) {
+        return gridCellLatitudeIndex * latitudeCellSize - (-1) * indexBounds.minLatitude;
     }
 
     @Override
@@ -458,31 +468,73 @@ public class GridIndex implements Index {
 
     @Override
     public void queryNodes(final BoundingBox limiter, final IndexVisitor visitor) {
+        queryGraphEntity(limiter, visitor, a -> a.nodes.stream());
+    }
+
+    @Override
+    public void queryEdges(final BoundingBox limiter, final IndexVisitor visitor) {
+        queryGraphEntity(limiter, visitor, a -> a.edges.stream());
+    }
+
+    public <T> void queryGraphEntity(final BoundingBox limiter, final IndexVisitor visitor,
+                                 final Function<GridCell, Stream<? extends T>> gridCellStreamFunction) {
         final Set<GridCell> cellsOverlappingLimiter = getNodesInLimiter(limiter);
-        final Set<Node> allNodesInCells = cellsOverlappingLimiter.stream().flatMap(a -> a.nodes.stream()).collect(Collectors.toSet());
+        final Set<T> allNodesInCells = cellsOverlappingLimiter.stream().flatMap(gridCellStreamFunction).collect(
+                Collectors.toSet());
 
         if (visitor instanceof GridIndexVisitor) {
             final GridIndexVisitor gridIndexVisitor = (GridIndexVisitor) visitor;
-            for (final Node node : allNodesInCells) {
-                final BoundingBox boundingBox = getBoundingBoxOfCell(node);
+            for (final T node : allNodesInCells) {
+                final BoundingBox boundingBox = getBoundingBoxOfCells(node);
 
                 gridIndexVisitor.accept(node, boundingBox);
             }
         } else {
-            for (final Node node : allNodesInCells) {
+            for (final T node : allNodesInCells) {
                 visitor.accept(node);
             }
         }
     }
 
-    public BoundingBox getBoundingBoxOfCell(final Node node) {
+    public BoundingBox getBoundingBoxOfCells(final Object graphEntity) {
+        if (graphEntity instanceof Node) {
+            final Node node = (Node) graphEntity;
+
+            return getBoundingBox(node);
+        } else if (graphEntity instanceof  Edge){
+            final Edge edge = (Edge) graphEntity;
+
+            return getBoundingBox(edge);
+        } else {
+            throw new IllegalArgumentException("Not a graph entity.");
+        }
+    }
+
+    public BoundingBox getBoundingBox(final Node node) {
         final int longitudeIndex = getLongitudeIndex(node.longitude);
         final int latitudeIndex = getLatitudeIndex(node.latitude);
 
-        final double minLongitude = longitudeIndex * longitudeCellSize;
-        final double maxLongitude = (longitudeIndex + 1) * longitudeCellSize;
-        final double minLatitude = latitudeIndex * longitudeCellSize;
-        final double maxLatitude = (latitudeIndex + 1) * longitudeCellSize;
+        final double minLongitude = getCellLongitudeStart(longitudeIndex);
+        final double maxLongitude = getCellLongitudeStart(longitudeIndex + 1);
+        final double minLatitude = getCellLatitudeStart(latitudeIndex);
+        final double maxLatitude = getCellLatitudeStart(latitudeIndex + 1);
+
+        return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
+    }
+
+    public BoundingBox getBoundingBox(final Edge edge) {
+        final List<Node> nodes = Arrays.asList(graph.getEdgeSource(edge), graph.getEdgeTarget(edge));
+
+        MinMaxLongLatExtractor minMaxLongLatExtractor = new MinMaxLongLatExtractor(nodes).invoke();
+        Node minLongNode = minMaxLongLatExtractor.getMinLongNode();
+        Node maxLongNode = minMaxLongLatExtractor.getMaxLongNode();
+        Node minLatNode = minMaxLongLatExtractor.getMinLatNode();
+        Node maxLatNode = minMaxLongLatExtractor.getMaxLatNode();
+
+        final double minLongitude = getCellLongitudeStart(getLongitudeIndex(minLongNode.longitude));
+        final double maxLongitude = getCellLongitudeStart(getLongitudeIndex(maxLongNode.longitude));
+        final double minLatitude = getCellLatitudeStart(getLatitudeIndex(minLatNode.latitude));
+        final double maxLatitude = getCellLatitudeStart(getLatitudeIndex(maxLatNode.latitude));
 
         return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
     }
@@ -534,11 +586,43 @@ public class GridIndex implements Index {
         }
     }
 
-    public void queryEdges(final BoundingBox limit, final IndexVisitor visitor) {
-
-    }
-
     public interface GridIndexVisitor<T> extends IndexVisitor<T> {
         void accept(T entity, BoundingBox cell);
+    }
+
+    private class MinMaxLongLatExtractor {
+        private final List<Node> nodes;
+        private Node minLongNode;
+        private Node maxLongNode;
+        private Node minLatNode;
+        private Node maxLatNode;
+
+        public MinMaxLongLatExtractor(final List<Node> nodes) {
+            this.nodes = nodes;
+        }
+
+        public Node getMinLongNode() {
+            return minLongNode;
+        }
+
+        public Node getMaxLongNode() {
+            return maxLongNode;
+        }
+
+        public Node getMinLatNode() {
+            return minLatNode;
+        }
+
+        public Node getMaxLatNode() {
+            return maxLatNode;
+        }
+
+        public MinMaxLongLatExtractor invoke() {
+            minLongNode = Collections.min(nodes, Comparator.comparingDouble(a -> a.longitude));
+            maxLongNode = Collections.max(nodes, Comparator.comparingDouble(a -> a.longitude));
+            minLatNode = Collections.min(nodes, Comparator.comparingDouble(a -> a.latitude));
+            maxLatNode = Collections.max(nodes, Comparator.comparingDouble(a -> a.latitude));
+            return this;
+        }
     }
 }

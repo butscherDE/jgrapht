@@ -7,4 +7,5 @@ public class Edge extends DefaultWeightedEdge {
     public Edge() {
         super();
     }
+
 }
