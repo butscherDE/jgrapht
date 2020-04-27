@@ -16,6 +16,8 @@ public interface Index {
 
     void queryNodes(final BoundingBox limiter, final IndexVisitor visitor);
 
+    void queryEdges(final BoundingBox limiter, final IndexVisitor visitor);
+
     interface IndexVisitor<T> {
         void accept(final T entity);
     }

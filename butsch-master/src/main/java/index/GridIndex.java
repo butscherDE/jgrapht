@@ -435,17 +435,18 @@ public class GridIndex implements Index {
 
     @Override
     public void queryNodes(final BoundingBox limiter, final IndexVisitor visitor) {
-        final Set<Node> nodesInLimiter = getNodesInLimiter(limiter);
+        final Set<GridCell> cellsOverlappingLimiter = getNodesInLimiter(limiter);
+        final Set<Node> allNodesInCells = cellsOverlappingLimiter.stream().flatMap(a -> a.nodes.stream()).collect(Collectors.toSet());
 
         if (visitor instanceof GridIndexVisitor) {
             final GridIndexVisitor gridIndexVisitor = (GridIndexVisitor) visitor;
-            for (final Node node : nodesInLimiter) {
+            for (final Node node : allNodesInCells) {
                 final BoundingBox boundingBox = getBoundingBoxOfCell(node);
 
                 gridIndexVisitor.accept(node, boundingBox);
             }
         } else {
-            for (final Node node : nodesInLimiter) {
+            for (final Node node : allNodesInCells) {
                 visitor.accept(node);
             }
         }
@@ -463,29 +464,29 @@ public class GridIndex implements Index {
         return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
     }
 
-    public Set<Node> getNodesInLimiter(final BoundingBox limiter) {
+    public Set<GridCell> getNodesInLimiter(final BoundingBox limiter) {
         final int minLongitudeIndex = getLongitudeIndex(limiter.minLongitude);
         final int maxLongitudeIndex = getLongitudeIndex(limiter.maxLongitude);
         final int minLatitudeIndex = getLatitudeIndex(limiter.minLatitude);
         final int maxLatitudeIndex = getLatitudeIndex(limiter.maxLatitude);
 
-        final Set<Node> nodesInLimiter = new LinkedHashSet<>();
+        final Set<GridCell> gridCellsOverlappingLimiter = new LinkedHashSet<>();
         addBorderCellNodes(limiter, minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex,
-                           nodesInLimiter);
-        addInnerCellNodes(minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex, nodesInLimiter);
-        return nodesInLimiter;
+                           gridCellsOverlappingLimiter);
+        addInnerCellNodes(minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex, gridCellsOverlappingLimiter);
+        return gridCellsOverlappingLimiter;
     }
 
     public void addBorderCellNodes(final BoundingBox limiter, final int minLongitudeIndex, final int maxLongitudeIndex,
                                    final int minLatitudeIndex, final int maxLatitudeIndex,
-                                   final Set<Node> nodesInLimiter) {
+                                   final Set<GridCell> gridCellsOverlappingLimiter) {
         for (int x = minLongitudeIndex; x <= maxLongitudeIndex; x++) {
-            nodesInLimiter.addAll(getNodesInLimiter(cells[x][minLatitudeIndex].nodes, limiter));
-            nodesInLimiter.addAll(getNodesInLimiter(cells[x][maxLatitudeIndex].nodes, limiter));
+            gridCellsOverlappingLimiter.add(cells[x][minLatitudeIndex]);
+            gridCellsOverlappingLimiter.add(cells[x][maxLatitudeIndex]);
         }
         for (int y = minLatitudeIndex; y <= maxLatitudeIndex; y++) {
-            nodesInLimiter.addAll(getNodesInLimiter(cells[minLongitudeIndex][y].nodes, limiter));
-            nodesInLimiter.addAll(getNodesInLimiter(cells[maxLongitudeIndex][y].nodes, limiter));
+            gridCellsOverlappingLimiter.add(cells[minLongitudeIndex][y]);
+            gridCellsOverlappingLimiter.add(cells[maxLongitudeIndex][y]);
         }
     }
 
@@ -502,12 +503,16 @@ public class GridIndex implements Index {
     }
 
     public void addInnerCellNodes(final int minLongitudeIndex, final int maxLongitudeIndex, final int minLatitudeIndex,
-                                  final int maxLatitudeIndex, final Set<Node> nodesInLimiter) {
+                                  final int maxLatitudeIndex, final Set<GridCell> gridCellsOverlappingLimiter) {
         for (int x = minLongitudeIndex + 1; x < maxLongitudeIndex; x++) {
             for (int y = minLatitudeIndex + 1; y < maxLatitudeIndex; y++) {
-                nodesInLimiter.addAll(cells[x][y].nodes);
+                gridCellsOverlappingLimiter.add(cells[x][y]);
             }
         }
+    }
+
+    public void queryEdges(final BoundingBox limit, final IndexVisitor visitor) {
+
     }
 
     public interface GridIndexVisitor<T> extends IndexVisitor<T> {

@@ -31,7 +31,7 @@ public class GridIndexTest {
     public GridIndexTest() {
         try {
             graph = new ImportERPGraph(Config.ERP_PATH).createGraph();
-            this.gridIndex = new GridIndex(graph, 1000, 1000);
+            this.gridIndex = new GridIndex(graph, 10, 10);
 
             double longitudeMinBound = Double.POSITIVE_INFINITY;
             double longitudeMaxBound = Double.NEGATIVE_INFINITY;
