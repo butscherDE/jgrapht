@@ -9,21 +9,26 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GridIndex implements Index {
+    private final static double LONGITUDE_RANGE = 360d;
+    private final static double LATITUDE_RANGE = 180d;
+
     private final RoadGraph graph;
+    private final BoundingBox indexBounds;
     private final double longitudeCellSize;
-    private final int longitudePrecision;
     private final double latitudeCellSize;
-    private final int latitudePrecision;
     private final GridCell[][] cells;
+
 
     public GridIndex(final RoadGraph graph, final int longitudeGranularity, final int latitudeGranularity) {
         this.graph = graph;
-        this.longitudeCellSize = 360d / longitudeGranularity;
-        this.longitudePrecision = (int) Math.pow(10, precision(longitudeGranularity));
-        this.latitudeCellSize = 180d / latitudeGranularity;
-        this.latitudePrecision = (int) Math.pow(10, precision(latitudeGranularity));
+        this.indexBounds = graph.getBoundingBox();
+        final double longitudeRange = (indexBounds.maxLongitude + LONGITUDE_RANGE) - (indexBounds.minLongitude + LONGITUDE_RANGE);
+        final double latitudeRange = (indexBounds.maxLatitude + LATITUDE_RANGE) - (indexBounds.minLatitude + LATITUDE_RANGE);
+        this.longitudeCellSize = longitudeRange / longitudeGranularity;
+        this.latitudeCellSize = latitudeRange / latitudeGranularity;
 
         this.cells = new GridCell[longitudeGranularity][latitudeGranularity];
 
@@ -81,12 +86,48 @@ public class GridIndex implements Index {
     }
 
     private int getLongitudeIndex(final double longitude) {
-        double longitudeNonNegative = longitude + 180;
+        if (longitude < indexBounds.minLongitude) {
+            return getOutOfLowerBoundLongitudeIndex();
+        } else if (longitude >= indexBounds.maxLongitude) {
+            return getOutOfUpperBoundLongitudeIndex();
+        } else {
+            return getInBoundsLongitudeIndex(longitude);
+        }
+    }
+
+    private int getOutOfLowerBoundLongitudeIndex() {
+        return 0;
+    }
+
+    private int getOutOfUpperBoundLongitudeIndex() {
+        return cells.length - 1;
+    }
+
+    private int getInBoundsLongitudeIndex(final double longitude) {
+        double longitudeNonNegative = longitude + (-1) * indexBounds.minLongitude;
         return (int) (longitudeNonNegative / longitudeCellSize);
     }
 
     private int getLatitudeIndex(final double latitude) {
-        double latitudeNonNegative = latitude + 90;
+        if (latitude < indexBounds.minLatitude) {
+            return getOutOfLowerBoundLatitudeIndex();
+        } else if (latitude >= indexBounds.maxLatitude) {
+            return getOutOfUpperBoundLatitudeIndex();
+        } else {
+            return getInBoundsLatitudeIndex(latitude);
+        }
+    }
+
+    private int getOutOfLowerBoundLatitudeIndex() {
+        return 0;
+    }
+
+    private int getOutOfUpperBoundLatitudeIndex() {
+        return cells[0].length - 1;
+    }
+
+    private int getInBoundsLatitudeIndex(final double latitude) {
+        double latitudeNonNegative = latitude + (-1) * indexBounds.minLatitude;
         return (int) (latitudeNonNegative / latitudeCellSize);
     }
 
@@ -99,7 +140,7 @@ public class GridIndex implements Index {
     }
 
     private List<GridCell> getIntersectingCells(final Edge edge) {
-        return getIntersectingCells((Node) graph.getEdgeSource(edge), (Node) graph.getEdgeTarget(edge));
+        return getIntersectingCells(graph.getEdgeSource(edge), graph.getEdgeTarget(edge));
     }
 
     private List<GridCell> getIntersectingCells(final Node start, final Node end) {
@@ -135,7 +176,6 @@ public class GridIndex implements Index {
     }
 
     private List<GridCell> getAllIntersectingCells(final LineSegment edgeRepresentingLine) {
-
         final Coordinate startCoordinate = edgeRepresentingLine.getCoordinate(0);
         final Coordinate endCoordinate = edgeRepresentingLine.getCoordinate(1);
 
@@ -167,18 +207,17 @@ public class GridIndex implements Index {
         return intersectingCells;
     }
 
-    @SuppressWarnings("UnnecessaryLocalVariable")
     private LineSegment[] getBoundingBoxLineSegments(final int gridCellLongitudeIndex, final int gridCellLatitudeIndex) {
         final LineSegment[] boundingBoxLineSegments = new LineSegment[4];
 
-        double cellLowerLeftLongitude = roundLongitude(gridCellLongitudeIndex * longitudeCellSize - 180);
-        double cellLowerLeftLatitude = roundLatitude(gridCellLatitudeIndex * latitudeCellSize - 90);
+        double cellLowerLeftLongitude = gridCellLongitudeIndex * longitudeCellSize - (-1) * indexBounds.minLongitude;
+        double cellLowerLeftLatitude = gridCellLatitudeIndex * latitudeCellSize - (-1) * indexBounds.minLatitude;
 
         double cellUpperLeftLongitude = cellLowerLeftLongitude;
-        double cellUpperLeftLatitude = roundLatitude((gridCellLatitudeIndex + 1) * latitudeCellSize - 90);
+        double cellUpperLeftLatitude = (gridCellLatitudeIndex + 1) * latitudeCellSize - (-1) * indexBounds.minLatitude;
 
-        double cellLowerRightLongitude = roundLongitude((gridCellLongitudeIndex + 1) * longitudeCellSize -180);
-        @SuppressWarnings("UnnecessaryLocalVariable") double cellLowerRightLatitude = cellLowerLeftLatitude;
+        double cellLowerRightLongitude = (gridCellLongitudeIndex + 1) * longitudeCellSize - (-1) * indexBounds.minLongitude;
+        double cellLowerRightLatitude = cellLowerLeftLatitude;
 
         double cellUpperRightLongitude = cellLowerRightLongitude;
         double cellUpperRightLatitude = cellUpperLeftLatitude;
@@ -200,23 +239,25 @@ public class GridIndex implements Index {
         final CellHullCreator hullCreator = new CellHullCreator(coordinate);
 
         Node minNode = null;
-        double minDistance = Double.POSITIVE_INFINITY;
         while (minNode == null) {
             final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
-            for (final GridCell cell : cellBlock) {
-                for (final Node node : cell.nodes) {
-                    final double distance = getDistance(coordinate, node);
-
-                    if (isDistanceSmaller(minDistance, distance)) {
-                        minDistance = distance;
-                        minNode = node;
-                    }
-                }
-            }
+            final List<Node> minNodesPerCell = cellBlock
+                    .stream()
+                    .map(a -> saveMinNode(a.nodes, Comparator.comparingDouble(b -> getDistance(coordinate, b))))
+                    .collect(Collectors.toList());
+            minNode = Collections.min(minNodesPerCell, Comparator.comparingDouble(a -> getDistance(coordinate, a)));
         }
 
         return minNode;
+    }
+
+    private Node saveMinNode(final Collection collection, final Comparator<? extends Node> comparator) {
+        try {
+            return Collections.min(collection, comparator);
+        } catch (NoSuchElementException e) {
+            return RoadGraph.INVALID_NODE;
+        }
     }
 
     private double getDistance(final Coordinate coordinate, final Node node) {
@@ -233,42 +274,27 @@ public class GridIndex implements Index {
     private Edge getClosestEdge(final Coordinate coordinate) {
         final CellHullCreator hullCreator = new CellHullCreator(coordinate);
 
-        double minDistance = Double.POSITIVE_INFINITY;
         Edge minEdge = null;
-        while (minEdge == null) //noinspection DuplicatedCode
+        while (minEdge == null)
         {
             final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
-            for (final GridCell gridCell : cellBlock) {
-                for (final Edge edge : gridCell.edges) {
-                    final double distance = getDistance(coordinate, edge);
-
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        minEdge = edge;
-                    }
-                }
-            }
-        }
-
-        // reassure closest found
-        for (int i = 0; i < 100; i++) //noinspection DuplicatedCode
-        {
-            final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
-
-            for (final GridCell gridCell : cellBlock) {
-                for (final Edge edge : gridCell.edges) {
-                    final double distance = getDistance(coordinate, edge);
-
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        minEdge = edge;
-                    }
-                }
-            }
+            final List<Edge> minDistanceEdgesPerCell = cellBlock
+                    .stream()
+                    .map(a -> saveMinEdge(a.edges, Comparator.comparingDouble(b -> getDistance(coordinate, b))))
+                    .collect(Collectors.toList());
+            minEdge = Collections.min(minDistanceEdgesPerCell, Comparator.comparingDouble(a -> getDistance(coordinate, a)));
         }
 
         return minEdge;
+    }
+
+    private Edge saveMinEdge(Collection collection, Comparator<? extends Edge> comparator) {
+        try {
+            return Collections.min(collection, comparator);
+        } catch (NoSuchElementException e) {
+            return RoadGraph.INVALID_EDGE;
+        }
     }
 
     private double getDistance(final Coordinate coordinate, final Edge edge) {
@@ -277,17 +303,13 @@ public class GridIndex implements Index {
         return edgeRepresentingLine.distance(coordinate);
     }
 
-    private boolean isDistanceSmaller(final Double minDistance, final double distance) {
-        return distance < minDistance;
-    }
-
     private Coordinate getCoordinate(final Node node) {
         return new Coordinate(node.longitude, node.latitude);
     }
 
     private LineSegment getLineSegment(final Edge edge) {
-        final Node baseNode = (Node) graph.getEdgeSource(edge);
-        final Node adjNode = (Node) graph.getEdgeTarget(edge);
+        final Node baseNode = graph.getEdgeSource(edge);
+        final Node adjNode = graph.getEdgeTarget(edge);
 
         final Coordinate baseCoordinate = getCoordinate(baseNode);
         final Coordinate adjCoordinate = getCoordinate(adjNode);
@@ -324,22 +346,6 @@ public class GridIndex implements Index {
 
     private boolean isIntersecting(final LineSegment lineSegment, final LineSegment lineSegment2) {
         return lineSegment2.intersection(lineSegment) != null;
-    }
-
-    private double roundLongitude(final double longitude) {
-        final double leftShiftedLongitude = longitude * longitudePrecision;
-        final double roundedLongitude = Math.round(leftShiftedLongitude);
-        return roundedLongitude / longitudePrecision;
-    }
-
-    private double roundLatitude(final double latitude) {
-        final double leftShiftedLatitude = latitude * latitudePrecision;
-        final double roundedLatitude = Math.round(leftShiftedLatitude);
-        return roundedLatitude / latitudePrecision;
-    }
-
-    private int precision(final int integer) {
-        return (int) (Math.log10(integer) + 1);
     }
 
     private static class GridCell {
@@ -382,10 +388,10 @@ public class GridIndex implements Index {
         }
 
         private void updateBoundingIndicesBasedOnLayer() {
-            longitudeStartIndex = getLongitudeIndex(longitude) - (layer);
-            latitudeStartIndex = getLatitudeIndex(latitude) - (layer);
-            longitudeEndIndex = getLongitudeIndex(longitude) + (layer);
-            latitudeEndIndex = getLatitudeIndex(latitude) + (layer);
+            longitudeStartIndex = Math.max(0, getLongitudeIndex(longitude) - layer);
+            latitudeStartIndex = Math.max(0, getLatitudeIndex(latitude) - layer);
+            longitudeEndIndex = Math.min(cells.length - 1, getLongitudeIndex(longitude) + layer);
+            latitudeEndIndex = Math.min(cells[0].length - 1, getLatitudeIndex(latitude) + layer);
         }
 
         private void addCenterNode() {
@@ -397,7 +403,7 @@ public class GridIndex implements Index {
         }
 
         private void getTopAndBottomRows() {
-            for (int x = longitudeStartIndex; x < longitudeEndIndex + 1; x = (x + 1) % cells.length) {
+            for (int x = longitudeStartIndex; x < longitudeEndIndex + 1; x++) {
                 addTopRow(x);
                 addBottomRow(x);
             }
@@ -412,7 +418,7 @@ public class GridIndex implements Index {
         }
 
         private void getSideColumns() {
-            for (int y = latitudeStartIndex + 1; y < latitudeEndIndex; y = (y + 1) % cells[0].length) {
+            for (int y = latitudeStartIndex + 1; y < latitudeEndIndex; y++) {
                 addLeftColumn(y);
                 addRightColumn(y);
             }
@@ -505,6 +511,6 @@ public class GridIndex implements Index {
     }
 
     public interface GridIndexVisitor<T> extends IndexVisitor<T> {
-        abstract void accept(T entity, BoundingBox cell);
+        void accept(T entity, BoundingBox cell);
     }
 }

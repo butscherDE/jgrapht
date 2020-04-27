@@ -12,7 +12,6 @@ import storage.ImportERPGraph;
 
 import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -32,7 +31,7 @@ public class GridIndexTest {
     public GridIndexTest() {
         try {
             graph = new ImportERPGraph(Config.ERP_PATH).createGraph();
-            this.gridIndex = new GridIndex(graph, 7200, 3600);
+            this.gridIndex = new GridIndex(graph, 1000, 1000);
 
             double longitudeMinBound = Double.POSITIVE_INFINITY;
             double longitudeMaxBound = Double.NEGATIVE_INFINITY;
@@ -66,8 +65,7 @@ public class GridIndexTest {
 
             Node closestNode = getClosestNodeSequentially(randomCoordinate);
             Node closestNodeByIndex = gridIndex.getClosestNode(randomCoordinate.getX(), randomCoordinate.getY());
-
-            assertEquals(closestNode, closestNodeByIndex);
+            assertEquals(closestNode, closestNodeByIndex, i + "th iteration");
         }
     }
 

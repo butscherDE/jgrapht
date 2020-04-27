@@ -9,7 +9,6 @@ import geometry.PolygonContainsChecker;
 import index.GridIndex;
 import index.Index;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import storage.CsvColumnDumper;

@@ -1,13 +1,14 @@
 package geometry;
 
+import data.RoadGraph;
+import data.Node;
+import org.jgrapht.Graph;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
+import org.locationtech.jts.triangulate.quadedge.Vertex;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class BoundingBox extends Polygon {
@@ -40,6 +41,17 @@ public class BoundingBox extends Polygon {
         }
 
         return new BoundingBox(minMaxLongLat.minLongitude, minMaxLongLat.maxLongitude, minMaxLongLat.minLatitude, minMaxLongLat.maxLatitude);
+    }
+
+    public static BoundingBox createFrom(final RoadGraph roadGraph) {
+        final Set<Node> vertices = roadGraph.vertexSet();
+
+        final Node minLongitude = Collections.min(vertices, Comparator.comparingDouble(a -> a.longitude));
+        final Node maxLongitude = Collections.max(vertices, Comparator.comparingDouble(a -> a.longitude));
+        final Node minLatitude = Collections.min(vertices, Comparator.comparingDouble(a -> a.latitude));
+        final Node maxLatitude = Collections.max(vertices, Comparator.comparingDouble(a -> a.latitude));
+
+        return new BoundingBox(minLongitude.longitude, maxLongitude.longitude, minLatitude.latitude, maxLatitude.latitude);
     }
 
     public boolean isOverlapping(final Geometry otherGeometry) {
