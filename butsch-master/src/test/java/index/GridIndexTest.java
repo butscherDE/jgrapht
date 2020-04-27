@@ -175,7 +175,7 @@ public class GridIndexTest {
 
         final List<Node> expectedNodeList = new LinkedList<>();
         for (final Node node : graph.vertexSet()) {
-            if (node.id % 2 == 1 && node.longitude > minLongitude && node.longitude < maxLongitude && node.latitude > minLatitude && node.latitude < maxLatitude) {
+            if (node.id % 2 == 1 && node.longitude >= minLongitude && node.longitude <= maxLongitude && node.latitude >= minLatitude && node.latitude <= maxLatitude) {
                 expectedNodeList.add(node);
             }
         }
