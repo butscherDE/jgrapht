@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import storage.ImportERPGraph;
+import util.PolygonRoutingTestGraph;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -193,30 +194,46 @@ public class GridIndexTest {
 
     @Test
     public void queryEdges() {
-        final double minLongitude = 48.75;
-        final double maxLongitude = 48.75;
-        final double minLatitude = 9.75;
-        final double maxLatitude = 9.75;
+        final PolygonRoutingTestGraph graphMocker = new PolygonRoutingTestGraph();
+        final Index index = new GridIndex(graphMocker.graph, 51, 25);
+
+        final double minLongitude = 5;
+        final double maxLongitude = 11;
+        final double minLatitude = 9;
+        final double maxLatitude = 11;
         final BoundingBox limiter = new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
 
-        final List<Edge> expectedNodeList = new LinkedList<>();
-        for (final Edge edge : graph.edgeSet()) {
-            final Node edgeSource = graph.getEdgeSource(edge);
-            final Node edgeTarget = graph.getEdgeTarget(edge);
-            if (limiter.contains(edgeSource.getPoint()) || limiter.contains(edgeTarget.getPoint())) {
-                expectedNodeList.add(edge);
-            }
-        }
+        final List<Edge> expectedEdgeList = Arrays.asList(graphMocker.getEdge(19,41),
+                                                          graphMocker.getEdge(41,52),
+                                                          graphMocker.getEdge(41, 53),
+                                                          graphMocker.getEdge(19,42),
+                                                          graphMocker.getEdge(41,19),
+                                                          graphMocker.getEdge(52,41),
+                                                          graphMocker.getEdge(53, 41),
+                                                          graphMocker.getEdge(42,19));
 
         final EdgeVisitor edgeVisitor = new EdgeVisitor(limiter);
-        gridIndex.queryEdges(limiter, edgeVisitor);
-        final List<Edge> actualNodeList = edgeVisitor.getEdges();
+        index.queryEdges(limiter, edgeVisitor);
+        final List<Edge> actualEdgeList = edgeVisitor.getEdges();
 
-        ;
-        Collections.sort(expectedNodeList, compareEdges());
-        Collections.sort(actualNodeList, compareEdges());
+        Collections.sort(expectedEdgeList, compareEdges());
+        Collections.sort(actualEdgeList, compareEdges());
 
-        assertEquals(expectedNodeList, actualNodeList);
+        for (final Edge edge : expectedEdgeList) {
+            final Node sourceNode = graphMocker.graph.getEdgeSource(edge);
+            final Node targetNode = graphMocker.graph.getEdgeTarget(edge);
+
+
+            boolean contains = false;
+            for (final Edge other : expectedEdgeList) {
+                final Node otherSourceNode = graphMocker.graph.getEdgeSource(other);
+                final Node otherTargetNode = graphMocker.graph.getEdgeTarget(other);
+                contains |= sourceNode == otherSourceNode && targetNode == otherTargetNode;
+            }
+
+            assertTrue(contains);
+        }
+        assertEquals(expectedEdgeList.size(), actualEdgeList.size());
         assertTrue(edgeVisitor.acceptCounts < graph.vertexSet().size());
     }
 
@@ -275,9 +292,9 @@ public class GridIndexTest {
             final Node edgeSource = graph.getEdgeSource(entity);
             final Node edgeTarget = graph.getEdgeTarget(entity);
 
-            if (boundingBox.contains(edgeSource.getPoint()) || boundingBox.contains(edgeTarget.getPoint())) {
+//            if (boundingBox.contains(edgeSource.getPoint()) || boundingBox.contains(edgeTarget.getPoint())) {
                 edges.add(entity);
-            }
+//            }
         }
 
         public List<Edge> getEdges() {

@@ -339,7 +339,7 @@ public class PolygonRoutingTestGraph {
         return new LinkedList<>(graph.edgeSet());
     }
 
-    public Edge getEdge(final int sourceNodeId, final int targetNodeId) {
+    public Edge getEdge(final long sourceNodeId, final long targetNodeId) {
         final Node sourceNode = nodeMap.get(sourceNodeId);
         final Node targetNode = nodeMap.get(targetNodeId);
         return graph.getEdge(sourceNode, targetNode);
