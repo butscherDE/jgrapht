@@ -3,6 +3,7 @@ package data;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
 import java.util.Objects;
 
@@ -57,7 +58,7 @@ public class Node implements Comparable<Node> {
     }
 
     // TODO think about converting Node to a subclass of Coordinate
-    public Geometry getPoint() {
+    public Point getPoint() {
         return GEOMETRY_FACTORY.createPoint(new Coordinate(longitude, latitude, elevation));
     }
 

@@ -4,13 +4,12 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import geometry.BoundingBox;
-import index.GridIndex;
+import geometry.PolygonContainsChecker;
 import index.Index;
 import org.locationtech.jts.geom.Polygon;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public class EntryExitPointExtractor {
     private final Polygon region;
@@ -26,52 +25,46 @@ public class EntryExitPointExtractor {
     public Set<Node> extract() {
         final EntryExitNodeVisitor entryExitNodeVisitor = new EntryExitNodeVisitor(graph, region);
         final BoundingBox boundingBox = BoundingBox.createFrom(region);
-        //gridIndex.queryNodes(boundingBox, entryExitNodeVisitor);
-        throw new UnsupportedOperationException("fix the query on index first");
+        gridIndex.queryEdges(boundingBox, entryExitNodeVisitor);
 
-//        return entryExitNodeVisitor.getEntryExitNodes();
+        return entryExitNodeVisitor.getEntryExitNodes();
     }
 
-    private class EntryExitNodeVisitor implements Consumer<Node> {
+    private static class EntryExitNodeVisitor implements Index.IndexVisitor<Edge> {
         private final RoadGraph graph;
-        private final Polygon region;
+        private final PolygonContainsChecker containsChecker;
         private final LinkedHashSet<Node> entryExitNodes = new LinkedHashSet<>();
 
         private EntryExitNodeVisitor(final RoadGraph graph, final Polygon region) {
             this.graph = graph;
-            this.region = region;
+            this.containsChecker = new PolygonContainsChecker(region);
         }
 
         @Override
-        public void accept(final Node node) {
-            if (isNodeInRegion(node)) {
-                addNodesOnIncomingIncidence(node);
-                addNodesOnOutgoingIncidence(node);
+        public void accept(final Edge entity) {
+            final Node source = graph.getEdgeSource(entity);
+            final Node target = graph.getEdgeTarget(entity);
+
+            addIfOneIsEntryExitNode(source, target);
+        }
+
+        public void addIfOneIsEntryExitNode(final Node source, final Node target) {
+            final boolean isSourceContained = containsChecker.contains(source.getPoint());
+            final boolean isTargetContained = containsChecker.contains(target.getPoint());
+
+            if (isSourceEntryExitPoint(isSourceContained, isTargetContained)) {
+                entryExitNodes.add(source);
+            } else if (isTargetEntryExitPoint(isSourceContained, isTargetContained)) {
+                entryExitNodes.add(target);
             }
         }
 
-        public void addNodesOnIncomingIncidence(final Node node) {
-            for (final Edge edge : graph.incomingEdgesOf(node)) {
-                final Node source = graph.getEdgeSource(edge);
-
-                if (!isNodeInRegion(source)) {
-                    entryExitNodes.add(source);
-                }
-            }
+        public boolean isTargetEntryExitPoint(final boolean isSourceContained, final boolean isTargetContained) {
+            return isSourceContained && !isTargetContained;
         }
 
-        public void addNodesOnOutgoingIncidence(final Node node) {
-            for (final Edge edge : graph.outgoingEdgesOf(node)) {
-                final Node target = graph.getEdgeTarget(edge);
-
-                if (!isNodeInRegion(target)) {
-                    entryExitNodes.add(target);
-                }
-            }
-        }
-
-        public boolean isNodeInRegion(final Node node) {
-            return region.contains(node.getPoint());
+        public boolean isSourceEntryExitPoint(final boolean isSourceContained, final boolean isTargetContained) {
+            return !isSourceContained && isTargetContained;
         }
 
         public Set<Node> getEntryExitNodes() {
