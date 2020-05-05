@@ -108,19 +108,26 @@ public class ImportPBF implements GraphImporter {
             ways.put(way.getId(), way);
             final List<Long> nodeIds = way.getNodes();
 
-            final String highwayTag = way.getTags().get("highway");
-            if (highwayTag != null) {
-                final Iterator<Long> nodeIdIterator = nodeIds.iterator();
-                long lastNodeId = nodeIdIterator.next();
-                final List<Pair<Long, Long>> edgesOnThisWay = new LinkedList<>();
-                while (nodeIdIterator.hasNext()) {
-                    final long currentNodeId = nodeIdIterator.next();
-
-                    edgesOnThisWay.add(new Pair<>(lastNodeId, currentNodeId));
-                    lastNodeId = currentNodeId;
-                }
-                edges.addAll(edgesOnThisWay);
+            if (isRoad(way)) {
+                rememberEdgesToAddToGraph(nodeIds);
             }
+        }
+
+        public boolean isRoad(final Way way) {
+            return way.getTags().get("highway") != null;
+        }
+
+        public void rememberEdgesToAddToGraph(final List<Long> nodeIds) {
+            final Iterator<Long> nodeIdIterator = nodeIds.iterator();
+            long lastNodeId = nodeIdIterator.next();
+            final List<Pair<Long, Long>> edgesOnThisWay = new LinkedList<>();
+            while (nodeIdIterator.hasNext()) {
+                final long currentNodeId = nodeIdIterator.next();
+
+                edgesOnThisWay.add(new Pair<>(lastNodeId, currentNodeId));
+                lastNodeId = currentNodeId;
+            }
+            edges.addAll(edgesOnThisWay);
         }
 
         public void addEdgesToGraph() {
