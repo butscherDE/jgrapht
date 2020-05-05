@@ -41,7 +41,7 @@ public class RoadGraph extends DefaultDirectedWeightedGraph<Node, Edge> {
 
     @Override
     public boolean addVertex(Node node) {
-        boolean isAdded = super.addVertex(node);
+        boolean isAdded = nodes.get(node.id) == null ? super.addVertex(node) : false;
 
         if (isAdded) {
             nodes.put(node.id, node);

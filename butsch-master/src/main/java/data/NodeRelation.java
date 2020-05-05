@@ -20,6 +20,23 @@ public class NodeRelation {
     }
 
     public static NodeRelation createFromNodeIds(final long id, final String description, Map<String, String> tags,
+                                                 final List<Long> nodeIds, final Map<Long, Node> nodeMap) {
+        final List<Node> nodes = new LinkedList<>();
+
+        for (final Long nodeId : nodeIds) {
+            final Node vertex = nodeMap.get(nodeId);
+
+            if (vertex != null) {
+                nodes.add(vertex);
+            } else {
+                throw new NoSuchElementException("Vertex " + nodeId + " was not found in the graph.");
+            }
+        }
+
+        return new NodeRelation(id, description, tags, nodes);
+    }
+
+    public static NodeRelation createFromNodeIds(final long id, final String description, Map<String, String> tags,
                                                  final List<Long> nodeIds, final RoadGraph graph) {
         final List<Node> nodes = new LinkedList<>();
 

@@ -58,8 +58,7 @@ public class ImportPBF implements GraphImporter {
     }
 
     private void addGraphData() {
-        onNodes.addNodesToGraph();
-        onWays.addEdgesToGraph();
+        onWays.addEntitiesToGraph();
     }
 
     private void createNodeRelations() {
@@ -83,19 +82,13 @@ public class ImportPBF implements GraphImporter {
     }
 
     private class RoadGraphNodeAdder implements Consumer<com.wolt.osm.parallelpbf.entity.Node> {
-        final List<Node> nodes = Collections.synchronizedList(new LinkedList<>());
+        final Map<Long, Node> nodes = Collections.synchronizedMap(new HashMap<>());
 
         @Override
         public void accept(final com.wolt.osm.parallelpbf.entity.Node node) {
             final data.Node internalNodeFormat = new Node(node.getId(), node.getLon(), node.getLat(), 0);
 
-            nodes.add(internalNodeFormat);
-        }
-
-        public void addNodesToGraph() {
-            for (final Node node : nodes) {
-                graph.addVertex(node);
-            }
+            nodes.put(internalNodeFormat.id, internalNodeFormat);
         }
     }
 
@@ -130,11 +123,13 @@ public class ImportPBF implements GraphImporter {
             edges.addAll(edgesOnThisWay);
         }
 
-        public void addEdgesToGraph() {
+        public void addEntitiesToGraph() {
             for (final Pair<Long, Long> edge : edges) {
-                final Node baseNode = graph.getVertex(edge.getFirst());
-                final Node adjNode = graph.getVertex(edge.getSecond());
+                final Node baseNode = onNodes.nodes.get(edge.getFirst());
+                final Node adjNode = onNodes.nodes.get(edge.getSecond());
 
+                graph.addVertex(baseNode);
+                graph.addVertex(adjNode);
                 graph.addEdge(baseNode, adjNode);
             }
         }
@@ -176,7 +171,7 @@ public class ImportPBF implements GraphImporter {
 
             final NodeRelation newRelation = NodeRelation.createFromNodeIds(relation.getId(),
                                                                             relation.getInfo().toString(),
-                                                                            relation.getTags(), nodeIds, graph);
+                                                                            relation.getTags(), nodeIds, onNodes.nodes);
             return newRelation;
         }
 
