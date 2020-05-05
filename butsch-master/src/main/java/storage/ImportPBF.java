@@ -108,13 +108,18 @@ public class ImportPBF implements GraphImporter {
             ways.put(way.getId(), way);
             final List<Long> nodeIds = way.getNodes();
 
-            final Iterator<Long> nodeIdIterator = nodeIds.iterator();
-            long lastNodeId = nodeIdIterator.next();
-            while (nodeIdIterator.hasNext()) {
-                final long currentNodeId = nodeIdIterator.next();
+            final String highwayTag = way.getTags().get("highway");
+            if (highwayTag != null) {
+                final Iterator<Long> nodeIdIterator = nodeIds.iterator();
+                long lastNodeId = nodeIdIterator.next();
+                final List<Pair<Long, Long>> edgesOnThisWay = new LinkedList<>();
+                while (nodeIdIterator.hasNext()) {
+                    final long currentNodeId = nodeIdIterator.next();
 
-                edges.add(new Pair<>(lastNodeId, currentNodeId));
-                lastNodeId = currentNodeId;
+                    edgesOnThisWay.add(new Pair<>(lastNodeId, currentNodeId));
+                    lastNodeId = currentNodeId;
+                }
+                edges.addAll(edgesOnThisWay);
             }
         }
 
