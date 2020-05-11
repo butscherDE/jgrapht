@@ -23,7 +23,6 @@ import java.util.*;
  * General schema: For each edge in the allEdgesIterator: Check if it was used in a left run, if not run left. Check if it was used in a right run if not run right
  */
 class VisibilityCellsCreator {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final RoadGraph graph;
     private final BinaryHashFunction<Pair<Node, Node>> visitedManagerLeft = new BinaryHashFunction<>();;
     private final BinaryHashFunction<Pair<Node, Node>> visitedManagerRight = new BinaryHashFunction<>();;
@@ -51,7 +50,7 @@ class VisibilityCellsCreator {
     private void startRunsOnEachEdgeInTheGraph() {
         StopWatchVerbose swAll = new StopWatchVerbose("VisibilityCells created").;
         for (final Edge currentEdge : this.allEdges) {
-            if (continueOnLengthZeroEdge()) {
+            if (continueOnLengthZeroEdge(currentEdge)) {
                 continue;
             }
 
@@ -60,7 +59,7 @@ class VisibilityCellsCreator {
             }
 
             if (!visibilityCellOnTheRightFound(currentEdge)) {
-                addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerLeft, currentEdge, sortedNeighborListRight).extractVisibilityCell());
+                addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerRight, currentEdge, sortedNeighborListRight).extractVisibilityCell());
             }
         }
         swAll.printTimingIfVerbose();
