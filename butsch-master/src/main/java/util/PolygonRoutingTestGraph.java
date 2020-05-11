@@ -7,10 +7,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PolygonRoutingTestGraph {
     public static final PolygonRoutingTestGraph DEFAULT_INSTANCE = new PolygonRoutingTestGraph();
@@ -352,6 +349,6 @@ public class PolygonRoutingTestGraph {
     }
 
     private void createTestIndex() {
-        gridIndex = new GridIndex(graph, 720, 360);
+        gridIndex = new GridIndex(graph, Collections.emptyList(), 720, 360);
     }
 }

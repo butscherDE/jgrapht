@@ -18,6 +18,8 @@ public interface Index {
 
     void queryEdges(final BoundingBox limiter, final IndexVisitor visitor);
 
+    void queryVisibilityCells(final BoundingBox limiter, final IndexVisitor visitor);
+
     interface IndexVisitor<T> {
         void accept(final T entity);
     }

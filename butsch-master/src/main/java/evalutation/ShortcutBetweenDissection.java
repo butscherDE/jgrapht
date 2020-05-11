@@ -45,7 +45,7 @@ public class ShortcutBetweenDissection {
         final ImportPBF importPBF = new ImportPBF(Config.PBF_LUXEMBOURG);
         final RoadGraph graph = importPBF.createGraph();
         nodeRelations = importPBF.getNodeRelations();
-        index = new GridIndex(graph, 3600, 3600);
+        index = new GridIndex(graph, Collections.emptyList(), 3600, 3600);
     }
 
     public static void prepareDataStorages() {

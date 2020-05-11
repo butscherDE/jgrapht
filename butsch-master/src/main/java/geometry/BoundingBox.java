@@ -2,6 +2,7 @@ package geometry;
 
 import data.RoadGraph;
 import data.Node;
+import data.VisibilityCell;
 import org.jgrapht.Graph;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.Polygon;
@@ -40,7 +41,7 @@ public class BoundingBox extends Polygon {
             minMaxLongLat.accept(coordinate);
         }
 
-        return new BoundingBox(minMaxLongLat.minLongitude, minMaxLongLat.maxLongitude, minMaxLongLat.minLatitude, minMaxLongLat.maxLatitude);
+        return createFrom(minMaxLongLat);
     }
 
     public static BoundingBox createFrom(final RoadGraph roadGraph) {
@@ -53,6 +54,20 @@ public class BoundingBox extends Polygon {
         final Node maxLatitude = Collections.max(vertices, Comparator.comparingDouble(a -> a.latitude));
 
         return new BoundingBox(minLongitude.longitude, maxLongitude.longitude, minLatitude.latitude, maxLatitude.latitude);
+    }
+
+    public static BoundingBox createFrom(final VisibilityCell visibilityCell) {
+        final MinMaxLongLat minMaxLongLat = new MinMaxLongLat();
+
+        for (final LineSegment lineSegment : visibilityCell.lineSegments) {
+            minMaxLongLat.accept(lineSegment.p0);
+        }
+
+        return createFrom(minMaxLongLat);
+    }
+
+    public static BoundingBox createFrom(final MinMaxLongLat minMaxLongLat) {
+        return new BoundingBox(minMaxLongLat.minLongitude, minMaxLongLat.maxLongitude, minMaxLongLat.minLatitude, minMaxLongLat.maxLatitude);
     }
 
     public boolean isOverlapping(final Geometry otherGeometry) {

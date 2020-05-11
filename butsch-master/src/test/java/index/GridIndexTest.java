@@ -31,7 +31,7 @@ public class GridIndexTest {
     public GridIndexTest() {
         try {
             graph = new ImportERPGraph(Config.ERP_PATH).createGraph();
-            this.gridIndex = new GridIndex(graph, 10, 10);
+            this.gridIndex = new GridIndex(graph, Collections.emptyList(), 10, 10);
 
             double longitudeMinBound = Double.POSITIVE_INFINITY;
             double longitudeMaxBound = Double.NEGATIVE_INFINITY;
@@ -195,7 +195,7 @@ public class GridIndexTest {
     @Test
     public void queryEdges() {
         final PolygonRoutingTestGraph graphMocker = new PolygonRoutingTestGraph();
-        final Index index = new GridIndex(graphMocker.graph, 51, 25);
+        final Index index = new GridIndex(graphMocker.graph, Collections.emptyList(), 51, 25);
 
         final double minLongitude = 5;
         final double maxLongitude = 11;

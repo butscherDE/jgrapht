@@ -3,10 +3,12 @@ package index;
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import data.VisibilityCell;
 import evalutation.StopWatchVerbose;
 import geometry.BoundingBox;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.Polygon;
 
 import java.util.*;
 import java.util.function.Function;
@@ -24,7 +26,8 @@ public class GridIndex implements Index {
     private final GridCell[][] cells;
 
 
-    public GridIndex(final RoadGraph graph, final int longitudeGranularity, final int latitudeGranularity) {
+    public GridIndex(final RoadGraph graph, final List<VisibilityCell> visibilityCells,
+                     final int longitudeGranularity, final int latitudeGranularity) {
         this.graph = graph;
         this.indexBounds = graph.getBoundingBox();
         final double longitudeRange = (indexBounds.maxLongitude + LONGITUDE_RANGE) - (indexBounds.minLongitude + LONGITUDE_RANGE);
@@ -35,14 +38,15 @@ public class GridIndex implements Index {
         this.cells = new GridCell[longitudeGranularity][latitudeGranularity];
 
         StopWatchVerbose sw = new StopWatchVerbose("Index creation");
-        initCells();
+        initCells(visibilityCells);
         sw.printTimingIfVerbose();
     }
 
-    private void initCells() {
+    private void initCells(final List<VisibilityCell> visibilityCells) {
         instantiateCellObjects();
         addNodesToIntersectingCells();
         addEdgesToIntersectingCells();
+        addVisibilityCellsToOverlappingCells(visibilityCells);
     }
 
     private void instantiateCellObjects() {
@@ -241,6 +245,29 @@ public class GridIndex implements Index {
         return gridCellLatitudeIndex * latitudeCellSize - (-1) * indexBounds.minLatitude;
     }
 
+    private void addVisibilityCellsToOverlappingCells(final List<VisibilityCell> visibilityCells) {
+        visibilityCells.stream().forEach(a -> addVisibilityCellToGridCells(a));
+    }
+
+    private void addVisibilityCellToGridCells(final VisibilityCell visibilityCell) {
+        final BoundingBox vcBoundingBox  = BoundingBox.createFrom(visibilityCell);
+
+        final int minLongIndex = getLongitudeIndex(vcBoundingBox.minLongitude);
+        final int maxLongIndex = getLongitudeIndex(vcBoundingBox.maxLongitude);
+        final int minLatIndex = getLongitudeIndex(vcBoundingBox.minLatitude);
+        final int maxLatIndex = getLongitudeIndex(vcBoundingBox.maxLatitude);
+
+        for (int i = minLongIndex; i <= maxLongIndex; i++) {
+            final GridCell[] row = cells[i];
+
+            for (int j = minLatIndex; j <= maxLatIndex; j++) {
+                final GridCell cell = row[j];
+
+                cell.visibilityCells.add(visibilityCell);
+            }
+        }
+    }
+
     @Override
     public Node getClosestNode(final double longitude, final double latitude) {
         return getClosestNode(new Coordinate(longitude, latitude));
@@ -363,6 +390,7 @@ public class GridIndex implements Index {
         // Initial size = 0 because in various szenarios most cells are empty.
         final List<Node> nodes = new ArrayList<>(0);
         final List<Edge> edges = new ArrayList<>(0);
+        final List<VisibilityCell> visibilityCells = new ArrayList<>(0);
 
         @Override
         public String toString() {
@@ -474,6 +502,11 @@ public class GridIndex implements Index {
     @Override
     public void queryEdges(final BoundingBox limiter, final IndexVisitor visitor) {
         queryGraphEntity(limiter, visitor, a -> a.edges.stream());
+    }
+
+    @Override
+    public void queryVisibilityCells(final BoundingBox limiter, final IndexVisitor visitor) {
+        queryGraphEntity(limiter, visitor, a -> a.visibilityCells.stream());
     }
 
     public <T> void queryGraphEntity(final BoundingBox limiter, final IndexVisitor visitor,
