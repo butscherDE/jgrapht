@@ -11,7 +11,7 @@ public class RedBlueSegmentIntersectionCrossProduct implements SegmentIntersecti
     private final Collection<LineSegment> redSegments;
     private final Collection<LineSegment> blueSegments;
 
-    public RedBlueSegmentIntersectionCrossProduct(final Collection<LineSegment> redSegments,
+    RedBlueSegmentIntersectionCrossProduct(final Collection<LineSegment> redSegments,
                                                   final Collection<LineSegment> blueSegments) {
         this.redSegments = redSegments;
         this.blueSegments = blueSegments;
