@@ -1,8 +1,10 @@
 package index.vc;
 
-import com.graphhopper.storage.Graph;
-import com.graphhopper.storage.NodeAccess;
-import com.graphhopper.util.EdgeIteratorState;
+import data.Node;
+import data.RoadGraph;
+import data.VisibilityCell;
+import org.jgrapht.alg.util.Pair;
+import util.BinaryHashFunction;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,10 +12,10 @@ import java.util.Map;
 
 abstract class CellRunner {
     final LinkedList<EdgeIteratorState> edgesOnCell = new LinkedList<>();
-    private final Graph graph;
+    private final RoadGraph graph;
     final NodeAccess nodeAccess;
     private final VisitedManager localVisitedManager;
-    final VisitedManagerDual globalVisitedManager;
+    final VisitedManagerDual visitedManager;
     private final VectorAngleCalculator vectorAngleCalculator;
     private final EdgeIteratorState startEdge;
     private final Map<Integer, SortedNeighbors> sortedNeighborsMap;
@@ -21,12 +23,12 @@ abstract class CellRunner {
     private EdgeIteratorState lastNonZeroLengthEdge;
 
 
-    CellRunner(final Graph graph, final VisitedManagerDual globalVisitedManager, final VectorAngleCalculator vectorAngleCalculator,
-               final EdgeIteratorState startEdge, Map<Integer, SortedNeighbors> sortedNeighborsMap) {
+    CellRunner(final RoadGraph graph, final BinaryHashFunction<Pair<Node, Node>> visitedManager, final VectorAngleCalculator vectorAngleCalculator,
+               final Edge startEdge, Map<Integer, SortedNeighbors> sortedNeighborsMap) {
         this.graph = graph;
         this.nodeAccess = graph.getNodeAccess();
         this.localVisitedManager = new VisitedManager(graph);
-        this.globalVisitedManager = globalVisitedManager;
+        this.visitedManager = visitedManager;
         this.vectorAngleCalculator = vectorAngleCalculator;
 
         this.startEdge = VisitedManager.forceNodeIdsAscending(startEdge);
@@ -142,7 +144,7 @@ abstract class CellRunner {
         return longitudeEqual && latitudeEqual;
     }
 
-    List<Integer> extractNodesFromVisitedEdges() {
+    List<Node> extractNodesFromVisitedEdges() {
         final List<Integer> nodesOnCell = new LinkedList<>();
 
         for (EdgeIteratorState edgeIteratorState : edgesOnCell) {

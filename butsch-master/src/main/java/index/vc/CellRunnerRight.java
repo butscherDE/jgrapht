@@ -1,14 +1,18 @@
 package index.vc;
 
-import com.graphhopper.storage.Graph;
-import com.graphhopper.util.EdgeIteratorState;
+import data.Node;
+import data.RoadGraph;
+import data.VisibilityCell;
+import org.jgrapht.alg.util.Pair;
+import util.BinaryHashFunction;
 
 import java.util.Map;
 
 class CellRunnerRight extends CellRunner {
 
-    public CellRunnerRight(final Graph graph, final VisitedManagerDual visitedManagerDual, final EdgeIteratorState startEdge, final Map<Integer, SortedNeighbors> sortedNeighborsMap) {
-        super(graph, visitedManagerDual, new VectorAngleCalculatorRight(graph.getNodeAccess()), startEdge, sortedNeighborsMap);
+    public CellRunnerRight(final RoadGraph graph, final BinaryHashFunction<Pair<Node, Node>> visitedManager,
+                           final Edge startEdge, final Map<Integer, SortedNeighbors> sortedNeighborsMap) {
+        super(graph, visitedManagerDual, new VectorAngleCalculatorRight(), startEdge, sortedNeighborsMap);
     }
 
     @Override
@@ -17,6 +21,6 @@ class CellRunnerRight extends CellRunner {
     }
 
     void markGloballyVisited(final EdgeIteratorState edge) {
-        globalVisitedManager.settleEdgeRight(edge);
+        visitedManager.settleEdgeRight(edge);
     }
 }

@@ -1,26 +1,29 @@
 package index.vc;
 
-import com.graphhopper.storage.NodeAccess;
-import com.graphhopper.util.EdgeIteratorState;
+import data.Node;
+import data.Edge;
+import data.RoadGraph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.math.Vector2D;
 
 public abstract class VectorAngleCalculator {
     final static double ANGLE_WHEN_COORDINATES_ARE_EQUAL = -Double.MAX_VALUE;
 
-    private final NodeAccess nodeAccess;
+    private final RoadGraph graph;
 
-    VectorAngleCalculator(NodeAccess nodeAccess) {
-        this.nodeAccess = nodeAccess;
+    public VectorAngleCalculator(final RoadGraph graph) {
+        this.graph = graph;
     }
 
-    public double getAngleOfVectorsOriented(final EdgeIteratorState candidateEdge) {
-        return getAngleOfVectorsOriented(candidateEdge.getBaseNode(), candidateEdge.getAdjNode());
+    public double getAngleOfVectorsOriented(final Edge candidateEdge) {
+        final Node sourceNode = graph.getEdgeSource(candidateEdge);
+        final Node targetNode = graph.getEdgeTarget(candidateEdge);
+        return getAngleOfVectorsOriented(sourceNode, targetNode);
     }
 
-    public abstract double getAngleOfVectorsOriented(final int baseNode, final int adjNode);
+    public abstract double getAngleOfVectorsOriented(final Node baseNode, final Node adjNode);
 
-    double getAngle(final int baseNode, final int adjNode) {
+    double getAngle(final Node baseNode, final Node adjNode) {
         try {
             return getAngleAfterErrorHandling(baseNode, adjNode);
         } catch (IllegalArgumentException e) {
@@ -28,16 +31,16 @@ public abstract class VectorAngleCalculator {
         }
     }
 
-    private double getAngleAfterErrorHandling(final int baseNode, final int adjNode) {
+    private double getAngleAfterErrorHandling(final Node baseNode, final Node adjNode) {
         final Vector2D lastEdgeVector = createHorizontalRightVector(baseNode);
         final Vector2D candidateEdgeVector = createVectorCorrespondingToEdge(baseNode, adjNode);
 
         return getAngle(lastEdgeVector, candidateEdgeVector);
     }
 
-    private Vector2D createHorizontalRightVector(final int baseNode) {
-        final Coordinate candidateEdgeBaseNodeCoordinate = new Coordinate(nodeAccess.getLongitude(baseNode), nodeAccess.getLatitude(baseNode));
-        final Coordinate coordinateToTheRightOfPrevious = new Coordinate(nodeAccess.getLongitude(baseNode) + 1, nodeAccess.getLatitude(baseNode));
+    private Vector2D createHorizontalRightVector(final Node baseNode) {
+        final Coordinate candidateEdgeBaseNodeCoordinate = new Coordinate(baseNode.longitude, baseNode.latitude);
+        final Coordinate coordinateToTheRightOfPrevious = new Coordinate(baseNode.longitude + 1, baseNode.latitude);
 
         return new Vector2D(candidateEdgeBaseNodeCoordinate, coordinateToTheRightOfPrevious);
     }
@@ -54,17 +57,17 @@ public abstract class VectorAngleCalculator {
         return differenceToTwoPi < 0.000000000000001 ? 0 : angleToContinuousInterval;
     }
 
-    private Vector2D createVectorCorrespondingToEdge(final int baseNode, final int adjNode) {
+    private Vector2D createVectorCorrespondingToEdge(final Node baseNode, final Node adjNode) {
         return createVectorByNodeIds(baseNode, adjNode);
     }
 
-    private Vector2D createVectorByNodeIds(final int baseNode, final int adjNode) {
-        final Coordinate lastEdgeBaseNodeCoordinate = new Coordinate(nodeAccess.getLongitude(baseNode), nodeAccess.getLatitude(baseNode));
-        final Coordinate lastEdgeAdjNodeCoordinate = new Coordinate(nodeAccess.getLongitude(adjNode), nodeAccess.getLatitude(adjNode));
-        if (lastEdgeBaseNodeCoordinate.equals2D(lastEdgeAdjNodeCoordinate)) {
+    private Vector2D createVectorByNodeIds(final Node baseNode, final Node adjNode) {
+        final Coordinate baseNodeCoordinate = baseNode.getPoint().getCoordinate();
+        final Coordinate adjNodeCoordinate = adjNode.getPoint().getCoordinate();
+        if (baseNodeCoordinate.equals2D(adjNodeCoordinate)) {
             throw new IllegalArgumentException("Coordinates of both edge end points shall not be equal");
         }
-        return new Vector2D(lastEdgeBaseNodeCoordinate, lastEdgeAdjNodeCoordinate);
+        return new Vector2D(baseNodeCoordinate, adjNodeCoordinate);
     }
 
     private double transformAngleToContinuousInterval(final double angleTo) {

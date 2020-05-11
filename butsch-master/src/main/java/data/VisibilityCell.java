@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.Polygon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class VisibilityCell {
     public final List<LineSegment> lineSegments;
@@ -28,5 +29,11 @@ public class VisibilityCell {
         }
 
         return new VisibilityCell(lineSegments);
+    }
+
+    public static VisibilityCell createVisibilityCellFromNodes(final List<Node> nodes) {
+        final Object[] coordinates = nodes.stream().map(a -> a.getPoint().getCoordinate()).toArray();
+
+        return create((Coordinate[]) coordinates);
     }
 }

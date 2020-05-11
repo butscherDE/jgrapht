@@ -1,14 +1,15 @@
 package index.vc;
 
-import com.graphhopper.storage.NodeAccess;
+import data.Node;
+import data.RoadGraph;
 
 public class VectorAngleCalculatorLeft extends VectorAngleCalculator {
-    public VectorAngleCalculatorLeft(NodeAccess nodeAccess) {
-        super(nodeAccess);
+    public VectorAngleCalculatorLeft(final RoadGraph graph) {
+        super(graph);
     }
 
     @Override
-    public double getAngleOfVectorsOriented(final int baseNode, final int adjNode) {
+    public double getAngleOfVectorsOriented(final Node baseNode, final Node adjNode) {
         return getAngle(baseNode, adjNode);
     }
 }
