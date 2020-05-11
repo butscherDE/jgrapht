@@ -6,8 +6,11 @@ import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.StopWatch;
 import data.Edge;
+import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
+import evalutation.StopWatchVerbose;
+import org.jgrapht.alg.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.BinaryHashFunction;
@@ -22,18 +25,17 @@ import java.util.*;
 class VisibilityCellsCreator {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final RoadGraph graph;
-    private final BinaryHashFunction<Edge> globalVisitedManager;
+    private final BinaryHashFunction<Pair<Node, Node>> visitedManagerLeft = new BinaryHashFunction<>();;
+    private final BinaryHashFunction<Pair<Node, Node>> visitedManagerRight = new BinaryHashFunction<>();;
     private final Map<Integer, SortedNeighbors> sortedNeighborListLeft;
     private final Map<Integer, SortedNeighbors> sortedNeighborListRight;
 
-    private final List<VisibilityCell> allFoundCells;
+    private final List<VisibilityCell> allFoundCells = new LinkedList<>();;
     private final Set<Edge> allEdges;
 
     public VisibilityCellsCreator(final RoadGraph graph) {
         this.graph = graph;
         this.allEdges = graph.edgeSet();
-        this.allFoundCells = new LinkedList<>();
-        this.globalVisitedManager = new BinaryHashFunction<>();
 
         final NeighborPreSorter neighborPreSorter = new NeighborPreSorter(graph);
         this.sortedNeighborListLeft = neighborPreSorter.getAllSortedNeighborsLeft();
@@ -47,55 +49,57 @@ class VisibilityCellsCreator {
     }
 
     private void startRunsOnEachEdgeInTheGraph() {
-        StopWatch swAll = new StopWatch("VisibilityCells created").start();
-        while (allEdges.next()) {
+        StopWatchVerbose swAll = new StopWatchVerbose("VisibilityCells created").;
+        for (final Edge currentEdge : this.allEdges) {
             if (continueOnLengthZeroEdge()) {
                 continue;
             }
 
-
-            final EdgeIteratorState currentEdge = allEdges.detach(false);
             if (!visibilityCellOnTheLeftFound(currentEdge)) {
-                addVisibilityCellToResults(new CellRunnerLeft(graph, globalVisitedManager, currentEdge, sortedNeighborListLeft).extractVisibilityCell());
+                addVisibilityCellToResults(new CellRunnerLeft(graph, visitedManagerLeft, currentEdge, sortedNeighborListLeft).extractVisibilityCell());
             }
 
             if (!visibilityCellOnTheRightFound(currentEdge)) {
-                addVisibilityCellToResults(new CellRunnerRight(graph, globalVisitedManager, currentEdge, sortedNeighborListRight).extractVisibilityCell());
+                addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerLeft, currentEdge, sortedNeighborListRight).extractVisibilityCell());
             }
         }
-        logger.info(swAll.stop().toString());
+        swAll.printTimingIfVerbose();
     }
 
-    private boolean continueOnLengthZeroEdge() {
-        if (isCurrentEdgeLengthZero()) {
-            globalVisitedManager.settleEdgeLeft(allEdges);
-            globalVisitedManager.settleEdgeRight(allEdges);
+    private boolean continueOnLengthZeroEdge(final Edge currentEdge) {
+        if (isCurrentEdgeLengthZero(currentEdge)) {
+            final Pair<Node, Node> nodePair = getAscendingNodePair(currentEdge);
+            visitedManagerLeft.set(nodePair, true);
+            visitedManagerRight.set(nodePair, true);
             return true;
         }
         return false;
     }
 
-    private boolean isCurrentEdgeLengthZero() {
-        final int baseNode = allEdges.getBaseNode();
-        final int adjNode = allEdges.getAdjNode();
+    private boolean isCurrentEdgeLengthZero(final Edge currentEdge) {
+        final Node sourceNode = graph.getEdgeSource(currentEdge);
+        final Node targetNode = graph.getEdgeTarget(currentEdge);
 
-        final double baseNodeLatitude = nodeAccess.getLatitude(baseNode);
-        final double baseNodeLongitude = nodeAccess.getLongitude(baseNode);
-        final double adjNodeLatitude = nodeAccess.getLatitude(adjNode);
-        final double adjNodeLongitude = nodeAccess.getLongitude(adjNode);
-
-        return baseNodeLatitude == adjNodeLatitude && baseNodeLongitude == adjNodeLongitude;
+        return sourceNode.latitude == targetNode.latitude && sourceNode.longitude == targetNode.longitude;
     }
 
     private void addVisibilityCellToResults(VisibilityCell visibilityCell) {
         allFoundCells.add(visibilityCell);
     }
 
-    private Boolean visibilityCellOnTheLeftFound(final EdgeIteratorState currentEdge) {
-        return globalVisitedManager.isEdgeSettledLeft(VisitedManager.forceNodeIdsAscending(currentEdge));
+    private Boolean visibilityCellOnTheLeftFound(final Edge currentEdge) {
+        return visitedManagerLeft.get(getAscendingNodePair(currentEdge));
     }
 
-    private Boolean visibilityCellOnTheRightFound(final EdgeIteratorState currentEdge) {
-        return globalVisitedManager.isEdgeSettledRight(VisitedManager.forceNodeIdsAscending(currentEdge));
+    private Boolean visibilityCellOnTheRightFound(final Edge currentEdge) {
+        return visitedManagerRight.get(getAscendingNodePair(currentEdge));
+    }
+
+    public Pair<Node, Node> getAscendingNodePair(final Edge edge) {
+        final Node edgeSource = graph.getEdgeSource(edge);
+        final Node edgeTarget = graph.getEdgeTarget(edge);
+
+        final boolean isEdgesVertexIdAscending = edgeSource.id < edgeTarget.id;
+        return isEdgesVertexIdAscending ? new Pair<>(edgeSource, edgeTarget) : new Pair<>(edgeTarget, edgeSource);
     }
 }
