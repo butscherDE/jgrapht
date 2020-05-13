@@ -34,31 +34,7 @@ public class SortedNeighborsTest {
         final Edge edge = GRAPH_MOCKER.getEdge(57, 52);
         final ReflectiveEdge edgeReflective = new ReflectiveEdge(edge, graph);
         final ReflectiveEdge mostOrientedEdge = sortedNeighbors.getMostOrientedEdge(edgeReflective);
-        assertEquals(53, mostOrientedEdge.target);
-    }
-
-    @Test
-    public void orderingWithMultiEdges() {
-        final PolygonRoutingTestGraph graphMocker = getMultiEdgeTestGraph();
-
-        final SortedNeighbors sortedNeighbors = getSortedNeighbors(graphMocker, 1, 0);
-
-        assertEquals(0, sortedNeighbors.get(0).id);
-        assertEquals(1, sortedNeighbors.get(1).id);
-    }
-
-    private PolygonRoutingTestGraph getMultiEdgeTestGraph() {
-        final Node[] nodes = new Node[]{
-                new Node(0, Double.MIN_VALUE, 0, 0),
-                new Node(1, 0, 1, 0)
-        };
-        final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(0,1));
-
-        return new PolygonRoutingTestGraph(nodes, edges);
-    }
-
+        assertEquals(graph.getVertex(53), mostOrientedEdge.target);
     @Test
     public void collinearInEdges1() {
         final PolygonRoutingTestGraph graphMocker = getCollinearInEdgesTestGraph();
@@ -66,9 +42,9 @@ public class SortedNeighborsTest {
         final SortedNeighbors sortedNeighbors = getSortedNeighbors(graphMocker, 2, 0);
 
         final Node[] expectedOrder = new Node[]{
-                graph.getVertex(3),
-                graph.getVertex(0),
-                graph.getVertex(1)};
+                graphMocker.graph.getVertex(3),
+                graphMocker.graph.getVertex(1),
+                graphMocker.graph.getVertex(0)};
 
         assertOrdering(expectedOrder, sortedNeighbors);
     }
@@ -80,9 +56,9 @@ public class SortedNeighborsTest {
         final SortedNeighbors sortedNeighbors = getSortedNeighbors(graphMocker, 2, 1);
 
         final Node[] expectedOrder = new Node[]{
-                graph.getVertex(3),
-                graph.getVertex(0),
-                graph.getVertex(1)};
+                graphMocker.graph.getVertex(3),
+                graphMocker.graph.getVertex(1),
+                graphMocker.graph.getVertex(0)};
 
         assertOrdering(expectedOrder, sortedNeighbors);
     }
@@ -95,9 +71,9 @@ public class SortedNeighborsTest {
                 new Node(3, 0, 3, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,2));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(2,3));
+        edges.add(new Pair(0L,2L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(2L,3L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -108,14 +84,14 @@ public class SortedNeighborsTest {
         final SortedNeighbors sortedNeighbors = getSortedNeighbors(graphMocker, 1, 0);
 
         final Node[] expectedOrder = new Node[]{
-                graph.getVertex(2),
-                graph.getVertex(3),
-                graph.getVertex(0)};
+                graphMocker.graph.getVertex(3),
+                graphMocker.graph.getVertex(2),
+                graphMocker.graph.getVertex(0)};
 
         assertOrdering(expectedOrder, sortedNeighbors);
         final Edge edge = graphMocker.getEdge(1, 0);
         final ReflectiveEdge edgeReflective = new ReflectiveEdge(edge, graph);
-        assertEquals(3, sortedNeighbors.getMostOrientedEdge(edgeReflective).target);
+        assertEquals(graphMocker.graph.getVertex(2), sortedNeighbors.getMostOrientedEdge(edgeReflective).target);
     }
 
     private PolygonRoutingTestGraph getCollinearOutEdgesTestGraph() {
@@ -126,21 +102,22 @@ public class SortedNeighborsTest {
                 new Node(3, 0, 3, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(1,3));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(1L,3L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
     @Test
     public void multipleNeighborsWithSameCoordinates() {
         final PolygonRoutingTestGraph graphMocker = getMultipleNeighborsWithSameCoordinatesTestGraph();
+        final RoadGraph graph = graphMocker.graph;
 
         final SortedNeighbors sortedNeighbors = getSortedNeighbors(graphMocker, 1, 0);
 
         final Node[] expectedOrder = new Node[]{
-                graph.getVertex(2),
                 graph.getVertex(3),
+                graph.getVertex(2),
                 graph.getVertex(0)};
 
         assertOrdering(expectedOrder, sortedNeighbors);
@@ -154,9 +131,9 @@ public class SortedNeighborsTest {
                 new Node(3, 0, 2, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,2));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(1,3));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(1L,3L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -181,9 +158,9 @@ public class SortedNeighborsTest {
                 new Node(3, 0, 2, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(2,3));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(2L,3L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -210,11 +187,11 @@ public class SortedNeighborsTest {
                 new Node(5, 0, 2, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(2,3));
-        edges.add(new Pair(3,4));
-        edges.add(new Pair(4,5));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(2L,3L));
+        edges.add(new Pair(3L,4L));
+        edges.add(new Pair(4L,5L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -236,8 +213,8 @@ public class SortedNeighborsTest {
                 new Node(2, 0, 1, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,2));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -261,10 +238,10 @@ public class SortedNeighborsTest {
                 new Node(4, 0, 1, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(2,3));
-        edges.add(new Pair(3,4));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(2L,3L));
+        edges.add(new Pair(3L,4L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 

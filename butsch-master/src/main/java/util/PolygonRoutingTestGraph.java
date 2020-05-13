@@ -301,8 +301,10 @@ public class PolygonRoutingTestGraph {
 
     private void buildEdges() {
         for (Pair<Long,Long> nodeIdPair : edges) {
-            final Node sourceNode = nodeMap.get(nodeIdPair.getFirst());
-            final Node targetNode = nodeMap.get(nodeIdPair.getSecond());
+            final Long sourceId = nodeIdPair.getFirst();
+            final Long targetId = nodeIdPair.getSecond();
+            final Node sourceNode = nodeMap.get(sourceId);
+            final Node targetNode = nodeMap.get(targetId);
             final double weight = sourceNode.euclideanDistance(targetNode);
 
             final Edge edge = graph.addEdge(sourceNode, targetNode);

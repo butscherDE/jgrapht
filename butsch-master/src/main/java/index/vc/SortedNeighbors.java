@@ -110,13 +110,13 @@ public class SortedNeighbors {
                 .stream()
                 .map(a -> new ReflectiveEdge(a, graph))
                 .collect(Collectors.toSet());
-        final Set<ReflectiveEdge> ingoingEdgesAsReflective = graph
-                .incomingEdgesOf(node)
-                .stream()
-                .map(a -> new ReflectiveEdge(a, graph).getReversed())
-                .collect(Collectors.toSet());
-
-        outgoingEdgesAsReflective.addAll(ingoingEdgesAsReflective);
+//        final Set<ReflectiveEdge> ingoingEdgesAsReflective = graph
+//                .incomingEdgesOf(node)
+//                .stream()
+//                .map(a -> new ReflectiveEdge(a, graph).getReversed())
+//                .collect(Collectors.toSet());
+//
+//        outgoingEdgesAsReflective.addAll(ingoingEdgesAsReflective);
         return outgoingEdgesAsReflective;
     }
 
