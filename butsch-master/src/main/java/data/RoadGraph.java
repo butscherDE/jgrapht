@@ -54,6 +54,11 @@ public class RoadGraph extends DefaultDirectedWeightedGraph<Node, Edge> {
         return nodes.get(id);
     }
 
+    public boolean removeVertex(final Node node) {
+        nodes.remove(node);
+        return super.removeVertex(node);
+    }
+
     public int getNumNodes() {
         return vertexSet().size();
     }

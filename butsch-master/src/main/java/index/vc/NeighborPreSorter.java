@@ -1,7 +1,7 @@
 package index.vc;
 
-import com.graphhopper.storage.Graph;
-import com.graphhopper.util.EdgeIterator;
+import data.Edge;
+import data.Node;
 import data.RoadGraph;
 
 import java.util.HashMap;
@@ -12,48 +12,49 @@ import java.util.Set;
 public class NeighborPreSorter {
     private final RoadGraph graph;
 
-    private final Map<Integer, SortedNeighbors> allSortedNeighborsLeft;
-    private final Map<Integer, SortedNeighbors> allSortedNeighborsRight;
+    private final Map<Node, SortedNeighbors> allSortedNeighborsLeft;
+    private final Map<Node, SortedNeighbors> allSortedNeighborsRight;
 
     public NeighborPreSorter(RoadGraph graph) {
         this.graph = graph;
 
-        allSortedNeighborsLeft = new HashMap<>(graph.getNodes());
-        allSortedNeighborsRight = new HashMap<>(graph.getNodes());
+        allSortedNeighborsLeft = new HashMap<>(graph.vertexSet().size());
+        allSortedNeighborsRight = new HashMap<>(graph.vertexSet().size());
 
         createSortedNeighbors();
     }
 
-    public Map<Integer, SortedNeighbors> getAllSortedNeighborsLeft() {
+    public Map<Node, SortedNeighbors> getAllSortedNeighborsLeft() {
         return allSortedNeighborsLeft;
     }
 
-    public Map<Integer, SortedNeighbors> getAllSortedNeighborsRight() {
+    public Map<Node, SortedNeighbors> getAllSortedNeighborsRight() {
         return allSortedNeighborsRight;
     }
 
     private void createSortedNeighbors() {
-        final Set<Integer> allNodes = getAllNodes();
+        final Set<Node> allNodes = getAllNodes();
 
         addSortedNeighbors(allNodes);
     }
 
-    private Set<Integer> getAllNodes() {
-        final Set<Integer> allNodes = new LinkedHashSet<>();
+    private Set<Node> getAllNodes() {
+        final Set<Node> allNodes = new LinkedHashSet<>();
 
-        final EdgeIterator allEdges = graph.getAllEdges();
-        while (allEdges.next()) {
-            allNodes.add(allEdges.getBaseNode());
-            allNodes.add(allEdges.getAdjNode());
+        final Set<Edge> allEdges = graph.edgeSet();
+        for (final Edge edge : allEdges) {
+            allNodes.add(graph.getEdgeSource(edge));
+            allNodes.add(graph.getEdgeTarget(edge));
         }
+
         return allNodes;
     }
 
-    private void addSortedNeighbors(final Set<Integer> allNodes) {
-        for (Integer node : allNodes) {
-            final SortedNeighbors sortedNeighborsLeft = new SortedNeighbors(graph, node, SortedNeighbors.DO_NOT_IGNORE_NODE, new VectorAngleCalculatorLeft(graph.getNodeAccess()));
+    private void addSortedNeighbors(final Set<Node> allNodes) {
+        for (final Node node : allNodes) {
+            final SortedNeighbors sortedNeighborsLeft = new SortedNeighbors(graph, node, SortedNeighbors.DO_NOT_IGNORE_NODE, new VectorAngleCalculatorLeft(graph));
             allSortedNeighborsLeft.put(node, sortedNeighborsLeft);
-            final SortedNeighbors sortedNeighborsRight = new SortedNeighbors(graph, node, SortedNeighbors.DO_NOT_IGNORE_NODE, new VectorAngleCalculatorRight(graph.getNodeAccess()));
+            final SortedNeighbors sortedNeighborsRight = new SortedNeighbors(graph, node, SortedNeighbors.DO_NOT_IGNORE_NODE, new VectorAngleCalculatorRight(graph));
             allSortedNeighborsRight.put(node, sortedNeighborsRight);
         }
     }

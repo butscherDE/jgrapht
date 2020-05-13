@@ -1,9 +1,11 @@
 package index.vc;
 
+import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
 import org.jgrapht.alg.util.Pair;
+import org.jgrapht.graph.EdgeReversedGraph;
 import util.BinaryHashFunction;
 
 import java.util.LinkedList;
@@ -11,29 +13,36 @@ import java.util.List;
 import java.util.Map;
 
 abstract class CellRunner {
-    final LinkedList<EdgeIteratorState> edgesOnCell = new LinkedList<>();
+    final LinkedList<ReflectiveEdge> edgesOnCell = new LinkedList<>();
     private final RoadGraph graph;
-    final NodeAccess nodeAccess;
-    private final VisitedManager localVisitedManager;
-    final VisitedManagerDual visitedManager;
+    private final BinaryHashFunction<AscendingEdge> localVisitedManager;
+    final BinaryHashFunction<AscendingEdge> visitedManager;
     private final VectorAngleCalculator vectorAngleCalculator;
-    private final EdgeIteratorState startEdge;
-    private final Map<Integer, SortedNeighbors> sortedNeighborsMap;
+    private final ReflectiveEdge startEdge;
+    private final Map<Node, SortedNeighbors> sortedNeighborsMap;
 
-    private EdgeIteratorState lastNonZeroLengthEdge;
+    private ReflectiveEdge lastNonZeroLengthEdge;
 
 
-    CellRunner(final RoadGraph graph, final BinaryHashFunction<Pair<Node, Node>> visitedManager, final VectorAngleCalculator vectorAngleCalculator,
-               final Edge startEdge, Map<Integer, SortedNeighbors> sortedNeighborsMap) {
+    CellRunner(final RoadGraph graph, final BinaryHashFunction<AscendingEdge> visitedManager,
+               final VectorAngleCalculator vectorAngleCalculator, final Edge startEdge,
+               Map<Node, SortedNeighbors> sortedNeighborsMap) {
         this.graph = graph;
-        this.nodeAccess = graph.getNodeAccess();
-        this.localVisitedManager = new VisitedManager(graph);
+        this.localVisitedManager = new BinaryHashFunction<>();
         this.visitedManager = visitedManager;
         this.vectorAngleCalculator = vectorAngleCalculator;
 
-        this.startEdge = VisitedManager.forceNodeIdsAscending(startEdge);
+        this.startEdge = forceEdgeAscendingNodeIDs(new ReflectiveEdge(startEdge, graph));
         this.sortedNeighborsMap = sortedNeighborsMap;
         this.lastNonZeroLengthEdge = this.startEdge;
+    }
+
+    public ReflectiveEdge forceEdgeAscendingNodeIDs(final ReflectiveEdge edge) {
+        if (edge.source.id < edge.target.id) {
+            return edge;
+        } else {
+            return edge.getReversed();
+        }
     }
 
     public VisibilityCell extractVisibilityCell() {
@@ -62,28 +71,18 @@ abstract class CellRunner {
         while (endNotReached);
     }
 
-    private void checkRepetition(int i) {
-        if (i == 1000) {
-            if (RepititionFinder.isRepitition(extractNodesFromVisitedEdges(), 10)) {
-                System.out.println(i + ": " + this.getClass().getSimpleName());
-                System.out.println(extractNodesFromVisitedEdges());
-                System.exit(-1);
-            }
-        }
-    }
-
     private void addStartAndEndNodeOfCell() {
         edgesOnCell.add(startEdge);
-        markGloballyVisited(startEdge);
+        visitedManager.set(new AscendingEdge(startEdge), true);
     }
 
     private boolean processNextNeighborOnCell() {
-        final EdgeIteratorState leftOrRightMostNeighbor = getMostLeftOrRightOrientedEdge();
+        final ReflectiveEdge leftOrRightMostNeighbor = getMostLeftOrRightOrientedEdge();
 
         return settleAllFoundEdgesAndSetWhenRunHasStopped(leftOrRightMostNeighbor);
     }
 
-    private boolean settleAllFoundEdgesAndSetWhenRunHasStopped(EdgeIteratorState edge) {
+    private boolean settleAllFoundEdgesAndSetWhenRunHasStopped(ReflectiveEdge edge) {
         if (lastEdgeNotReached(edge)) {
             settleEdge(edge);
             return true;
@@ -92,63 +91,65 @@ abstract class CellRunner {
         }
     }
 
-    private void settleEdge(EdgeIteratorState edge) {
-        localVisitedManager.settleEdge(edge);
-        markGloballyVisited(edge);
+    private void settleEdge(ReflectiveEdge edge) {
+        final AscendingEdge ascendingEdge = new AscendingEdge(edge);
+        localVisitedManager.set(ascendingEdge, true);
+        visitedManager.set(ascendingEdge, true);
         edgesOnCell.add(edge);
     }
 
-    private boolean lastEdgeNotReached(final EdgeIteratorState lastEdge) {
-        final boolean baseNodeEqual = lastEdge.getBaseNode() == startEdge.getBaseNode();
-        final boolean adjNodeEqual = lastEdge.getAdjNode() == startEdge.getAdjNode();
-        final boolean sameDirection = baseNodeEqual && adjNodeEqual;
-        return !sameDirection;
+    private boolean lastEdgeNotReached(final ReflectiveEdge lastEdge) {
+        final AscendingEdge lastEdgeAscending = new AscendingEdge(lastEdge);
+        return !lastEdgeAscending.equals(startEdge);
+
+//        final Node lastEdgeSourceNode = graph.getEdgeSource(lastEdge);
+//        final Node lastEdgeTargetNode = graph.getEdgeTarget(lastEdge);
+//        final boolean baseNodeEqual = lastEdgeSourceNode.equals(startEdge.sourceNode);
+//        final boolean adjNodeEqual = lastEdgeTargetNode.equals(startEdge.targetNode);
+//        final boolean sameDirection = baseNodeEqual && adjNodeEqual;
+//        return !sameDirection;
     }
 
-    private EdgeIteratorState getMostLeftOrRightOrientedEdge() {
-        final EdgeIteratorState lastEdge = edgesOnCell.getLast();
-        final int ignoreBackwardsEdge = getIgnoreBackwardsEdge(lastEdge);
-        final EdgeIteratorState mostOrientedEdge = getMostOrientedEdgeFromSortedNeighbors(lastEdge, ignoreBackwardsEdge);
+    private ReflectiveEdge getMostLeftOrRightOrientedEdge() {
+        final ReflectiveEdge lastEdge = edgesOnCell.getLast();
+        final Node ignoreBackwardsEdge = getIgnoreBackwardsEdge(lastEdge);
+        final ReflectiveEdge mostOrientedEdge = getMostOrientedEdgeFromSortedNeighbors(lastEdge, ignoreBackwardsEdge);
 
         updateLastNonZeroLengthEdge(mostOrientedEdge);
 
         return mostOrientedEdge;
     }
 
-    private int getIgnoreBackwardsEdge(EdgeIteratorState lastEdge) {
-        final int lastEdgeBaseNode = lastEdge.getBaseNode();
+    private Node getIgnoreBackwardsEdge(ReflectiveEdge lastEdge) {
+        final Node lastEdgeBaseNode = lastEdge.source;
         return hasEdgeEndPointsWithEqualCoordinates(lastEdge) ? lastEdgeBaseNode : SortedNeighbors.DO_NOT_IGNORE_NODE;
     }
 
-    private EdgeIteratorState getMostOrientedEdgeFromSortedNeighbors(EdgeIteratorState lastEdge, int ignoreBackwardsEdge) {
-        final int lastEdgeAdjNode = lastEdge.getAdjNode();
+    private ReflectiveEdge getMostOrientedEdgeFromSortedNeighbors(ReflectiveEdge lastEdge, Node ignoreBackwardsEdge) {
+        final Node lastEdgeAdjNode = lastEdge.target;
         final SortedNeighbors sortedNeighbors = sortedNeighborsMap.get(lastEdgeAdjNode); //new SortedNeighbors(graph, lastEdgeAdjNode, ignoreBackwardsEdge, vectorAngleCalculator);
-        return sortedNeighbors.getMostOrientedEdge(lastNonZeroLengthEdge.detach(true));
+        return sortedNeighbors.getMostOrientedEdge(lastNonZeroLengthEdge.getReversed());
     }
 
-    private void updateLastNonZeroLengthEdge(EdgeIteratorState mostOrientedEdge) {
+    private void updateLastNonZeroLengthEdge(ReflectiveEdge mostOrientedEdge) {
         if (!hasEdgeEndPointsWithEqualCoordinates(mostOrientedEdge)) {
             this.lastNonZeroLengthEdge = mostOrientedEdge;
         }
     }
 
-    private boolean hasEdgeEndPointsWithEqualCoordinates(EdgeIteratorState edge) {
-        final double baseNodeLongitude = nodeAccess.getLongitude(edge.getBaseNode());
-        final double adjNodeLongitude = nodeAccess.getLongitude(edge.getAdjNode());
-        final boolean longitudeEqual = baseNodeLongitude == adjNodeLongitude;
+    private boolean hasEdgeEndPointsWithEqualCoordinates(ReflectiveEdge edge) {
+        final Node sourceNode = edge.source;
+        final Node targetNode = edge.target;
 
-        final double baseNodeLatitude = nodeAccess.getLatitude(edge.getBaseNode());
-        final double adjNodeLatitude = nodeAccess.getLatitude(edge.getAdjNode());
-        final boolean latitudeEqual = baseNodeLatitude == adjNodeLatitude;
-
-        return longitudeEqual && latitudeEqual;
+        final double distance = sourceNode.getPoint().distance(targetNode.getPoint());
+        return distance < 0.0000000001;
     }
 
     List<Node> extractNodesFromVisitedEdges() {
-        final List<Integer> nodesOnCell = new LinkedList<>();
+        final List<Node> nodesOnCell = new LinkedList<>();
 
-        for (EdgeIteratorState edgeIteratorState : edgesOnCell) {
-            nodesOnCell.add(edgeIteratorState.getBaseNode());
+        for (ReflectiveEdge edge : edgesOnCell) {
+            nodesOnCell.add(edge.source);
         }
 
         return nodesOnCell;
@@ -156,5 +157,4 @@ abstract class CellRunner {
 
     abstract VisibilityCell createVisibilityCell();
 
-    abstract void markGloballyVisited(EdgeIteratorState edge);
 }
