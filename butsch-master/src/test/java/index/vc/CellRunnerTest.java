@@ -28,7 +28,8 @@ public class CellRunnerTest {
         final Coordinate[] coordinates = new Coordinate[] {
                 new Coordinate(38, 7),
                 new Coordinate(33, 3),
-                new Coordinate(32, 7)
+                new Coordinate(32, 7),
+                new Coordinate(38, 7)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -48,7 +49,8 @@ public class CellRunnerTest {
         final Coordinate[] coordinates = new Coordinate[] {
                 new Coordinate(38, 7),
                 new Coordinate(33, 3),
-                new Coordinate(32, 7)
+                new Coordinate(32, 7),
+                new Coordinate(38, 7)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -100,7 +102,8 @@ public class CellRunnerTest {
         final Coordinate[] coordinates = new Coordinate[] {
                 new Coordinate(32, 7),
                 new Coordinate(33, 3),
-                new Coordinate(25, 6)
+                new Coordinate(25, 6),
+                new Coordinate(32, 7)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -119,7 +122,8 @@ public class CellRunnerTest {
         final Coordinate[] coordinates = new Coordinate[] {
                 new Coordinate(32, 7),
                 new Coordinate(33, 3),
-                new Coordinate(25, 6)
+                new Coordinate(25, 6),
+                new Coordinate(32, 7)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -175,7 +179,8 @@ public class CellRunnerTest {
         final Coordinate[] coordinates = new Coordinate[] {
                 new Coordinate(43, 15),
                 new Coordinate(47, 10),
-                new Coordinate(43, 11)
+                new Coordinate(43, 11),
+                new Coordinate(43, 15)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -192,7 +197,8 @@ public class CellRunnerTest {
         final Coordinate[] coordinates = new Coordinate[] {
                 new Coordinate(47, 10),
                 new Coordinate(43, 11),
-                new Coordinate(43, 15)
+                new Coordinate(43, 15),
+                new Coordinate(47, 10)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -212,7 +218,8 @@ public class CellRunnerTest {
                 new Coordinate(43, 11),
                 new Coordinate(41, 9),
                 new Coordinate(43, 11),
-                new Coordinate(43, 11)
+                new Coordinate(43, 11),
+                new Coordinate(43, 15)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -242,7 +249,8 @@ public class CellRunnerTest {
                 new Coordinate(44, 9),
                 new Coordinate(42, 7),
                 new Coordinate(38, 7),
-                new Coordinate(43, 15)
+                new Coordinate(43, 15),
+                new Coordinate(43, 11)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -264,7 +272,8 @@ public class CellRunnerTest {
                 new Coordinate(5, -1),
                 new Coordinate(5, 0),
                 new Coordinate(4, 0),
-                new Coordinate(2, 0)
+                new Coordinate(2, 0),
+                new Coordinate(4, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -306,7 +315,8 @@ public class CellRunnerTest {
                 new Coordinate(1, 0),
                 new Coordinate(2, 0),
                 new Coordinate(1, 0),
-                new Coordinate(0, 0)
+                new Coordinate(0, 0),
+                new Coordinate(1, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -341,7 +351,8 @@ public class CellRunnerTest {
                 new Coordinate(5, 0),
                 new Coordinate(4, 0),
                 new Coordinate(3, 0),
-                new Coordinate(2, 0)
+                new Coordinate(2, 0),
+                new Coordinate(3, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -384,7 +395,8 @@ public class CellRunnerTest {
                 new Coordinate(3, 0),
                 new Coordinate(2, 0),
                 new Coordinate(1, 0),
-                new Coordinate(0, 0)
+                new Coordinate(0, 0),
+                new Coordinate(1, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -426,7 +438,8 @@ public class CellRunnerTest {
                 new Coordinate(1, 0),
                 new Coordinate(1, -1),
                 new Coordinate(1, 0),
-                new Coordinate(0, 0)
+                new Coordinate(0, 0),
+                new Coordinate(1, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -463,7 +476,8 @@ public class CellRunnerTest {
                 new Coordinate(0, -3),
                 new Coordinate(0, -2),
                 new Coordinate(0, -1),
-                new Coordinate(-1, 0)
+                new Coordinate(-1, 0),
+                new Coordinate(1, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -505,7 +519,8 @@ public class CellRunnerTest {
                 new Coordinate(1, -4),
                 new Coordinate(1, -2),
                 new Coordinate(1, -1),
-                new Coordinate(1, 0)
+                new Coordinate(1, 0),
+                new Coordinate(1, -1)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -528,7 +543,8 @@ public class CellRunnerTest {
                 new Coordinate(1, -4),
                 new Coordinate(1, -3),
                 new Coordinate(1, -2),
-                new Coordinate(1, -1)
+                new Coordinate(1, -1),
+                new Coordinate(1, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -575,7 +591,8 @@ public class CellRunnerTest {
                 new Coordinate(0, -1),
                 new Coordinate(1, -1),
                 new Coordinate(0, -1),
-                new Coordinate(0, 0)
+                new Coordinate(0, 0),
+                new Coordinate(0, -1)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -601,7 +618,8 @@ public class CellRunnerTest {
                 new Coordinate(0, -2),
                 new Coordinate(0, -1),
                 new Coordinate(1, -1),
-                new Coordinate(0, -1)
+                new Coordinate(0, -1),
+                new Coordinate(0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);

@@ -5,6 +5,8 @@ import data.RoadGraph;
 import org.junit.jupiter.api.Test;
 import util.PolygonRoutingTestGraph;
 
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VectorAngleCalculatorLeftTest {
@@ -13,10 +15,13 @@ public class VectorAngleCalculatorLeftTest {
 
     @Test
     public void anglesToNode39to38right() {
-        graph.removeVertex(graph.getVertex(21));
+        System.out.println(Objects.hash(21));
+        System.out.println(Objects.hash(52));
+        final Node vertex = graph.getVertex(21);
+        graph.removeVertex(vertex);
         graph.removeVertex(graph.getVertex(38));
-        graph.addVertex(new Node(21, 6, 15, 0));
-        graph.addVertex(new Node(38, 6, 15, 0));
+        graph.addVertex(new Node(21, 15, 6, 0));
+        graph.addVertex(new Node(38, 15, 6, 0));
         final VectorAngleCalculator vac = new VectorAngleCalculatorLeft(graph);
 
         final double angle = vac.getAngleOfVectorsOriented(graph.getVertex(39), graph.getVertex(21));
@@ -27,8 +32,8 @@ public class VectorAngleCalculatorLeftTest {
     public void anglesToNode39to38left() {
         graph.removeVertex(graph.getVertex(21));
         graph.removeVertex(graph.getVertex(38));
-        graph.addVertex(new Node(21, 6, 13, 0));
-        graph.addVertex(new Node(38, 6, 15, 0));
+        graph.addVertex(new Node(21, 13, 6, 0));
+        graph.addVertex(new Node(38, 15, 6, 0));
         final VectorAngleCalculator vac = new VectorAngleCalculatorLeft(graph);
 
         final double angle = vac.getAngleOfVectorsOriented(graph.getVertex(39), graph.getVertex(21));
@@ -39,8 +44,8 @@ public class VectorAngleCalculatorLeftTest {
     public void anglesToNode39to38below() {
         graph.removeVertex(graph.getVertex(21));
         graph.removeVertex(graph.getVertex(38));
-        graph.addVertex(new Node(21, 5, 14, 0));
-        graph.addVertex(new Node(38, 6, 15, 0));
+        graph.addVertex(new Node(21, 14, 5, 0));
+        graph.addVertex(new Node(38, 15, 6, 0));
         final VectorAngleCalculator vac = new VectorAngleCalculatorLeft(graph);
 
         final double angle = vac.getAngleOfVectorsOriented(graph.getVertex(39), graph.getVertex(21));
@@ -51,8 +56,8 @@ public class VectorAngleCalculatorLeftTest {
     public void anglesToNode39to38above() {
         graph.removeVertex(graph.getVertex(21));
         graph.removeVertex(graph.getVertex(38));
-        graph.addVertex(new Node(21, 7, 14, 0));
-        graph.addVertex(new Node(38, 6, 15, 0));
+        graph.addVertex(new Node(21, 14, 7, 0));
+        graph.addVertex(new Node(38, 15, 6, 0));
         final VectorAngleCalculator vac = new VectorAngleCalculatorLeft(graph);
 
         final double angle = vac.getAngleOfVectorsOriented(graph.getVertex(39), graph.getVertex(21));
@@ -63,8 +68,8 @@ public class VectorAngleCalculatorLeftTest {
     public void anglesOnNodesWithEqualCoordinatesLastEdge() {
         graph.removeVertex(graph.getVertex(0));
         graph.removeVertex(graph.getVertex(1));
-        graph.addVertex(new Node(0, 25, 0, 0));
-        graph.addVertex(new Node(1, 25, 0, 0));
+        graph.addVertex(new Node(0, 0, 25, 0));
+        graph.addVertex(new Node(1, 0, 25, 0));
 
         final VectorAngleCalculator vac = new VectorAngleCalculatorLeft(graph);
 
@@ -76,8 +81,8 @@ public class VectorAngleCalculatorLeftTest {
     public void anglesOnNodesWithEqualCoordinatesCandidateEdge() {
         graph.removeVertex(graph.getVertex(21));
         graph.removeVertex(graph.getVertex(38));
-        graph.addVertex(new Node(21, 6, 14, 0));
-        graph.addVertex(new Node(38, 6, 15, 0));
+        graph.addVertex(new Node(21, 14, 6, 0));
+        graph.addVertex(new Node(38, 15, 6, 0));
 
         final VectorAngleCalculator vac = new VectorAngleCalculatorLeft(graph);
 
