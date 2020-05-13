@@ -1,13 +1,18 @@
 package data;
 
 import geometry.BoundingBox;
+import geometry.RedBlueSegmentIntersectionCrossProduct;
+import geometry.RedBlueSegmentIntersectionCrossProductFactory;
+import geometry.SegmentIntersectionAlgorithm;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jgrapht.util.VisitedManager;
 import org.locationtech.jts.geom.*;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 public class VisibilityCell {
@@ -40,7 +45,13 @@ public class VisibilityCell {
     }
 
     public static VisibilityCell create(final List<Node> nodes) {
-        final Object[] coordinates = nodes.stream().map(a -> a.getPoint().getCoordinate()).toArray();
+        final Coordinate[] coordinates = new Coordinate[nodes.size() + 1];
+        final Iterator<Node> nodeIterator = nodes.iterator();
+        for (int i = 0; i < nodes.size(); i++) {
+            final Node node = nodeIterator.next();
+            coordinates[i] = node.getPoint().getCoordinate();
+        }
+        coordinates[coordinates.length - 1] = nodes.get(0).getPoint().getCoordinate();
 
         return create((Coordinate[]) coordinates);
     }
@@ -62,7 +73,10 @@ public class VisibilityCell {
     }
 
     public boolean intersects(final Polygon polygon) {
-        throw new NotImplementedException("TODO");
+        final SegmentIntersectionAlgorithm intersectionAlgoInstance = new RedBlueSegmentIntersectionCrossProductFactory()
+                .createInstance(this, polygon);
+        return intersectionAlgoInstance.isIntersectionPresent();
+//        throw new NotImplementedException("TODO");
     }
 
     public boolean contains(final Geometry geometry) {

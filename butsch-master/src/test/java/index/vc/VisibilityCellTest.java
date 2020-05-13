@@ -42,7 +42,8 @@ public class VisibilityCellTest {
         final Coordinate[] coordinates = new Coordinate[] {
                 new Coordinate(32, 7),
                 new Coordinate(34, 11),
-                new Coordinate(38, 7)
+                new Coordinate(38, 7),
+                new Coordinate(32, 7)
         };
         return gf.createPolygon(coordinates);
     }
@@ -60,7 +61,8 @@ public class VisibilityCellTest {
                 new Coordinate(31, 6),
                 new Coordinate(31, 12),
                 new Coordinate(39, 12),
-                new Coordinate(39, 6)
+                new Coordinate(39, 6),
+                new Coordinate(31, 6)
         };
         return gf.createPolygon(coordinates);
     }
@@ -78,7 +80,8 @@ public class VisibilityCellTest {
                 new Coordinate(34, 6),
                 new Coordinate(34, 8),
                 new Coordinate(36, 8),
-                new Coordinate(36, 6)
+                new Coordinate(36, 6),
+                new Coordinate(34, 6)
         };
         return gf.createPolygon(coordinates);
     }
@@ -139,8 +142,9 @@ public class VisibilityCellTest {
     public void equalWithCellShape() {
         final VisibilityCell visibilityCell = createDefaultVisibilityCell();
         final Polygon cellShape = createDefaultVisibilityCellsExpectedCellShape();
+        final VisibilityCell expectedVC = VisibilityCell.create(cellShape);
 
-        assertEquals(visibilityCell, cellShape);
+        assertEquals(visibilityCell, expectedVC);
     }
 
     @Test
