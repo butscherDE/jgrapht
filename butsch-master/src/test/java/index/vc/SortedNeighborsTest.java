@@ -35,6 +35,8 @@ public class SortedNeighborsTest {
         final ReflectiveEdge edgeReflective = new ReflectiveEdge(edge, graph);
         final ReflectiveEdge mostOrientedEdge = sortedNeighbors.getMostOrientedEdge(edgeReflective);
         assertEquals(graph.getVertex(53), mostOrientedEdge.target);
+    }
+
     @Test
     public void collinearInEdges1() {
         final PolygonRoutingTestGraph graphMocker = getCollinearInEdgesTestGraph();
