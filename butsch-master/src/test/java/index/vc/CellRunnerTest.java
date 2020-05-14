@@ -307,11 +307,11 @@ public class CellRunnerTest {
     @Test
     public void startOnImpasse() {
         final Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(1, 0),
-                new Coordinate(2, 0),
-                new Coordinate(1, 0),
-                new Coordinate(0, 0),
-                new Coordinate(1, 0)
+                new Coordinate(1, 0, 0),
+                new Coordinate(2, 0, 0),
+                new Coordinate(1, 0, 0),
+                new Coordinate(0, 0, 0),
+                new Coordinate(1, 0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -328,8 +328,8 @@ public class CellRunnerTest {
     private PolygonRoutingTestGraph createSimpleImpasseTestGraph() {
         final Node[] nodes = new Node[]{
                 new Node(0, 0, 0, 0),
-                new Node(1, Double.MIN_VALUE, 1, 0),
-                new Node(2, 0, 2, 0)
+                new Node(1, 1, 0, 0),
+                new Node(2, 2, 0, 0)
         };
         List<Pair<Long, Long>> edges = new LinkedList<>();
         edges.add(new Pair(0L,1L));
