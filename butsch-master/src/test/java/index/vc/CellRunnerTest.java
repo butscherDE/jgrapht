@@ -236,14 +236,14 @@ public class CellRunnerTest {
     @Test
     public void collinearEdgesLeft() {
         final Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(4, 0),
-                new Coordinate(5, 0),
-                new Coordinate(5, -1),
-                new Coordinate(3, -1),
-                new Coordinate(3, 0),
-                new Coordinate(4, 0),
-                new Coordinate(2, 0),
-                new Coordinate(4, 0)
+                new Coordinate(4, 0, 0),
+                new Coordinate(3, 0, 0),
+                new Coordinate(3, -1, 0),
+                new Coordinate(5, -1, 0),
+                new Coordinate(5, 0, 0),
+                new Coordinate(4, 0, 0),
+                new Coordinate(2, 0, 0),
+                new Coordinate(4, 0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -261,14 +261,14 @@ public class CellRunnerTest {
     @Test
     public void collinearEdgesRight() {
         final Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(2, 0),
-                new Coordinate(4, 0),
-                new Coordinate(3, 0),
-                new Coordinate(3, -1),
-                new Coordinate(5, -1),
-                new Coordinate(5, 0),
-                new Coordinate(4, 0),
-                new Coordinate(2, 0)
+                new Coordinate(2, 0, 0),
+                new Coordinate(4, 0, 0),
+                new Coordinate(5, 0, 0),
+                new Coordinate(5, -1, 0),
+                new Coordinate(3, -1, 0),
+                new Coordinate(3, 0, 0),
+                new Coordinate(4, 0, 0),
+                new Coordinate(2, 0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -490,14 +490,14 @@ public class CellRunnerTest {
     @Test
     public void collinearEdgeWhereNextNodeHintShallNotBeTaken2() {
         final Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(1, 0, 0),
+                new Coordinate(-1, 0, 0),
                 new Coordinate(0, -1, 0),
                 new Coordinate(0, -2, 0),
                 new Coordinate(0, -3, 0),
                 new Coordinate(0, -2, 0),
                 new Coordinate(0, -1, 0),
-                new Coordinate(-1, 0, 0),
-                new Coordinate(1, 0, 0)
+                new Coordinate(1, 0, 0),
+                new Coordinate(-1, 0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -537,7 +537,7 @@ public class CellRunnerTest {
                 new Coordinate(1, -1,0),
                 new Coordinate(0, -3,0),
                 new Coordinate(1, -4,0),
-                new Coordinate(1, -3,0),
+//                new Coordinate(1, -3,0),
                 new Coordinate(1, -2,0),
                 new Coordinate(1, -1,0),
                 new Coordinate(1, 0,0),

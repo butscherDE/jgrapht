@@ -45,8 +45,8 @@ public class SortedNeighborsTest {
 
         final Node[] expectedOrder = new Node[]{
                 graphMocker.graph.getVertex(3),
-                graphMocker.graph.getVertex(1),
-                graphMocker.graph.getVertex(0)};
+                graphMocker.graph.getVertex(0),
+                graphMocker.graph.getVertex(1)};
 
         assertOrdering(expectedOrder, sortedNeighbors);
     }
@@ -59,8 +59,8 @@ public class SortedNeighborsTest {
 
         final Node[] expectedOrder = new Node[]{
                 graphMocker.graph.getVertex(3),
-                graphMocker.graph.getVertex(1),
-                graphMocker.graph.getVertex(0)};
+                graphMocker.graph.getVertex(0),
+                graphMocker.graph.getVertex(1)};
 
         assertOrdering(expectedOrder, sortedNeighbors);
     }
@@ -86,14 +86,14 @@ public class SortedNeighborsTest {
         final SortedNeighbors sortedNeighbors = getSortedNeighbors(graphMocker, 1, 0);
 
         final Node[] expectedOrder = new Node[]{
-                graphMocker.graph.getVertex(3),
                 graphMocker.graph.getVertex(2),
+                graphMocker.graph.getVertex(3),
                 graphMocker.graph.getVertex(0)};
 
         assertOrdering(expectedOrder, sortedNeighbors);
         final Edge edge = graphMocker.getEdge(1, 0);
         final ReflectiveEdge edgeReflective = new ReflectiveEdge(edge, graph);
-        assertEquals(graphMocker.graph.getVertex(2), sortedNeighbors.getMostOrientedEdge(edgeReflective).target);
+        assertEquals(graphMocker.graph.getVertex(3), sortedNeighbors.getMostOrientedEdge(edgeReflective).target);
     }
 
     private PolygonRoutingTestGraph getCollinearOutEdgesTestGraph() {
@@ -118,8 +118,8 @@ public class SortedNeighborsTest {
         final SortedNeighbors sortedNeighbors = getSortedNeighbors(graphMocker, 1, 0);
 
         final Node[] expectedOrder = new Node[]{
-                graph.getVertex(3),
                 graph.getVertex(2),
+                graph.getVertex(3),
                 graph.getVertex(0)};
 
         assertOrdering(expectedOrder, sortedNeighbors);

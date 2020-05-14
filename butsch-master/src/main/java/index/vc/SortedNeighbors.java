@@ -147,6 +147,8 @@ public class SortedNeighbors {
         int indexOfEndOfList = sortedEdges.size() - 1;
         int indexOfPredecessorOfLastEdge = addIndexPredecessor < 0 ? indexOfEndOfList : addIndexPredecessor;
 
+        System.out.println(sortedEdges);
+
         return get(indexOfPredecessorOfLastEdge);
     }
 
@@ -183,8 +185,8 @@ public class SortedNeighbors {
             final double angleOther = vectorAngleCalculator.getAngleOfVectorsOriented(o.baseNode, o.adjNode);
             final double angleDifference = angleThis - angleOther;
             final int angleResult = angleDifference > 0 ? 1 : angleDifference == 0 ? 0 : -1;
-            final long idDifference = id - o.id;
-//            final long idDifference = vectorAngleCalculator instanceof VectorAngleCalculatorLeft ? actualIdDif : actualIdDif * (-1);
+            final long actualIdDif = id - o.id;
+            final long idDifference = vectorAngleCalculator instanceof VectorAngleCalculatorRight ? actualIdDif : actualIdDif * (-1);
             final int idComparision = idDifference < 0 ? 1 : idDifference == 0 ? 0 : -1;
 
             return angleResult != 0 ? angleResult : idComparision;
@@ -198,6 +200,11 @@ public class SortedNeighbors {
             } else {
                 return false;
             }
+        }
+
+        @Override
+        public String toString() {
+            return "ComparableEdge{" + "id=" + id + ", baseNode=" + baseNode + ", adjNode=" + adjNode + '}';
         }
     }
 }

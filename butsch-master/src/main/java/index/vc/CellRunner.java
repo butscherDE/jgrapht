@@ -47,6 +47,7 @@ abstract class CellRunner {
 
     public VisibilityCell extractVisibilityCell() {
         runAroundCellAndLogNodes();
+        edgesOnCell.stream().forEach(a -> System.out.println(a));
         return createVisibilityCell();
     }
 
