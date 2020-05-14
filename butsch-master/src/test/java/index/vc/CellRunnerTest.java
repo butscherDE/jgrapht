@@ -231,8 +231,6 @@ public class CellRunnerTest {
         final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
 
         assertThrows(IllegalArgumentException.class, () -> cr.extractVisibilityCell());
-        final VisibilityCell vc = cr.extractVisibilityCell();
-        assertEquals(expectedVc, vc);
     }
 
     @Test
