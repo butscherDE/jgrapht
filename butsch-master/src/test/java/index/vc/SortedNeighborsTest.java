@@ -247,6 +247,52 @@ public class SortedNeighborsTest {
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
+    @Test
+    public void reversedEdgeIdLowerThanActualSameEdge() {
+        final PolygonRoutingTestGraph graphMocker = reversedEdgeIdLowerThanActualSameEdgeTestGraph();
+        final RoadGraph graph = graphMocker.graph;
+
+        final Node vertex0 = graph.getVertex(0);
+        final Node vertex1 = graph.getVertex(1);
+        final Node vertex2 = graph.getVertex(2);
+
+        final SortedNeighbors sortedNeighbors = getReversedEdgeIdLowerThanActualSameEdgeSortedNeighbors(graph, vertex1);
+        final ReflectiveEdge mostOrientedEdge = getReversedEdgeIdLowerThanActualSameEdgeMostOriented(graph, vertex1,
+                                                                                                     vertex2,
+                                                                                                     sortedNeighbors);
+
+        final ReflectiveEdge expectedEdge = new ReflectiveEdge(graph.getEdge(vertex1, vertex0), graph);
+        assertEquals(expectedEdge, mostOrientedEdge);
+    }
+
+    public SortedNeighbors getReversedEdgeIdLowerThanActualSameEdgeSortedNeighbors(final RoadGraph graph,
+                                                                                   final Node vertex1) {
+        final Node doNotIgnoreNode = SortedNeighbors.DO_NOT_IGNORE_NODE;
+        final VectorAngleCalculatorLeft vectorAngleCalculator = new VectorAngleCalculatorLeft(graph);
+        return new SortedNeighbors(graph, vertex1, doNotIgnoreNode, vectorAngleCalculator);
+    }
+
+    public ReflectiveEdge getReversedEdgeIdLowerThanActualSameEdgeMostOriented(final RoadGraph graph,
+                                                                               final Node vertex1, final Node vertex2,
+                                                                               final SortedNeighbors sortedNeighbors) {
+        final Edge lastEdge = graph.getEdge(vertex2, vertex1);
+        final ReflectiveEdge lastEdgeReflective = new ReflectiveEdge(lastEdge, graph);
+        final ReflectiveEdge lastEdgeReflectiveReversed = lastEdgeReflective.getReversed();
+        return sortedNeighbors.getMostOrientedEdge(lastEdgeReflectiveReversed);
+    }
+
+    private PolygonRoutingTestGraph reversedEdgeIdLowerThanActualSameEdgeTestGraph() {
+        final Node[] nodes = new Node[] {
+                new Node(0, 0, 0, 0),
+                new Node(1, 0, 1, 0),
+                new Node(2, 0, 2, 0)
+        };
+        final List<Pair<Long, Long>> edges = new LinkedList<>();
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
+        return new PolygonRoutingTestGraph(nodes, edges);
+    }
+
     private SortedNeighbors getSortedNeighbors(final PolygonRoutingTestGraph graphMocker, final int baseNode, final int adjNode) {
         final VectorAngleCalculator vac = new VectorAngleCalculatorLeft(graph);
 

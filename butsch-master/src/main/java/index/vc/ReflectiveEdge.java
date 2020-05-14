@@ -4,6 +4,8 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 
+import java.util.Objects;
+
 public class ReflectiveEdge {
     public final long id;
     public final Node source;
@@ -21,5 +23,27 @@ public class ReflectiveEdge {
 
     public ReflectiveEdge getReversed() {
         return new ReflectiveEdge(id, target, source);
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final ReflectiveEdge that = (ReflectiveEdge) o;
+        return id == that.id && Objects.equals(source, that.source) && Objects.equals(target, that.target);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, source, target);
+    }
+
+    @Override
+    public String toString() {
+        return "ReflectiveEdge{" + "id=" + id + ", source=" + source + ", target=" + target + '}';
     }
 }

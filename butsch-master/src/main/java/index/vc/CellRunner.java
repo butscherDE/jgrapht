@@ -128,7 +128,8 @@ abstract class CellRunner {
     private ReflectiveEdge getMostOrientedEdgeFromSortedNeighbors(ReflectiveEdge lastEdge, Node ignoreBackwardsEdge) {
         final Node lastEdgeAdjNode = lastEdge.target;
         final SortedNeighbors sortedNeighbors = sortedNeighborsMap.get(lastEdgeAdjNode); //new SortedNeighbors(graph, lastEdgeAdjNode, ignoreBackwardsEdge, vectorAngleCalculator);
-        return sortedNeighbors.getMostOrientedEdge(lastNonZeroLengthEdge.getReversed());
+        final ReflectiveEdge reversed = lastNonZeroLengthEdge.getReversed();
+        return sortedNeighbors.getMostOrientedEdge(reversed);
     }
 
     private void updateLastNonZeroLengthEdge(ReflectiveEdge mostOrientedEdge) {

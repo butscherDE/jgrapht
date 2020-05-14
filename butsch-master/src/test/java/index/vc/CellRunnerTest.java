@@ -228,8 +228,6 @@ public class CellRunnerTest {
         final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManagerDual, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         assertThrows(IllegalArgumentException.class, () -> cr.extractVisibilityCell());
-        final VisibilityCell vc = cr.extractVisibilityCell();
-        assertEquals(expectedVc, vc);
     }
 
     @Test
@@ -299,12 +297,12 @@ public class CellRunnerTest {
         };
 
         List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(2,3));
-        edges.add(new Pair(3,4));
-        edges.add(new Pair(4,5));
-        edges.add(new Pair(5,1));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(2L,3L));
+        edges.add(new Pair(3L,4L));
+        edges.add(new Pair(4L,5L));
+        edges.add(new Pair(5L,1L));
 
         return new PolygonRoutingTestGraph(nodes, edges);
     }
@@ -337,8 +335,8 @@ public class CellRunnerTest {
                 new Node(2, 0, 2, 0)
         };
         List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,2));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -376,12 +374,12 @@ public class CellRunnerTest {
                 new Node(5, 0, 3, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,5));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(2,3));
-        edges.add(new Pair(3,4));
-        edges.add(new Pair(4,5));
-        edges.add(new Pair(5,1));
+        edges.add(new Pair(0L,5L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(2L,3L));
+        edges.add(new Pair(3L,4L));
+        edges.add(new Pair(4L,5L));
+        edges.add(new Pair(5L,1L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -420,12 +418,12 @@ public class CellRunnerTest {
                 new Node(4, 0, 3, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(2,3));
-        edges.add(new Pair(2,4));
-        edges.add(new Pair(3,100));
-        edges.add(new Pair(100,2));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(2L,3L));
+        edges.add(new Pair(2L,4L));
+        edges.add(new Pair(3L,100L));
+        edges.add(new Pair(100L,2L));
 
         return new PolygonRoutingTestGraph(nodes, edges);
     }
@@ -461,9 +459,9 @@ public class CellRunnerTest {
                 new Node(3, -1, 1, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,3));
-        edges.add(new Pair(2,3));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,3L));
+        edges.add(new Pair(2L,3L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -502,12 +500,12 @@ public class CellRunnerTest {
                 new Node(5, -3, 0, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,2));
-        edges.add(new Pair(2,4));
-        edges.add(new Pair(4,5));
-        edges.add(new Pair(4,3));
-        edges.add(new Pair(3,1));
-        edges.add(new Pair(1,0));
+        edges.add(new Pair(0L,2L));
+        edges.add(new Pair(2L,4L));
+        edges.add(new Pair(4L,5L));
+        edges.add(new Pair(4L,3L));
+        edges.add(new Pair(3L,1L));
+        edges.add(new Pair(1L,0L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -568,14 +566,14 @@ public class CellRunnerTest {
                 new Node(6, -3, 0, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(2,3));
-        edges.add(new Pair(2,6));
-        edges.add(new Pair(3,4));
-        edges.add(new Pair(3,5));
-        edges.add(new Pair(4,5));
-        edges.add(new Pair(4,6));
-        edges.add(new Pair(5,6));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(2L,3L));
+        edges.add(new Pair(2L,6L));
+        edges.add(new Pair(3L,4L));
+        edges.add(new Pair(3L,5L));
+        edges.add(new Pair(4L,5L));
+        edges.add(new Pair(4L,6L));
+        edges.add(new Pair(5L,6L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -644,12 +642,12 @@ public class CellRunnerTest {
                 new Node(6, -2, -1, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0,1));
-        edges.add(new Pair(1,2));
-        edges.add(new Pair(1,4));
-        edges.add(new Pair(2,3));
-        edges.add(new Pair(2,5));
-        edges.add(new Pair(2,6));
+        edges.add(new Pair(0L,1L));
+        edges.add(new Pair(1L,2L));
+        edges.add(new Pair(1L,4L));
+        edges.add(new Pair(2L,3L));
+        edges.add(new Pair(2L,5L));
+        edges.add(new Pair(2L,6L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
