@@ -47,11 +47,11 @@ class AscendingEdge {
             return false;
         }
         final AscendingEdge that = (AscendingEdge) o;
-        return id == that.id;
+        return Objects.equals(source, that.source) && Objects.equals(target, that.target);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(source, target);
     }
 }

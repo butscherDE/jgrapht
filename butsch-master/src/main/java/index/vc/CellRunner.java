@@ -99,8 +99,8 @@ abstract class CellRunner {
     }
 
     private boolean lastEdgeNotReached(final ReflectiveEdge lastEdge) {
-        final AscendingEdge lastEdgeAscending = new AscendingEdge(lastEdge);
-        return !lastEdgeAscending.equals(startEdge);
+//        final AscendingEdge lastEdgeAscending = new AscendingEdge(lastEdge);
+        return !lastEdge.equals(startEdge);
 
 //        final Node lastEdgeSourceNode = graph.getEdgeSource(lastEdge);
 //        final Node lastEdgeTargetNode = graph.getEdgeTarget(lastEdge);

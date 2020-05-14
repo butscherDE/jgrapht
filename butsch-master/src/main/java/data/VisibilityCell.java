@@ -65,7 +65,7 @@ public class VisibilityCell {
             return false;
         }
         final VisibilityCell that = (VisibilityCell) o;
-        return Objects.equals(lineSegments, that.lineSegments);
+        return lineSegments.equals(that.lineSegments);
     }
 
     public Polygon toPolygon() {
