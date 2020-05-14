@@ -131,15 +131,12 @@ public class SortedNeighbors {
 
     private int findIndex(ComparableEdge lastEdgeComparable, Iterator<ComparableEdge> allNeighborEdges) {
         boolean lastEdgeIsGreater = true;
-        boolean currentEdgeNotInversedLastEdge = true;
         int i = 0;
-        while (allNeighborEdges.hasNext() && lastEdgeIsGreater/* && currentEdgeNotInversedLastEdge*/) {
+        while (allNeighborEdges.hasNext() && lastEdgeIsGreater) {
             final ComparableEdge currentEdge = allNeighborEdges.next();
             lastEdgeIsGreater = lastEdgeComparable.compareTo(currentEdge) > 0;
-            currentEdgeNotInversedLastEdge = !(currentEdge.baseNode.equals(lastEdgeComparable.baseNode) &&
-                                               currentEdge.adjNode.equals(lastEdgeComparable.adjNode));
 
-            i = lastEdgeIsGreater/* && currentEdgeNotInversedLastEdge*/ ? i + 1 : i;
+            i = lastEdgeIsGreater ? i + 1 : i;
         }
         return i;
     }
