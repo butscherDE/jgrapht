@@ -351,6 +351,6 @@ public class PolygonRoutingTestGraph {
     }
 
     private void createTestIndex() {
-        gridIndex = new GridIndex(graph, Collections.emptyList(), 720, 360);
+        gridIndex = new GridIndex(graph, 720, 360);
     }
 }

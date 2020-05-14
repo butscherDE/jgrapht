@@ -6,6 +6,7 @@ import data.RoadGraph;
 import data.VisibilityCell;
 import evalutation.StopWatchVerbose;
 import geometry.BoundingBox;
+import index.vc.VisibilityCellsCreator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
@@ -26,8 +27,7 @@ public class GridIndex implements Index {
     private final GridCell[][] cells;
 
 
-    public GridIndex(final RoadGraph graph, final List<VisibilityCell> visibilityCells,
-                     final int longitudeGranularity, final int latitudeGranularity) {
+    public GridIndex(final RoadGraph graph, final int longitudeGranularity, final int latitudeGranularity) {
         this.graph = graph;
         this.indexBounds = graph.getBoundingBox();
         final double longitudeRange = (indexBounds.maxLongitude + LONGITUDE_RANGE) - (indexBounds.minLongitude + LONGITUDE_RANGE);
@@ -38,11 +38,13 @@ public class GridIndex implements Index {
         this.cells = new GridCell[longitudeGranularity][latitudeGranularity];
 
         StopWatchVerbose sw = new StopWatchVerbose("Index creation");
-        initCells(visibilityCells);
+        initCells();
         sw.printTimingIfVerbose();
     }
 
-    private void initCells(final List<VisibilityCell> visibilityCells) {
+    private void initCells() {
+        final VisibilityCellsCreator vcc = new VisibilityCellsCreator(graph);
+        final List<VisibilityCell> visibilityCells = vcc.create();
         instantiateCellObjects();
         addNodesToIntersectingCells();
         addEdgesToIntersectingCells();
@@ -254,8 +256,8 @@ public class GridIndex implements Index {
 
         final int minLongIndex = getLongitudeIndex(vcBoundingBox.minLongitude);
         final int maxLongIndex = getLongitudeIndex(vcBoundingBox.maxLongitude);
-        final int minLatIndex = getLongitudeIndex(vcBoundingBox.minLatitude);
-        final int maxLatIndex = getLongitudeIndex(vcBoundingBox.maxLatitude);
+        final int minLatIndex = getLatitudeIndex(vcBoundingBox.minLatitude);
+        final int maxLatIndex = getLatitudeIndex(vcBoundingBox.maxLatitude);
 
         for (int i = minLongIndex; i <= maxLongIndex; i++) {
             final GridCell[] row = cells[i];

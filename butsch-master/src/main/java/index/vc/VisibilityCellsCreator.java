@@ -16,7 +16,7 @@ import java.util.*;
  * <p>
  * General schema: For each edge in the allEdgesIterator: Check if it was used in a left run, if not run left. Check if it was used in a right run if not run right
  */
-class VisibilityCellsCreator {
+public class VisibilityCellsCreator {
     private final RoadGraph graph;
     private final EdgeReversedGraph<Node, Edge> reversedGraph;
     private final BinaryHashFunction<AscendingEdge> visitedManagerLeft = new BinaryHashFunction<>();;

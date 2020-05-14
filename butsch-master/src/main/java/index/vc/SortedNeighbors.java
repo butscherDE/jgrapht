@@ -138,8 +138,6 @@ public class SortedNeighbors {
         int indexOfEndOfList = sortedEdges.size() - 1;
         int indexOfPredecessorOfLastEdge = addIndexPredecessor < 0 ? indexOfEndOfList : addIndexPredecessor;
 
-        System.out.println(sortedEdges);
-
         return get(indexOfPredecessorOfLastEdge);
     }
 
