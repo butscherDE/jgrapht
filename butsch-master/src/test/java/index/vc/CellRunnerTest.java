@@ -236,13 +236,13 @@ public class CellRunnerTest {
     }
 
     @Test
-    public void collinearEdges() {
+    public void collinearEdgesLeft() {
         final Coordinate[] coordinates = new Coordinate[] {
                 new Coordinate(4, 0),
-                new Coordinate(3, 0),
-                new Coordinate(3, -1),
-                new Coordinate(5, -1),
                 new Coordinate(5, 0),
+                new Coordinate(5, -1),
+                new Coordinate(3, -1),
+                new Coordinate(3, 0),
                 new Coordinate(4, 0),
                 new Coordinate(2, 0),
                 new Coordinate(4, 0)
@@ -260,14 +260,39 @@ public class CellRunnerTest {
         assertEquals(expectedVc, vc);
     }
 
+    @Test
+    public void collinearEdgesRight() {
+        final Coordinate[] coordinates = new Coordinate[] {
+                new Coordinate(2, 0),
+                new Coordinate(4, 0),
+                new Coordinate(3, 0),
+                new Coordinate(3, -1),
+                new Coordinate(5, -1),
+                new Coordinate(5, 0),
+                new Coordinate(4, 0),
+                new Coordinate(2, 0)
+        };
+        final Polygon expectedPolygon = gf.createPolygon(coordinates);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+
+
+        final PolygonRoutingTestGraph customTestGraph = createCustomTestGraphToTryTrapTheAlgorithmInEndlessLoop();
+
+        final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final VisibilityCell vc = cr.extractVisibilityCell();
+
+        assertEquals(expectedVc, vc);
+    }
+
     private PolygonRoutingTestGraph createCustomTestGraphToTryTrapTheAlgorithmInEndlessLoop() {
         final Node[] nodes = new Node[]{
-                new Node(0, 0, 2, 0), //s
-                new Node(1, 0, 4, 0), //v
-                new Node(2, 0, 5, 0), //w
-                new Node(3, -1, 5, 0),
-                new Node(4, -1, 3, 0),
-                new Node(5, 0, 3, 0)  //u
+                new Node(0, 2,0, 0), //s
+                new Node(1, 4, 0, 0), //v
+                new Node(2, 5, 0, 0), //w
+                new Node(3, 5, -1, 0),
+                new Node(4, 3, -1, 0),
+                new Node(5, 3, 0, 0)  //u
         };
 
         List<Pair<Long, Long>> edges = new LinkedList<>();
@@ -340,12 +365,12 @@ public class CellRunnerTest {
 
     private PolygonRoutingTestGraph createAdvancedImpasseTestGraph() {
         final Node[] nodes = new Node[]{
-                new Node(0, 0, 2, 0),
-                new Node(1, 0, 4, 0),
-                new Node(2, 0, 5, 0),
-                new Node(3, -1, 5, 0),
-                new Node(4, -1, 3, 0),
-                new Node(5, 0, 3, 0)
+                new Node(0, 2, 0, 0),
+                new Node(1, 4, 0, 0),
+                new Node(2, 5, 0, 0),
+                new Node(3, 5, -1, 0),
+                new Node(4, 3, -1, 0),
+                new Node(5, 3, 0, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
         edges.add(new Pair(0L,5L));
@@ -385,11 +410,11 @@ public class CellRunnerTest {
     private PolygonRoutingTestGraph twoImpassesInARowGraph() {
         final Node[] nodes = new Node[]{
                 new Node(0, 0, 0, 0),
-                new Node(1, 0, 1, 0),
-                new Node(2, 0, 2, 0),
-                new Node(3, -1, 2, 0),
-                new Node(100, -1, 2, 0),
-                new Node(4, 0, 3, 0)
+                new Node(1, 1, 0, 0),
+                new Node(2, 2, 0, 0),
+                new Node(3, 2, -1, 0),
+                new Node(100, 2, -1, 0),
+                new Node(4, 3, 0, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
         edges.add(new Pair(0L,1L));
@@ -428,9 +453,9 @@ public class CellRunnerTest {
     private PolygonRoutingTestGraph createTwoNodesSameCoordinatesNoEdgeTestGraph() {
         final Node[] nodes = new Node[]{
                 new Node(0, 0, 0, 0),
-                new Node(1, 0, 1, 0),
-                new Node(2, 0, 1, 0),
-                new Node(3, -1, 1, 0)
+                new Node(1, 1, 0, 0),
+                new Node(2, 1, 0, 0),
+                new Node(3, 1, -1, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
         edges.add(new Pair(0L,1L));
@@ -466,12 +491,12 @@ public class CellRunnerTest {
 
     private PolygonRoutingTestGraph collinearEdgeWhereNextNodeHintShallNotBeTakenGraph() {
         final Node[] nodes = new Node[]{
-                new Node(0, 0, -1, 0),
-                new Node(1, 0, 1, 0),
-                new Node(2, -1, 0, 0),
-                new Node(3, -1, 0, 0),
-                new Node(4, -2, 0, 0),
-                new Node(5, -3, 0, 0)
+                new Node(0, -1, 0, 0),
+                new Node(1, 1, 0, 0),
+                new Node(2, 0, -1, 0),
+                new Node(3, 0, -1, 0),
+                new Node(4, 0, -2, 0),
+                new Node(5, 0, -3, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
         edges.add(new Pair(0L,2L));
@@ -532,12 +557,12 @@ public class CellRunnerTest {
 
     private PolygonRoutingTestGraph collinearEdgeWithNoOtherNeighborsThanBackwardsTestGraph() {
         final Node[] nodes = new Node[]{
-                new Node(1, 0, 1, 0),
-                new Node(2, -1, 1, 0),
-                new Node(3, -2, 1, 0),
-                new Node(4, -3, 1, 0),
-                new Node(5, -4, 1, 0),
-                new Node(6, -3, 0, 0)
+                new Node(1, 1, 0, 0),
+                new Node(2, 1, -1, 0),
+                new Node(3, 1, -2, 0),
+                new Node(4, 1, -3, 0),
+                new Node(5, 1, -4, 0),
+                new Node(6, 0, -3, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
         edges.add(new Pair(1L,2L));
@@ -608,12 +633,12 @@ public class CellRunnerTest {
     private PolygonRoutingTestGraph issueOnEdgeGermanyTestGraph() {
         final Node[] nodes = new Node[]{
                 new Node(0, 0, 0, 0),
-                new Node(1, -1, 0, 0),
-                new Node(2, -2, 0, 0),
-                new Node(3, -2, 1, 0),
-                new Node(4, -1, 1, 0),
-                new Node(5, -2, 0, 0),
-                new Node(6, -2, -1, 0)
+                new Node(1, 0, -1, 0),
+                new Node(2, 0, -2, 0),
+                new Node(3, 1, -2, 0),
+                new Node(4, 1, -1, 0),
+                new Node(5, 0, -2, 0),
+                new Node(6, -1, -2, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
         edges.add(new Pair(0L,1L));
