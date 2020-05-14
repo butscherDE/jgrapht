@@ -67,7 +67,6 @@ public class CellRunnerTest {
     private void visibilityManagerAsserts17to26Left(CellRunnerTestInputs cti) {
         assertWalkedEdgesMarkedAsVisited17to26Left(cti);
         assertExploredButNotWalkedEdgesNotVisited17to26Left(cti);
-//        assertNoViewedEdgeSettledForRightRun17to26Left(cti);
     }
 
     private void assertWalkedEdgesMarkedAsVisited17to26Left(CellRunnerTestInputs cti) {
@@ -128,7 +127,6 @@ public class CellRunnerTest {
     private void visibilityManagerAsserts17to26Right(CellRunnerTestInputs cti) {
         assertWalkedEdgesMarkedAsVisited17to26Right(cti);
         assertExploredButNotWalkedEdgesNotVisited17to26Right(cti);
-//        assertNoViewedEdgeSettledForRightRun17to26Right(cti);
     }
 
     private void assertWalkedEdgesMarkedAsVisited17to26Right(CellRunnerTestInputs cti) {
@@ -483,7 +481,6 @@ public class CellRunnerTest {
         final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
-        System.out.println(vc.lineSegments);
         assertEquals(expectedVc, vc);
     }
 
@@ -508,7 +505,6 @@ public class CellRunnerTest {
         final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
-        System.out.println(vc.lineSegments);
         assertEquals(expectedVc, vc);
     }
 
@@ -537,7 +533,6 @@ public class CellRunnerTest {
                 new Coordinate(1, -1,0),
                 new Coordinate(0, -3,0),
                 new Coordinate(1, -4,0),
-//                new Coordinate(1, -3,0),
                 new Coordinate(1, -2,0),
                 new Coordinate(1, -1,0),
                 new Coordinate(1, 0,0),
@@ -697,17 +692,6 @@ public class CellRunnerTest {
         }
 
         public Edge getEdge(final Node source, final Node target) {
-//            final List<Edge> edges = graphMocker.getAllEdges();
-//
-//            for (Edge edge : edges) {
-//                final ReflectiveEdge edgeAsReflective = new ReflectiveEdge(edge, graph);
-//
-//                if (edgeAsReflective.source.equals(source) && edgeAsReflective.target.equals(target)) {
-//                    return edge;
-//                } else if (edgeAsReflective.source.equals(target) && edgeAsReflective.target.equals(source)) {
-//                    return edge;
-//                }
-//            }
             final Edge edge = graph.getEdge(source, target);
             if (edge == null) {
                 throw new IllegalArgumentException("Edge doesn't exist.");

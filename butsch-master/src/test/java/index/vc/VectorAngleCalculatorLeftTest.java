@@ -15,8 +15,6 @@ public class VectorAngleCalculatorLeftTest {
 
     @Test
     public void anglesToNode39to38right() {
-        System.out.println(Objects.hash(21));
-        System.out.println(Objects.hash(52));
         final Node vertex = graph.getVertex(21);
         graph.removeVertex(vertex);
         graph.removeVertex(graph.getVertex(38));

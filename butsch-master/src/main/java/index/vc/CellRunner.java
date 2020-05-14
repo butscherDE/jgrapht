@@ -14,7 +14,6 @@ import java.util.Map;
 
 abstract class CellRunner {
     final LinkedList<ReflectiveEdge> edgesOnCell = new LinkedList<>();
-    private final RoadGraph graph;
     private final BinaryHashFunction<AscendingEdge> localVisitedManager;
     final BinaryHashFunction<AscendingEdge> visitedManager;
     private final VectorAngleCalculator vectorAngleCalculator;
@@ -27,7 +26,6 @@ abstract class CellRunner {
     CellRunner(final RoadGraph graph, final BinaryHashFunction<AscendingEdge> visitedManager,
                final VectorAngleCalculator vectorAngleCalculator, final Edge startEdge,
                Map<Node, SortedNeighbors> sortedNeighborsMap) {
-        this.graph = graph;
         this.localVisitedManager = new BinaryHashFunction<>();
         this.visitedManager = visitedManager;
         this.vectorAngleCalculator = vectorAngleCalculator;
@@ -47,7 +45,6 @@ abstract class CellRunner {
 
     public VisibilityCell extractVisibilityCell() {
         runAroundCellAndLogNodes();
-        edgesOnCell.stream().forEach(a -> System.out.println(a));
         return createVisibilityCell();
     }
 
@@ -100,15 +97,7 @@ abstract class CellRunner {
     }
 
     private boolean lastEdgeNotReached(final ReflectiveEdge lastEdge) {
-//        final AscendingEdge lastEdgeAscending = new AscendingEdge(lastEdge);
         return !lastEdge.equals(startEdge);
-
-//        final Node lastEdgeSourceNode = graph.getEdgeSource(lastEdge);
-//        final Node lastEdgeTargetNode = graph.getEdgeTarget(lastEdge);
-//        final boolean baseNodeEqual = lastEdgeSourceNode.equals(startEdge.sourceNode);
-//        final boolean adjNodeEqual = lastEdgeTargetNode.equals(startEdge.targetNode);
-//        final boolean sameDirection = baseNodeEqual && adjNodeEqual;
-//        return !sameDirection;
     }
 
     private ReflectiveEdge getMostLeftOrRightOrientedEdge() {

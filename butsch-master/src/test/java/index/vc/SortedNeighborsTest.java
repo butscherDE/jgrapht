@@ -302,8 +302,6 @@ public class SortedNeighborsTest {
 
     private void assertOrdering(Node[] expectedOrder, SortedNeighbors sortedNeighbors) {
         final Node[] actualOrder = extractAdjNodes(sortedNeighbors);
-        System.out.println("Expected: " + Arrays.toString(expectedOrder));
-        System.out.println("Actual: " + Arrays.toString(actualOrder));
         assertArrayEquals(expectedOrder, actualOrder);
     }
 

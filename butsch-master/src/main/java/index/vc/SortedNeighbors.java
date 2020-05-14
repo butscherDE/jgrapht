@@ -1,10 +1,8 @@
 package index.vc;
 
-import data.Edge;
 import data.RoadGraph;
 import data.Node;
 
-import java.sql.Ref;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,13 +108,6 @@ public class SortedNeighbors {
                 .stream()
                 .map(a -> new ReflectiveEdge(a, graph))
                 .collect(Collectors.toSet());
-//        final Set<ReflectiveEdge> ingoingEdgesAsReflective = graph
-//                .incomingEdgesOf(node)
-//                .stream()
-//                .map(a -> new ReflectiveEdge(a, graph).getReversed())
-//                .collect(Collectors.toSet());
-//
-//        outgoingEdgesAsReflective.addAll(ingoingEdgesAsReflective);
         return outgoingEdgesAsReflective;
     }
 

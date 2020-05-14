@@ -73,7 +73,6 @@ public class VisibilityCell {
         final SegmentIntersectionAlgorithm intersectionAlgoInstance = new RedBlueSegmentIntersectionCrossProductFactory()
                 .createInstance(this, polygon);
         return intersectionAlgoInstance.isIntersectionPresent();
-//        throw new NotImplementedException("TODO");
     }
 
     public boolean contains(final Geometry geometry) {
