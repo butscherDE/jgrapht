@@ -485,7 +485,32 @@ public class CellRunnerTest {
         final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
+        System.out.println(vc.lineSegments);
+        assertEquals(expectedVc, vc);
+    }
 
+    @Test
+    public void collinearEdgeWhereNextNodeHintShallNotBeTaken2() {
+        final Coordinate[] coordinates = new Coordinate[] {
+                new Coordinate(1, 0),
+                new Coordinate(0, -1),
+                new Coordinate(0, -2),
+                new Coordinate(0, -3),
+                new Coordinate(0, -2),
+                new Coordinate(0, -1),
+                new Coordinate(-1, 0),
+                new Coordinate(1, 0)
+        };
+        final Polygon expectedPolygon = gf.createPolygon(coordinates);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+
+        final PolygonRoutingTestGraph customTestGraph = collinearEdgeWhereNextNodeHintShallNotBeTakenGraph();
+
+        final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 2);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+
+        final VisibilityCell vc = cr.extractVisibilityCell();
+        System.out.println(vc.lineSegments);
         assertEquals(expectedVc, vc);
     }
 
@@ -511,13 +536,14 @@ public class CellRunnerTest {
     @Test
     public void collinearityStackOverFlowLeft() {
         final Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(1, -1),
-                new Coordinate(0, -3),
-                new Coordinate(1, -4),
-                new Coordinate(1, -2),
-                new Coordinate(1, -1),
-                new Coordinate(1, 0),
-                new Coordinate(1, -1)
+                new Coordinate(1, -1,0),
+                new Coordinate(0, -3,0),
+                new Coordinate(1, -4,0),
+                new Coordinate(1, -3,0),
+                new Coordinate(1, -2,0),
+                new Coordinate(1, -1,0),
+                new Coordinate(1, 0,0),
+                new Coordinate(1,-1,0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
@@ -534,14 +560,13 @@ public class CellRunnerTest {
     @Test
     public void collinearityStackOverFlowRight() {
         final Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(1, 0),
-                new Coordinate(1, -1),
-                new Coordinate(0, -3),
-                new Coordinate(1, -4),
-                new Coordinate(1, -3),
-                new Coordinate(1, -2),
-                new Coordinate(1, -1),
-                new Coordinate(1, 0)
+                new Coordinate(1, 0,0),
+                new Coordinate(1, -1,0),
+                new Coordinate(0, -3,0),
+                new Coordinate(1, -4,0),
+                new Coordinate(1, -2,0),
+                new Coordinate(1, -1,0),
+                new Coordinate(1, 0,0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);

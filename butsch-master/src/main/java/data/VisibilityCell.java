@@ -8,10 +8,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.jgrapht.util.VisitedManager;
 import org.locationtech.jts.geom.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
@@ -85,5 +82,10 @@ public class VisibilityCell {
 
     public BoundingBox getBoundingBox() {
         return BoundingBox.createFrom(toPolygon());
+    }
+
+    @Override
+    public String toString() {
+        return "VisibilityCell{" + "coordinates=" + Arrays.toString(coordinates) + '}';
     }
 }

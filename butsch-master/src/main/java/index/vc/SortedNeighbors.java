@@ -133,13 +133,13 @@ public class SortedNeighbors {
         boolean lastEdgeIsGreater = true;
         boolean currentEdgeNotInversedLastEdge = true;
         int i = 0;
-        while (allNeighborEdges.hasNext() && lastEdgeIsGreater && currentEdgeNotInversedLastEdge) {
+        while (allNeighborEdges.hasNext() && lastEdgeIsGreater/* && currentEdgeNotInversedLastEdge*/) {
             final ComparableEdge currentEdge = allNeighborEdges.next();
             lastEdgeIsGreater = lastEdgeComparable.compareTo(currentEdge) > 0;
             currentEdgeNotInversedLastEdge = !(currentEdge.baseNode.equals(lastEdgeComparable.baseNode) &&
                                                currentEdge.adjNode.equals(lastEdgeComparable.adjNode));
 
-            i = lastEdgeIsGreater && currentEdgeNotInversedLastEdge ? i + 1 : i;
+            i = lastEdgeIsGreater/* && currentEdgeNotInversedLastEdge*/ ? i + 1 : i;
         }
         return i;
     }
@@ -187,6 +187,7 @@ public class SortedNeighbors {
             final double angleDifference = angleThis - angleOther;
             final int angleResult = angleDifference > 0 ? 1 : angleDifference == 0 ? 0 : -1;
             final long idDifference = id - o.id;
+//            final long idDifference = vectorAngleCalculator instanceof VectorAngleCalculatorLeft ? actualIdDif : actualIdDif * (-1);
             final int idComparision = idDifference < 0 ? 1 : idDifference == 0 ? 0 : -1;
 
             return angleResult != 0 ? angleResult : idComparision;
