@@ -1,5 +1,6 @@
 package index.vc;
 
+import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
@@ -10,7 +11,9 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import util.PolygonRoutingTestGraph;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,14 +29,14 @@ public class VisibilityCellTest {
                 graph.getVertex(17),
                 graph.getVertex(15),
                 graph.getVertex(18));
-        return VisibilityCell.create(visibilityCellNodeIds);
+        return VisibilityCell.create(visibilityCellNodeIds, null);
     }
 
     @Test
     public void cellShape() {
         final VisibilityCell visibilityCell = createDefaultVisibilityCell();
         final Polygon expectedPolygon = createDefaultVisibilityCellsExpectedCellShape();
-        final VisibilityCell expectedVC = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVC = VisibilityCell.create(expectedPolygon, null);
 
         assertEquals(expectedVC, visibilityCell);
     }
@@ -135,14 +138,14 @@ public class VisibilityCellTest {
                 graph.getVertex(34),
                 graph.getVertex(15),
                 graph.getVertex(17));
-        return VisibilityCell.create(vcNodeId);
+        return VisibilityCell.create(vcNodeId, null);
     }
 
     @Test
     public void equalWithCellShape() {
         final VisibilityCell visibilityCell = createDefaultVisibilityCell();
         final Polygon cellShape = createDefaultVisibilityCellsExpectedCellShape();
-        final VisibilityCell expectedVC = VisibilityCell.create(cellShape);
+        final VisibilityCell expectedVC = VisibilityCell.create(cellShape, null);
 
         assertEquals(visibilityCell, expectedVC);
     }
@@ -218,5 +221,64 @@ public class VisibilityCellTest {
         final BoundingBox boundingBox = new BoundingBox(32, 38, 7, 11);
 
         assertEquals(boundingBox, visibilityCell.getBoundingBox());
+    }
+
+    @Test
+    public void subGraphBuilding() {
+        final RoadGraph originalGraph = graphMocker.graph;
+
+        final Node vertex0 = originalGraph.getVertex(0);
+        final Node vertex1 = originalGraph.getVertex(1);
+        final Node vertex7 = originalGraph.getVertex(7);
+        final Node vertex8 = originalGraph.getVertex(8);
+        final Node vertex44 = originalGraph.getVertex(44);
+
+        final List<Node> vc1nodes = Arrays.asList(vertex0, vertex1, vertex7);
+        final List<Node> vc2nodes = Arrays.asList(vertex1, vertex8, vertex44, vertex7);
+
+        final List<ReflectiveEdge> vc1edges = Arrays.asList(
+                new ReflectiveEdge(0, vertex0, vertex1, originalGraph),
+                new ReflectiveEdge(1, vertex1, vertex7, originalGraph),
+                new ReflectiveEdge(2, vertex7, vertex0, originalGraph)
+        );
+
+        final List<ReflectiveEdge> vc2edges = Arrays.asList(
+                new ReflectiveEdge(3, vertex1, vertex8, originalGraph),
+                new ReflectiveEdge(4, vertex8, vertex44, originalGraph),
+                new ReflectiveEdge(5, vertex44, vertex7, originalGraph),
+                new ReflectiveEdge(6, vertex7, vertex1, originalGraph)
+        );
+
+        final VisibilityCell vc1 = VisibilityCell.create(vc1nodes, vc1edges);
+        final VisibilityCell vc2 = VisibilityCell.create(vc2nodes, vc2edges);
+
+        final RoadGraph newGraph = new RoadGraph(Edge.class);
+
+        vc1.insertVCNodesAndEdgesInto(originalGraph, newGraph);
+        vc2.insertVCNodesAndEdgesInto(originalGraph, newGraph);
+
+        assertNotNull(newGraph.getVertex(0));
+        assertNotNull(newGraph.getVertex(1));
+        assertNotNull(newGraph.getVertex(7));
+        assertNotNull(newGraph.getVertex(8));
+        assertNotNull(newGraph.getVertex(44));
+
+        assertNull(newGraph.getVertex(2));
+
+        assertNotNull(newGraph.getEdge(vertex0, vertex1));
+        assertNotNull(newGraph.getEdge(vertex0, vertex7));
+        assertNotNull(newGraph.getEdge(vertex1, vertex7));
+        assertNotNull(newGraph.getEdge(vertex1, vertex8));
+        assertNotNull(newGraph.getEdge(vertex7, vertex44));
+        assertNotNull(newGraph.getEdge(vertex8, vertex44));
+
+        assertNotNull(newGraph.getEdge(vertex1, vertex0));
+        assertNotNull(newGraph.getEdge(vertex7, vertex0));
+        assertNotNull(newGraph.getEdge(vertex7, vertex1));
+        assertNotNull(newGraph.getEdge(vertex8, vertex1));
+        assertNotNull(newGraph.getEdge(vertex44, vertex7));
+        assertNotNull(newGraph.getEdge(vertex44, vertex8));
+
+        assertNull(newGraph.getEdge(graph.getVertex(7), graph.getVertex(43)));
     }
 }

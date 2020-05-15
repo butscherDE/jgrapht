@@ -32,7 +32,7 @@ public class CellRunnerTest {
                 new Coordinate(38, 7)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 17, 26);
@@ -53,7 +53,7 @@ public class CellRunnerTest {
                 new Coordinate(38, 7)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 26, 17);
         final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
@@ -93,7 +93,7 @@ public class CellRunnerTest {
                 new Coordinate(32, 7)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 17, 26);
         final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
@@ -113,7 +113,7 @@ public class CellRunnerTest {
                 new Coordinate(32, 7)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 26, 17);
         final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
@@ -155,7 +155,7 @@ public class CellRunnerTest {
                 new Coordinate(43, 15)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 14, 106);
         final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
@@ -173,7 +173,7 @@ public class CellRunnerTest {
                 new Coordinate(47, 10)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 106, 110);
         final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
@@ -194,7 +194,7 @@ public class CellRunnerTest {
                 new Coordinate(43, 15)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 109, 110);
         final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
@@ -223,7 +223,7 @@ public class CellRunnerTest {
                 new Coordinate(43, 11)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 109, 110);
         final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
@@ -244,7 +244,7 @@ public class CellRunnerTest {
                 new Coordinate(4, 0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
 
         final PolygonRoutingTestGraph customTestGraph = createCustomTestGraphToTryTrapTheAlgorithmInEndlessLoop();
@@ -269,7 +269,7 @@ public class CellRunnerTest {
                 new Coordinate(2, 0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
 
         final PolygonRoutingTestGraph customTestGraph = createCustomTestGraphToTryTrapTheAlgorithmInEndlessLoop();
@@ -312,7 +312,7 @@ public class CellRunnerTest {
                 new Coordinate(1, 0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final PolygonRoutingTestGraph customTestGraph = createSimpleImpasseTestGraph();
 
@@ -348,7 +348,7 @@ public class CellRunnerTest {
                 new Coordinate(3, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final PolygonRoutingTestGraph customTestGraph = createAdvancedImpasseTestGraph();
 
@@ -392,7 +392,7 @@ public class CellRunnerTest {
                 new Coordinate(1, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final PolygonRoutingTestGraph customTestGraph = twoImpassesInARowGraph();
 
@@ -435,7 +435,7 @@ public class CellRunnerTest {
                 new Coordinate(1, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final PolygonRoutingTestGraph customTestGraph = createTwoNodesSameCoordinatesNoEdgeTestGraph();
 
@@ -473,7 +473,7 @@ public class CellRunnerTest {
                 new Coordinate(1, 0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final PolygonRoutingTestGraph customTestGraph = collinearEdgeWhereNextNodeHintShallNotBeTakenGraph();
 
@@ -497,7 +497,7 @@ public class CellRunnerTest {
                 new Coordinate(-1, 0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final PolygonRoutingTestGraph customTestGraph = collinearEdgeWhereNextNodeHintShallNotBeTakenGraph();
 
@@ -539,7 +539,7 @@ public class CellRunnerTest {
                 new Coordinate(1,-1,0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
         final PolygonRoutingTestGraph customTestGraph = collinearEdgeWithNoOtherNeighborsThanBackwardsTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 1, 2);
@@ -562,7 +562,7 @@ public class CellRunnerTest {
                 new Coordinate(1, 0,0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
         final PolygonRoutingTestGraph customTestGraph = collinearEdgeWithNoOtherNeighborsThanBackwardsTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 1, 2);
@@ -610,7 +610,7 @@ public class CellRunnerTest {
                 new Coordinate(0, -1)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
         final PolygonRoutingTestGraph customTestGraph = issueOnEdgeGermanyTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);
@@ -637,7 +637,7 @@ public class CellRunnerTest {
                 new Coordinate(0, 0)
         };
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
-        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon);
+        final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
         final PolygonRoutingTestGraph customTestGraph = issueOnEdgeGermanyTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);

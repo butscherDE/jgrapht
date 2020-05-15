@@ -17,6 +17,6 @@ class CellRunnerRight extends CellRunner {
 
     @Override
     VisibilityCell createVisibilityCell() {
-        return VisibilityCell.create(extractNodesFromVisitedEdges());
+        return VisibilityCell.create(extractNodesFromVisitedEdges(), edgesOnCell);
     }
 }

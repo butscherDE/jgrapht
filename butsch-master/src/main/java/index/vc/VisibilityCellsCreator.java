@@ -18,7 +18,6 @@ import java.util.*;
  */
 public class VisibilityCellsCreator {
     private final RoadGraph graph;
-    private final EdgeReversedGraph<Node, Edge> reversedGraph;
     private final BinaryHashFunction<AscendingEdge> visitedManagerLeft = new BinaryHashFunction<>();;
     private final BinaryHashFunction<AscendingEdge> visitedManagerRight = new BinaryHashFunction<>();;
     private final Map<Node, SortedNeighbors> sortedNeighborListLeft;
@@ -29,7 +28,6 @@ public class VisibilityCellsCreator {
 
     public VisibilityCellsCreator(final RoadGraph graph) {
         this.graph = graph;
-        this.reversedGraph = new EdgeReversedGraph<>(graph);
         this.allEdges = graph.edgeSet();
 
         final NeighborPreSorter neighborPreSorter = new NeighborPreSorter(graph);

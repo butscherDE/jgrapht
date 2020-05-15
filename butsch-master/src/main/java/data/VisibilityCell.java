@@ -1,33 +1,32 @@
 package data;
 
 import geometry.BoundingBox;
-import geometry.RedBlueSegmentIntersectionCrossProduct;
 import geometry.RedBlueSegmentIntersectionCrossProductFactory;
 import geometry.SegmentIntersectionAlgorithm;
+import index.vc.ReflectiveEdge;
 import org.apache.commons.lang3.NotImplementedException;
-import org.jgrapht.util.VisitedManager;
 import org.locationtech.jts.geom.*;
 
 import java.util.*;
-import java.util.function.IntFunction;
-import java.util.stream.Collectors;
 
 public class VisibilityCell {
     private static GeometryFactory gf = new GeometryFactory();
     public final List<LineSegment> lineSegments;
     private final Coordinate[] coordinates;
+    private final List<ReflectiveEdge> edges;
 
-    private VisibilityCell(final List<LineSegment> lineSegments, final Coordinate[] coordinates) {
+    private VisibilityCell(final List<LineSegment> lineSegments, final Coordinate[] coordinates, final List<ReflectiveEdge> edges) {
         this.lineSegments = lineSegments;
         this.coordinates = coordinates;
+        this.edges = edges;
     }
 
-    public static VisibilityCell create(final Polygon polygon) {
+    public static VisibilityCell create(final Polygon polygon, final List<ReflectiveEdge> edges) {
         final Coordinate[] coordinates = polygon.getCoordinates();
-        return create(coordinates);
+        return create(coordinates, edges);
     }
 
-    public static VisibilityCell create(final Coordinate[] coordinates) {
+    public static VisibilityCell create(final Coordinate[] coordinates, final List<ReflectiveEdge> edges) {
         if (!coordinates[0].equals(coordinates[coordinates.length - 1])) {
             throw new IllegalArgumentException("Coordinates do not form a closed LineString");
         }
@@ -38,10 +37,10 @@ public class VisibilityCell {
             lineSegments.add(new LineSegment(coordinates[i], coordinates[i + 1]));
         }
 
-        return new VisibilityCell(lineSegments, coordinates);
+        return new VisibilityCell(lineSegments, coordinates, edges);
     }
 
-    public static VisibilityCell create(final List<Node> nodes) {
+    public static VisibilityCell create(final List<Node> nodes, final List<ReflectiveEdge> edges) {
         final Coordinate[] coordinates = new Coordinate[nodes.size() + 1];
         final Iterator<Node> nodeIterator = nodes.iterator();
         for (int i = 0; i < nodes.size(); i++) {
@@ -50,7 +49,7 @@ public class VisibilityCell {
         }
         coordinates[coordinates.length - 1] = nodes.get(0).getPoint().getCoordinate();
 
-        return create((Coordinate[]) coordinates);
+        return create((Coordinate[]) coordinates, edges);
     }
 
     @Override
@@ -81,6 +80,33 @@ public class VisibilityCell {
 
     public BoundingBox getBoundingBox() {
         return BoundingBox.createFrom(toPolygon());
+    }
+
+    public void insertVCNodesAndEdgesInto(final RoadGraph originalGraph, final RoadGraph newGraph) {
+        edges.stream().forEach(a -> addEdgeDataToNewGraph(originalGraph, newGraph, a));
+    }
+
+    public void addEdgeDataToNewGraph(final RoadGraph originalGraph, final RoadGraph newGraph, final ReflectiveEdge a) {
+        addVertices(newGraph, a);
+        addEdge(originalGraph, newGraph, a);
+        addReverseEdge(originalGraph, newGraph, a);
+    }
+
+    public void addVertices(final RoadGraph newGraph, final ReflectiveEdge a) {
+        newGraph.addVertex(a.source);
+        newGraph.addVertex(a.target);
+    }
+
+    public void addEdge(final RoadGraph originalGraph, final RoadGraph newGraph, final ReflectiveEdge a) {
+        if (originalGraph.getEdge(a.source, a.target) != null) {
+            newGraph.addEdge(a.source, a.target);
+        }
+    }
+
+    public void addReverseEdge(final RoadGraph originalGraph, final RoadGraph newGraph, final ReflectiveEdge a) {
+        if (originalGraph.getEdge(a.target, a.source) != null) {
+            newGraph.addEdge(a.target, a.source);
+        }
     }
 
     @Override
