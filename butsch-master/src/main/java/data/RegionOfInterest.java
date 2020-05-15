@@ -22,7 +22,7 @@ public class RegionOfInterest implements PolygonSegmentCollection {
         final Coordinate[] coordinates = polygon.getCoordinates();
         final List<LineSegment> segments = new ArrayList<>(coordinates.length);
 
-        for (int i = 0; i < coordinates.length; i++) {
+        for (int i = 0; i < coordinates.length - 1; i++) {
             final Coordinate start = coordinates[i];
             final Coordinate end = coordinates[i+1];
 
@@ -40,11 +40,11 @@ public class RegionOfInterest implements PolygonSegmentCollection {
 
     @Override
     public List<LineSegment> getSortedLineSegments() {
-        return null;
+        return segments;
     }
 
     @Override
     public Polygon getPolygon() {
-        return null;
+        return polygon;
     }
 }
