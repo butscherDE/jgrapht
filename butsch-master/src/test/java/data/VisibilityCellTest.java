@@ -1,19 +1,19 @@
-package index.vc;
+package data;
 
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
 import geometry.BoundingBox;
+import index.vc.ReflectiveEdge;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 import util.PolygonRoutingTestGraph;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -90,34 +90,6 @@ public class VisibilityCellTest {
     }
 
     @Test
-    public void surroundingBoundingBoxOverlapping() {
-        fail();
-//        final GridCell gridCell = createSurroundingGridCell();
-//        final VisibilityCell visibilityCell = createDefaultVisibilityCell();
-//
-//        assertTrue(visibilityCell.isOverlapping(gridCell));
-    }
-
-//    private GridCell createSurroundingGridCell() {
-//        final BBox boundingBox = new BBox(31, 39, 6, 12);
-//        return new GridCell(boundingBox);
-//    }
-
-    @Test
-    public void visibilityCellInternalGridCellIsOverlapping() {
-        fail();
-//        final GridCell gridCell = createInternalGridCell();
-//        final VisibilityCell visibilityCell = createDefaultVisibilityCell();
-//
-//        assertTrue(visibilityCell.isOverlapping(gridCell));
-    }
-
-//    private GridCell createInternalGridCell() {
-//        final BBox boundingBox = new BBox(34, 35, 8, 9);
-//        return new GridCell(boundingBox);
-//    }
-
-    @Test
     public void equalsOtherVisiblityCell() {
         final VisibilityCell visibilityCell1 = createDefaultVisibilityCell();
         final VisibilityCell visibilityCell2 = createDefaultVisibilityCell();
@@ -152,67 +124,10 @@ public class VisibilityCellTest {
 
     @Test
     public void unequalWithCellShape() {
-        fail();
         final VisibilityCell visibilityCell = createDefaultVisibilityCell();
-        final Polygon otherCellShape = createVisibilityCellOtherThanDefaultVisibilityCell().toPolygon();
+        final Polygon otherCellShape = createVisibilityCellOtherThanDefaultVisibilityCell().getPolygon();
 
         assertNotEquals(visibilityCell, otherCellShape);
-    }
-
-    @Test
-    public void containsInner() {
-        fail();
-//        final VisibilityCell visibilityCell = createDefaultVisibilityCell();
-//        final double internalLatitude = 8;
-//        final double internalLongitude = 35;
-//
-//        assertTrue(visibilityCell.contains(internalLatitude, internalLongitude));
-    }
-
-    @Test
-    public void containsMinimallyInner() {
-        fail();
-//        final VisibilityCell visibilityCell = createDefaultVisibilityCell();
-//        final double internalLatitude = 7 + Double.MIN_VALUE;
-//        final double internalLongitude = 35;
-//
-//        assertTrue(visibilityCell.contains(internalLatitude, internalLongitude));
-    }
-
-    @Test
-    public void notContainsOutside() {
-        fail();
-//        final VisibilityCell visibilityCell = createDefaultVisibilityCell();
-//        final double outerLatitude = 6;
-//        final double innerLongitude = 35;
-//
-//        assertFalse(visibilityCell.contains(outerLatitude, innerLongitude));
-    }
-
-    @Test
-    public void notContainsMinimallyOutside() {
-        fail();
-//        final VisibilityCell visibilityCell = createDefaultVisibilityCell();
-//        final double outerLatitude = 6.999999999;
-//        final double innerLongitude = 35;
-//
-//        assertFalse(visibilityCell.contains(outerLatitude, innerLongitude));
-    }
-
-    @Test
-    public void containsLine() {
-        fail();
-//        final VisibilityCell visibilityCell = createDefaultVisibilityCell();
-//
-//        assertTrue(visibilityCell.contains(7, 35));
-    }
-
-    @Test
-    public void containsCorner() {
-        fail();
-//        final VisibilityCell visibilityCell = createDefaultVisibilityCell();
-//
-//        assertTrue(visibilityCell.contains(7, 32));
     }
 
     @Test
@@ -280,5 +195,28 @@ public class VisibilityCellTest {
         assertNotNull(newGraph.getEdge(vertex44, vertex8));
 
         assertNull(newGraph.getEdge(graph.getVertex(7), graph.getVertex(43)));
+    }
+
+    @Test
+    public void sortedLineSegments() {
+        final Coordinate[] polygonCoordinates = new Coordinate[] {
+            new Coordinate(0,0),
+            new Coordinate(2,0),
+            new Coordinate(2,2),
+            new Coordinate(1,2),
+            new Coordinate(0,0)
+        };
+        final Polygon polygon = new GeometryFactory().createPolygon(polygonCoordinates);
+        final VisibilityCell vc = VisibilityCell.create(polygon, null);
+        final List<LineSegment> actualSegments = vc.getSortedLineSegments();
+
+        final List<LineSegment> expectedSegments = Arrays.asList(
+                new LineSegment(0,0,1,2),
+                new LineSegment(0,0,2,0),
+                new LineSegment(2,0,2,2),
+                new LineSegment(1,2,2,2)
+        );
+
+        assertEquals(expectedSegments, actualSegments);
     }
 }

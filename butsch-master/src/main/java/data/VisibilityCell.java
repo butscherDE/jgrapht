@@ -9,7 +9,7 @@ import org.locationtech.jts.geom.*;
 
 import java.util.*;
 
-public class VisibilityCell {
+public class VisibilityCell implements PolygonSegmentCollection {
     private static GeometryFactory gf = new GeometryFactory();
     public final List<LineSegment> lineSegments;
     private final Coordinate[] coordinates;
@@ -19,6 +19,8 @@ public class VisibilityCell {
         this.lineSegments = lineSegments;
         this.coordinates = coordinates;
         this.edges = edges;
+
+        Collections.sort(this.lineSegments, Comparator.comparingDouble(a -> a.p1.x));
     }
 
     public static VisibilityCell create(final Polygon polygon, final List<ReflectiveEdge> edges) {
@@ -34,7 +36,14 @@ public class VisibilityCell {
         final List<LineSegment> lineSegments = new ArrayList<>(coordinates.length - 1);
 
         for (int i = 0; i < coordinates.length - 1; i++) {
-            lineSegments.add(new LineSegment(coordinates[i], coordinates[i + 1]));
+            final Coordinate startCoordinate = coordinates[i];
+            final Coordinate endCoordinate = coordinates[i + 1];
+
+            if (startCoordinate.x <= endCoordinate.x) {
+                lineSegments.add(new LineSegment(startCoordinate, endCoordinate));
+            } else {
+                lineSegments.add(new LineSegment(endCoordinate, startCoordinate));
+            }
         }
 
         return new VisibilityCell(lineSegments, coordinates, edges);
@@ -64,7 +73,7 @@ public class VisibilityCell {
         return lineSegments.equals(that.lineSegments);
     }
 
-    public Polygon toPolygon() {
+    public Polygon getPolygon() {
         return gf.createPolygon(coordinates);
     }
 
@@ -79,7 +88,7 @@ public class VisibilityCell {
     }
 
     public BoundingBox getBoundingBox() {
-        return BoundingBox.createFrom(toPolygon());
+        return BoundingBox.createFrom(getPolygon());
     }
 
     public void insertVCNodesAndEdgesInto(final RoadGraph originalGraph, final RoadGraph newGraph) {
@@ -112,5 +121,10 @@ public class VisibilityCell {
     @Override
     public String toString() {
         return "VisibilityCell{" + "coordinates=" + Arrays.toString(coordinates) + '}';
+    }
+
+    @Override
+    public List<LineSegment> getSortedLineSegments() {
+        return lineSegments;
     }
 }
