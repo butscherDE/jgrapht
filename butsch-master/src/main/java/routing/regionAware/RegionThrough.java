@@ -1,6 +1,7 @@
 package routing.regionAware;
 
 import data.CHPreprocessing;
+import data.RegionOfInterest;
 import data.RoadCH;
 import data.RoadGraph;
 import index.Index;
@@ -9,7 +10,7 @@ import routing.regionAware.util.RegionSubGraphBuilder;
 
 public class RegionThrough extends AbstractRegion {
     public RegionThrough(final RoadGraph globalGraph, final RoadCH globalCH, final Index globalIndex,
-                         final Polygon region) {
+                         final RegionOfInterest region) {
         super(globalGraph, globalCH, globalIndex, region);
     }
 

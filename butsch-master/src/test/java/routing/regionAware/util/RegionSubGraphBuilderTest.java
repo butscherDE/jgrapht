@@ -1,6 +1,7 @@
 package routing.regionAware.util;
 
 import data.Node;
+import data.RegionOfInterest;
 import data.RoadGraph;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -8,6 +9,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import util.PolygonRoutingTestGraph;
 
+import javax.swing.plaf.synth.Region;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,10 +23,10 @@ public class RegionSubGraphBuilderTest {
         final PolygonRoutingTestGraph graphMocker = new PolygonRoutingTestGraph();
 
         final RoadGraph graph = graphMocker.graph;
-        final Polygon polygon = graphMocker.polygon;
+        final RegionOfInterest roi = graphMocker.roi;
         final List<Node> whitelist = new LinkedList<>(Arrays.asList(graph.getVertex(44), graph.getVertex(28)));
 
-        final RoadGraph subGraph = new RegionSubGraphBuilder().getSubGraph(graph, polygon, whitelist);
+        final RoadGraph subGraph = new RegionSubGraphBuilder().getSubGraph(graph, roi, whitelist);
 
         assertNull(subGraph.getVertex(0));
         assertNull(subGraph.getVertex(1));
@@ -98,7 +100,7 @@ public class RegionSubGraphBuilderTest {
         final PolygonRoutingTestGraph graphMocker = new PolygonRoutingTestGraph();
 
         final RoadGraph graph = graphMocker.graph;
-        final Polygon whitePolygon = graphMocker.polygon;
+        final RegionOfInterest whiteRoi = graphMocker.roi;
         final Coordinate[] blackCoordinates = {
                 new Coordinate(17, 14),
                 new Coordinate(17, 16),
@@ -108,7 +110,7 @@ public class RegionSubGraphBuilderTest {
         final Polygon blackPolygon = new GeometryFactory().createPolygon(blackCoordinates);
         final List<Node> whitelist = new LinkedList<>(Arrays.asList(graph.getVertex(44), graph.getVertex(28)));
 
-        final RoadGraph subGraph = new RegionSubGraphBuilder().getSubGraph(graph, whitePolygon, blackPolygon, whitelist);
+        final RoadGraph subGraph = new RegionSubGraphBuilder().getSubGraph(graph, whiteRoi, blackPolygon, whitelist);
 
         assertNull(subGraph.getVertex(0));
         assertNull(subGraph.getVertex(1));

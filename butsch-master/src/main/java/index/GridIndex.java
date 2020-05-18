@@ -9,7 +9,6 @@ import geometry.BoundingBox;
 import index.vc.VisibilityCellsCreator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
-import org.locationtech.jts.geom.Polygon;
 
 import java.util.*;
 import java.util.function.Function;
@@ -49,6 +48,18 @@ public class GridIndex implements Index {
         addNodesToIntersectingCells();
         addEdgesToIntersectingCells();
         addVisibilityCellsToOverlappingCells(visibilityCells);
+
+        if (graph.vertexSet().size() < 1000) {
+            for (final VisibilityCell visibilityCell : visibilityCells) {
+                final Coordinate[] coordinates = visibilityCell.getPolygon().getCoordinates();
+                for (final Coordinate coordinate : coordinates) {
+                    System.out.print(getClosestNode(coordinate.getX(), coordinate.getY()).id + ",");
+                }
+                System.out.println();
+            }
+        }
+
+        System.out.println("##################################");
     }
 
     private void instantiateCellObjects() {
@@ -513,19 +524,19 @@ public class GridIndex implements Index {
 
     public <T> void queryGraphEntity(final BoundingBox limiter, final IndexVisitor visitor,
                                  final Function<GridCell, Stream<? extends T>> gridCellStreamFunction) {
-        final Set<GridCell> cellsOverlappingLimiter = getNodesInLimiter(limiter);
-        final Set<T> allNodesInCells = cellsOverlappingLimiter.stream().flatMap(gridCellStreamFunction).collect(
+        final Set<GridCell> cellsOverlappingLimiter = getCellsInLimiter(limiter);
+        final Set<T> allEntitiesInCells = cellsOverlappingLimiter.stream().flatMap(gridCellStreamFunction).collect(
                 Collectors.toSet());
 
         if (visitor instanceof GridIndexVisitor) {
             final GridIndexVisitor gridIndexVisitor = (GridIndexVisitor) visitor;
-            for (final T node : allNodesInCells) {
+            for (final T node : allEntitiesInCells) {
                 final BoundingBox boundingBox = getBoundingBoxOfCells(node);
 
                 gridIndexVisitor.accept(node, boundingBox);
             }
         } else {
-            for (final T node : allNodesInCells) {
+            for (final T node : allEntitiesInCells) {
                 visitor.accept(node);
             }
         }
@@ -540,6 +551,10 @@ public class GridIndex implements Index {
             final Edge edge = (Edge) graphEntity;
 
             return getBoundingBox(edge);
+        } else if (graphEntity instanceof  VisibilityCell) {
+            final VisibilityCell vc = (VisibilityCell) graphEntity;
+
+            return getBoundingBox(vc);
         } else {
             throw new IllegalArgumentException("Not a graph entity.");
         }
@@ -574,7 +589,11 @@ public class GridIndex implements Index {
         return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
     }
 
-    public Set<GridCell> getNodesInLimiter(final BoundingBox limiter) {
+    private BoundingBox getBoundingBox(final VisibilityCell vc) {
+        return BoundingBox.createFrom(vc);
+    }
+
+    public Set<GridCell> getCellsInLimiter(final BoundingBox limiter) {
         final int minLongitudeIndex = getLongitudeIndex(limiter.minLongitude);
         final int maxLongitudeIndex = getLongitudeIndex(limiter.maxLongitude);
         final int minLatitudeIndex = getLatitudeIndex(limiter.minLatitude);
@@ -600,7 +619,7 @@ public class GridIndex implements Index {
         }
     }
 
-    private Set<Node> getNodesInLimiter(final List<Node> nodesToFilter, final BoundingBox limiter) {
+    private Set<Node> getCellsInLimiter(final List<Node> nodesToFilter, final BoundingBox limiter) {
         final Set<Node> nodesInLimiter = new LinkedHashSet<>();
 
         for (final Node node : nodesToFilter) {

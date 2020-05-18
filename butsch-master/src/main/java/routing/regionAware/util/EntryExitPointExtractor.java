@@ -2,6 +2,7 @@ package routing.regionAware.util;
 
 import data.Edge;
 import data.Node;
+import data.RegionOfInterest;
 import data.RoadGraph;
 import geometry.BoundingBox;
 import geometry.PolygonContainsChecker;
@@ -12,19 +13,19 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class EntryExitPointExtractor {
-    private final Polygon region;
+    private final RegionOfInterest region;
     private final RoadGraph graph;
     private final Index gridIndex;
 
-    public EntryExitPointExtractor(final Polygon region, final RoadGraph graph, final Index gridIndex) {
+    public EntryExitPointExtractor(final RegionOfInterest region, final RoadGraph graph, final Index gridIndex) {
         this.region = region;
         this.graph = graph;
         this.gridIndex = gridIndex;
     }
 
     public Set<Node> extract() {
-        final EntryExitNodeVisitor entryExitNodeVisitor = new EntryExitNodeVisitor(graph, region);
-        final BoundingBox boundingBox = BoundingBox.createFrom(region);
+        final EntryExitNodeVisitor entryExitNodeVisitor = new EntryExitNodeVisitor(graph, region.getPolygon());
+        final BoundingBox boundingBox = BoundingBox.createFrom(region.getPolygon());
         gridIndex.queryEdges(boundingBox, entryExitNodeVisitor);
 
         return entryExitNodeVisitor.getEntryExitNodes();

@@ -2,6 +2,7 @@ package routing.regionAware.util;
 
 import data.Edge;
 import data.Node;
+import data.RegionOfInterest;
 import data.RoadGraph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -16,11 +17,12 @@ public class RegionSubGraphBuilder {
     private final GeometryFactory geometryFactory = new GeometryFactory();
     private RoadGraph graph;
     private RoadGraph subGraph;
-    private Polygon whiteRegion;
+    private RegionOfInterest whiteRegion;
     private Polygon blackRegion;
     private Collection<Node> whitelist;
 
-    public RoadGraph getSubGraph(final RoadGraph graph, final Polygon whiteRegion, final Collection<Node> whitelist) {
+    public RoadGraph getSubGraph(final RoadGraph graph, final RegionOfInterest whiteRegion,
+                                 final Collection<Node> whitelist) {
         this.graph = graph;
         this.subGraph = new RoadGraph(Edge.class);
         this.whiteRegion = whiteRegion;
@@ -33,7 +35,7 @@ public class RegionSubGraphBuilder {
         return subGraph;
     }
 
-    public RoadGraph getSubGraph(final RoadGraph graph, final Polygon whiteRegion, final Polygon blackRegion, final Collection<Node> whitelist) {
+    public RoadGraph getSubGraph(final RoadGraph graph, final RegionOfInterest whiteRegion, final Polygon blackRegion, final Collection<Node> whitelist) {
         this.graph = graph;
         this.subGraph = new RoadGraph(Edge.class);
         this.whiteRegion = whiteRegion;
@@ -57,7 +59,7 @@ public class RegionSubGraphBuilder {
     private void addNodesWhite() {
         for (final Node node : graph.vertexSet()) {
             final Geometry point = toPoint(node);
-            if (whiteRegion.contains(point)) {
+            if (whiteRegion.getPolygon().contains(point)) {
                 addNode(node);
             }
         }
@@ -67,7 +69,7 @@ public class RegionSubGraphBuilder {
         for (final Node node : graph.vertexSet()) {
             final Geometry point = toPoint(node);
 
-            final boolean isWhiteContainingPoint = whiteRegion.contains(point);
+            final boolean isWhiteContainingPoint = whiteRegion.getPolygon().contains(point);
             final boolean isBlackContainingPoint = blackRegion.contains(point);
             if (isWhiteContainingPoint && !isBlackContainingPoint) {
                 addNode(node);

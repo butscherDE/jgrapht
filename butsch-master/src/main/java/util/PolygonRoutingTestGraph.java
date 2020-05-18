@@ -19,6 +19,7 @@ public class PolygonRoutingTestGraph {
     public RoadCH ch;
     public Polygon polygon;
     public GridIndex gridIndex;
+    public RegionOfInterest roi;
 
     public PolygonRoutingTestGraph() {
         this(getDefaultNodeList(), getDefaultEdgeList());
@@ -332,6 +333,7 @@ public class PolygonRoutingTestGraph {
 
     private void createTestPolygon() {
         this.polygon = createPolygon();
+        this.roi = new RegionOfInterest(polygon);
     }
 
     public List<Edge> getAllEdges() {

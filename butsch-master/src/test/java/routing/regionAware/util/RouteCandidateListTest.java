@@ -83,7 +83,7 @@ public class RouteCandidateListTest {
         final Node exitNode = graph.getVertex(29);
 
         final Map<Pair<Node, Node>, Path> alteredPaths = getInvalidatedPathMap(graph, startNode, entryNode);
-        final RouteCandidate testingCandidate = new RouteCandidate(REGION, graph, startNode, endNode, entryNode, exitNode, alteredPaths);
+        final RouteCandidate testingCandidate = new RouteCandidate(startNode, endNode, entryNode, exitNode, alteredPaths);
 
         illegalCandidateNotAdded(testingCandidate);
     }
@@ -99,7 +99,7 @@ public class RouteCandidateListTest {
         final Node exitNode = graph.getVertex(29);
 
         final Map<Pair<Node, Node>, Path> alteredPaths = getInvalidatedPathMap(graph, entryNode, exitNode);
-        final RouteCandidate testingCandidate = new RouteCandidate(REGION, graph, startNode, endNode, entryNode, exitNode, alteredPaths);
+        final RouteCandidate testingCandidate = new RouteCandidate(startNode, endNode, entryNode, exitNode, alteredPaths);
 
         illegalCandidateNotAdded(testingCandidate);
     }
@@ -115,7 +115,7 @@ public class RouteCandidateListTest {
         final Node exitNode = graph.getVertex(29);
 
         final Map<Pair<Node, Node>, Path> alteredPaths = getInvalidatedPathMap(graph, exitNode, endNode);
-        final RouteCandidate testingCandidate = new RouteCandidate(REGION, graph, startNode, endNode, entryNode, exitNode, alteredPaths);
+        final RouteCandidate testingCandidate = new RouteCandidate(startNode, endNode, entryNode, exitNode, alteredPaths);
 
         illegalCandidateNotAdded(testingCandidate);
     }
@@ -150,7 +150,7 @@ public class RouteCandidateListTest {
         final Node entryNode = graph.getVertex(29);
         final Node exitNode = graph.getVertex(28);
 
-        return new RouteCandidate(REGION, graph, startNode, endNode, entryNode, exitNode, allPaths);
+        return new RouteCandidate(startNode, endNode, entryNode, exitNode, allPaths);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class RouteCandidateListTest {
 
         RouteCandidateMocker(final double polygonRouteTime, final double timeInRoi, final double directTime,
                              final String name, final Map<Pair<Node, Node>, Path> allPaths) {
-            super(REGION, GRAPH, GRAPH_MOCKER.graph.getVertex(0), GRAPH_MOCKER.graph.getVertex(3), GRAPH_MOCKER.graph.getVertex(1),
+            super(GRAPH_MOCKER.graph.getVertex(0), GRAPH_MOCKER.graph.getVertex(3), GRAPH_MOCKER.graph.getVertex(1),
                   GRAPH_MOCKER.graph.getVertex(2), allPaths);
 
             this.polygonRouteTime = polygonRouteTime;

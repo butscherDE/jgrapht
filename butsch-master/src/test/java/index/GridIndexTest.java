@@ -3,8 +3,10 @@ package index;
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import data.VisibilityCell;
 import evalutation.Config;
 import geometry.BoundingBox;
+import index.vc.VCNodeTranslator;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
@@ -251,6 +253,17 @@ public class GridIndexTest {
         };
     }
 
+    @Test
+    public void queryVCs() {
+        final Index gridIndex = PolygonRoutingTestGraph.DEFAULT_INSTANCE.gridIndex;
+        final BoundingBox limiter = new BoundingBox(17, 21, 12, 16);
+
+        final AllVCsLogger visitor = new AllVCsLogger();
+        gridIndex.queryVisibilityCells(limiter, visitor);
+
+        visitor.getVisibilityCells().stream().forEach(a -> System.out.println(VCNodeTranslator.getNodeIDs(a, gridIndex)));
+    }
+
     private class OddIdVisitor implements Index.IndexVisitor<Node> {
         private final Set<Node> nodes = new LinkedHashSet<>();
         private final BoundingBox boundingBox;
@@ -299,6 +312,25 @@ public class GridIndexTest {
 
         public List<Edge> getEdges() {
             return new LinkedList<>(edges);
+        }
+    }
+
+    private class AllVCsLogger implements GridIndex.GridIndexVisitor {
+        final Set<VisibilityCell> vcs = new LinkedHashSet<>();
+
+
+        @Override
+        public void accept(final Object entity, final BoundingBox cell) {
+            accept(entity);
+        }
+
+        @Override
+        public void accept(final Object entity) {
+            vcs.add((VisibilityCell) entity);
+        }
+
+        public List<VisibilityCell> getVisibilityCells() {
+            return new LinkedList<>(vcs);
         }
     }
 }

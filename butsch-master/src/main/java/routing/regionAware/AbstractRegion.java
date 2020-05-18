@@ -1,9 +1,6 @@
 package routing.regionAware;
 
-import data.Node;
-import data.Path;
-import data.RoadCH;
-import data.RoadGraph;
+import data.*;
 import index.Index;
 import org.jgrapht.alg.util.Pair;
 import org.locationtech.jts.geom.Polygon;
@@ -15,20 +12,21 @@ import routing.regionAware.util.LOTNodeExtractor;
 import routing.regionAware.util.RouteCandidate;
 import routing.regionAware.util.RouteCandidateList;
 
+import javax.swing.plaf.synth.Region;
 import java.util.*;
 
 public abstract class AbstractRegion implements RoutingAlgorithm {
     final RoadGraph globalGraph;
     private final RoadCH globalCH;
     private final Index globalIndex;
-    final Polygon region;
+    final RegionOfInterest region;
     private final RoadCH regionCH;
     private final Map<Pair<Node, Node>, Path> allPathsNonBacktracked = new HashMap();
     final Set<Node> entryExitNodes;
     LOTNodeExtractor lotNodeExtractor;
 
     public AbstractRegion(final RoadGraph globalGraph, final RoadCH globalCH, final Index globalIndex,
-                          final Polygon region) {
+                          final RegionOfInterest region) {
         this.globalGraph = globalGraph;
         this.globalCH = globalCH;
         this.globalIndex = globalIndex;
@@ -59,8 +57,7 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
                 final RouteCandidateList<RouteCandidate> routeCandidates = new RouteCandidateList<>();
                 for (final Node entryNode : lotNodeExtractor.getLotNodesFor(source)) {
                     for (final Node exitNode : lotNodeExtractor.getLotNodesFor(target)) {
-                        final RouteCandidate candidate = new RouteCandidate(region, globalGraph, source, target,
-                                                                            entryNode, exitNode,
+                        final RouteCandidate candidate = new RouteCandidate(source, target, entryNode, exitNode,
                                                                             allPathsNonBacktracked);
                         routeCandidates.add(candidate);
                     }

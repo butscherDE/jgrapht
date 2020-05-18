@@ -1,9 +1,6 @@
 package routing.regionAware.util;
 
-import data.Edge;
-import data.Node;
-import data.Path;
-import data.RoadGraph;
+import data.*;
 import org.jgrapht.alg.util.Pair;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
@@ -12,8 +9,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class RouteCandidate implements Comparable<RouteCandidate> {
-    private final Polygon region;
-    private final RoadGraph graph;
     public final Node startNode;
     public final Node endNode;
     public final Node regionEntryNode;
@@ -24,10 +19,8 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
     final Path directRouteStartEnd;
     final Path mergedPath;
 
-    public RouteCandidate(final Polygon region, final RoadGraph graph, final Node startNode, final Node endNode, final Node regionEntryNode,
+    public RouteCandidate(final Node startNode, final Node endNode, final Node regionEntryNode,
                           final Node regionExitNode, final Map<Pair<Node, Node>, Path> allPaths) {
-        this.region = region;
-        this.graph = graph;
         this.startNode = startNode;
         this.endNode = endNode;
         this.regionEntryNode = regionEntryNode;

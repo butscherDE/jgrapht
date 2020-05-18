@@ -119,6 +119,11 @@ public class VisibilityCell implements PolygonSegmentCollection {
     }
 
     @Override
+    public int hashCode() {
+        return Arrays.hashCode(coordinates);
+    }
+
+    @Override
     public String toString() {
         return "VisibilityCell{" + "coordinates=" + Arrays.toString(coordinates) + '}';
     }

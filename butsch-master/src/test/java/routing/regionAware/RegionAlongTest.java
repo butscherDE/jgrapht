@@ -1,14 +1,12 @@
 package routing.regionAware;
 
-import data.Node;
-import data.Path;
-import data.RoadCH;
-import data.RoadGraph;
+import data.*;
 import index.Index;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Polygon;
 import util.PolygonRoutingTestGraph;
 
+import javax.swing.plaf.synth.Region;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -34,12 +32,12 @@ public class RegionAlongTest extends AbstractRegionTest{
         final RoadGraph graph = GRAPH_MOCKER.graph;
         final Index index = GRAPH_MOCKER.gridIndex;
         final RoadCH ch = GRAPH_MOCKER.ch;
-        final Polygon polygon = GRAPH_MOCKER.polygon;
+        final RegionOfInterest roi = GRAPH_MOCKER.roi;
 
         final Node startNode = index.getClosestNode(startLongitude, startLatitude);
         final Node endNode = index.getClosestNode(endLongitude, endLatitude);
 
-        final RegionThrough regionThrough = new RegionThrough(graph, ch, index, polygon);
+        final RegionThrough regionThrough = new RegionThrough(graph, ch, index, roi);
         return regionThrough.findPath(startNode, endNode);
     }
 

@@ -47,9 +47,8 @@ public class EntryExitPointExtractorTest {
     }
 
     public List<Node> getEntryExitNodes() {
-        final EntryExitPointExtractor entryExitPointExtractor = new EntryExitPointExtractor(GRAPH_MOCKER.polygon,
-                                                                                            GRAPH_MOCKER.graph,
-                                                                                            GRAPH_MOCKER.gridIndex);
+        final EntryExitPointExtractor entryExitPointExtractor =
+                new EntryExitPointExtractor(GRAPH_MOCKER.roi, GRAPH_MOCKER.graph, GRAPH_MOCKER.gridIndex);
         return new LinkedList<>(entryExitPointExtractor.extract());
     }
 
