@@ -53,13 +53,13 @@ public class GridIndex implements Index {
             for (final VisibilityCell visibilityCell : visibilityCells) {
                 final Coordinate[] coordinates = visibilityCell.getPolygon().getCoordinates();
                 for (final Coordinate coordinate : coordinates) {
-                    System.out.print(getClosestNode(coordinate.getX(), coordinate.getY()).id + ",");
+//                    System.out.print(getClosestNode(coordinate.getX(), coordinate.getY()).id + ",");
                 }
-                System.out.println();
+//                System.out.println();
             }
         }
 
-        System.out.println("##################################");
+//        System.out.println("##################################");
     }
 
     private void instantiateCellObjects() {
