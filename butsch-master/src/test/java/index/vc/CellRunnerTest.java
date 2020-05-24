@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
-import util.BinaryHashFunction;
 import util.PolygonRoutingTestGraph;
 
 import java.util.LinkedList;
@@ -61,7 +60,7 @@ public class CellRunnerTest {
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
 
-        visibilityManagerAsserts17to26Left(cti);
+        visibilityManagerAsserts17to26LeftInverse(cti);
     }
 
     private void visibilityManagerAsserts17to26Left(CellRunnerTestInputs cti) {
@@ -69,8 +68,19 @@ public class CellRunnerTest {
         assertExploredButNotWalkedEdgesNotVisited17to26Left(cti);
     }
 
+    private void visibilityManagerAsserts17to26LeftInverse(CellRunnerTestInputs cti) {
+        assertWalkedEdgesMarkedAsVisited17to26LeftInverse(cti);
+        assertExploredButNotWalkedEdgesNotVisited17to26Left(cti);
+    }
+
     private void assertWalkedEdgesMarkedAsVisited17to26Left(CellRunnerTestInputs cti) {
         assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.startingEdge, graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(26, 18), graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(18, 17), graph)));
+    }
+
+    private void assertWalkedEdgesMarkedAsVisited17to26LeftInverse(CellRunnerTestInputs cti) {
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.startingEdge, graph).getReversed()));
         assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(26, 18), graph)));
         assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(18, 17), graph)));
     }
@@ -121,7 +131,7 @@ public class CellRunnerTest {
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
 
-        visibilityManagerAsserts17to26Right(cti);
+        visibilityManagerAsserts17to26RightInverse(cti);
     }
 
     private void visibilityManagerAsserts17to26Right(CellRunnerTestInputs cti) {
@@ -129,8 +139,19 @@ public class CellRunnerTest {
         assertExploredButNotWalkedEdgesNotVisited17to26Right(cti);
     }
 
+    private void visibilityManagerAsserts17to26RightInverse(CellRunnerTestInputs cti) {
+        assertWalkedEdgesMarkedAsVisited17to26RightInverse(cti);
+        assertExploredButNotWalkedEdgesNotVisited17to26Right(cti);
+    }
+
     private void assertWalkedEdgesMarkedAsVisited17to26Right(CellRunnerTestInputs cti) {
         assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.startingEdge, graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(26, 35), graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(35, 17), graph)));
+    }
+
+    private void assertWalkedEdgesMarkedAsVisited17to26RightInverse(CellRunnerTestInputs cti) {
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.startingEdge, graph).getReversed()));
         assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(26, 35), graph)));
         assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(35, 17), graph)));
     }
