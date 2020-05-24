@@ -70,18 +70,18 @@ public class CellRunnerTest {
     }
 
     private void assertWalkedEdgesMarkedAsVisited17to26Left(CellRunnerTestInputs cti) {
-        assertTrue(cti.visitedManager.get(new AscendingEdge(cti.startingEdge, graph)));
-        assertTrue(cti.visitedManager.get(new AscendingEdge(cti.getEdge(18, 26), graph)));
-        assertTrue(cti.visitedManager.get(new AscendingEdge(cti.getEdge(17, 18), graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.startingEdge, graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(18, 26), graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(17, 18), graph)));
     }
 
     private void assertExploredButNotWalkedEdgesNotVisited17to26Left(CellRunnerTestInputs cti) {
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(26, 35), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(14, 18), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(15, 18), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(18, 27), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(18, 100), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(18, 108), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(26, 35), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(14, 18), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(15, 18), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(18, 27), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(18, 100), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(18, 108), graph)));
     }
 
     @Test
@@ -130,20 +130,20 @@ public class CellRunnerTest {
     }
 
     private void assertWalkedEdgesMarkedAsVisited17to26Right(CellRunnerTestInputs cti) {
-        assertTrue(cti.visitedManager.get(new AscendingEdge(cti.startingEdge, graph)));
-        assertTrue(cti.visitedManager.get(new AscendingEdge(cti.getEdge(26, 35), graph)));
-        assertTrue(cti.visitedManager.get(new AscendingEdge(cti.getEdge(35, 17), graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.startingEdge, graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(26, 35), graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(35, 17), graph)));
     }
 
     private void assertExploredButNotWalkedEdgesNotVisited17to26Right(CellRunnerTestInputs cti) {
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(17, 18), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(17, 15), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(17, 34), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(26, 18), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(35, 25), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(35, 34), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(35, 36), graph)));
-        assertFalse(cti.visitedManager.get(new AscendingEdge(cti.getEdge(35, 50), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(17, 18), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(17, 15), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(17, 34), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(26, 18), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(35, 25), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(35, 34), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(35, 36), graph)));
+        assertFalse(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(35, 50), graph)));
     }
 
     @Test
@@ -671,7 +671,7 @@ public class CellRunnerTest {
     public static class CellRunnerTestInputs {
         private final PolygonRoutingTestGraph graphMocker;
         public final RoadGraph graph;
-        public final BinaryHashFunction<AscendingEdge> visitedManager;
+        public final VisitedEdgesHashFunction visitedManager;
         public final Edge startingEdge;
         public final Map<Node, SortedNeighbors> preSortedNeighborsLeft;
         public final Map<Node, SortedNeighbors> preSortedNeighborsRight;
@@ -679,7 +679,7 @@ public class CellRunnerTest {
         public CellRunnerTestInputs(final PolygonRoutingTestGraph graphMocker, final int startBaseNode, final int startAdjNode) {
             this.graphMocker = graphMocker;
             this.graph = graphMocker.graph;
-            this.visitedManager = new BinaryHashFunction<>();
+            this.visitedManager = new VisitedEdgesHashFunction();
             this.startingEdge = getEdge(startBaseNode, startAdjNode);
 
             final NeighborPreSorter neighborPreSorter = new NeighborPreSorter(graph);

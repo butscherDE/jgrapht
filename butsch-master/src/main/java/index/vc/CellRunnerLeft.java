@@ -12,7 +12,7 @@ import java.util.Map;
 class CellRunnerLeft extends CellRunner {
 
     public CellRunnerLeft(final RoadGraph graph,
-                          final BinaryHashFunction<AscendingEdge> visitedManager,
+                          final VisitedEdgesHashFunction visitedManager,
                           final Edge startEdge, final Map<Node, SortedNeighbors> sortedNeighborsMap) {
         super(graph, visitedManager, startEdge, sortedNeighborsMap);
     }

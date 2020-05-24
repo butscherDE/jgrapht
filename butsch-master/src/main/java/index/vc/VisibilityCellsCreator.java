@@ -18,8 +18,8 @@ import java.util.*;
  */
 public class VisibilityCellsCreator {
     private final RoadGraph graph;
-    private final BinaryHashFunction<AscendingEdge> visitedManagerLeft = new BinaryHashFunction<>();;
-    private final BinaryHashFunction<AscendingEdge> visitedManagerRight = new BinaryHashFunction<>();;
+    private final VisitedEdgesHashFunction visitedManagerLeft = new VisitedEdgesHashFunction();;
+    private final VisitedEdgesHashFunction visitedManagerRight = new VisitedEdgesHashFunction();;
     private final Map<Node, SortedNeighbors> sortedNeighborListLeft;
     private final Map<Node, SortedNeighbors> sortedNeighborListRight;
 
@@ -61,9 +61,8 @@ public class VisibilityCellsCreator {
 
     private boolean continueOnLengthZeroEdge(final Edge currentEdge) {
         if (isCurrentEdgeLengthZero(currentEdge)) {
-            final AscendingEdge currentEdgeAscending = new AscendingEdge(currentEdge, graph);
-            visitedManagerLeft.set(currentEdgeAscending, true);
-            visitedManagerRight.set(currentEdgeAscending, true);
+            visitedManagerLeft.visited(new ReflectiveEdge(currentEdge, graph));
+            visitedManagerRight.visited(new ReflectiveEdge(currentEdge, graph));
             return true;
         }
         return false;
@@ -81,12 +80,10 @@ public class VisibilityCellsCreator {
     }
 
     private Boolean visibilityCellOnTheLeftFound(final Edge currentEdge) {
-        final AscendingEdge currentEdgeAscending = new AscendingEdge(currentEdge, graph);
-        return visitedManagerLeft.get(currentEdgeAscending);
+        return visitedManagerLeft.isVisited(new ReflectiveEdge(currentEdge, graph));
     }
 
     private Boolean visibilityCellOnTheRightFound(final Edge currentEdge) {
-        final AscendingEdge currentEdgeAscending = new AscendingEdge(currentEdge, graph);
-        return visitedManagerRight.get(currentEdgeAscending);
+        return visitedManagerRight.isVisited(new ReflectiveEdge(currentEdge, graph));
     }
 }

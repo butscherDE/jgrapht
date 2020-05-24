@@ -12,14 +12,14 @@ import java.util.Map;
 
 abstract class CellRunner {
     final LinkedList<ReflectiveEdge> edgesOnCell = new LinkedList<>();
-    final BinaryHashFunction<AscendingEdge> visitedManager;
+    final VisitedEdgesHashFunction visitedManager;
     private final ReflectiveEdge startEdge;
     private final Map<Node, SortedNeighbors> sortedNeighborsMap;
 
     private ReflectiveEdge lastNonZeroLengthEdge;
 
 
-    CellRunner(final RoadGraph graph, final BinaryHashFunction<AscendingEdge> visitedManager, final Edge startEdge,
+    CellRunner(final RoadGraph graph, final VisitedEdgesHashFunction visitedManager, final Edge startEdge,
                Map<Node, SortedNeighbors> sortedNeighborsMap) {
         this.visitedManager = visitedManager;
 
@@ -64,7 +64,7 @@ abstract class CellRunner {
 
     private void addStartAndEndNodeOfCell() {
         edgesOnCell.add(startEdge);
-        visitedManager.set(new AscendingEdge(startEdge), true);
+        visitedManager.visited(startEdge);
     }
 
     private boolean processNextNeighborOnCell() {
@@ -83,8 +83,7 @@ abstract class CellRunner {
     }
 
     private void settleEdge(ReflectiveEdge edge) {
-        final AscendingEdge ascendingEdge = new AscendingEdge(edge);
-        visitedManager.set(ascendingEdge, true);
+        visitedManager.visited(edge);
         edgesOnCell.add(edge);
     }
 
@@ -121,7 +120,7 @@ abstract class CellRunner {
                  lastNonZeroLengthEdge.source.id == 14 && lastNonZeroLengthEdge.target.id == 6) {
                 System.out.println(lastNonZeroLengthEdge);
                 System.out.println(this.getClass());
-                System.out.println(visitedManager.get(new AscendingEdge(lastNonZeroLengthEdge)));
+                System.out.println(visitedManager.isVisited(lastNonZeroLengthEdge));
             }
         }
     }
