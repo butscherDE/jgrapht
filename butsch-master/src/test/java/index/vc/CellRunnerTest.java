@@ -71,8 +71,8 @@ public class CellRunnerTest {
 
     private void assertWalkedEdgesMarkedAsVisited17to26Left(CellRunnerTestInputs cti) {
         assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.startingEdge, graph)));
-        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(18, 26), graph)));
-        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(17, 18), graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(26, 18), graph)));
+        assertTrue(cti.visitedManager.isVisited(new ReflectiveEdge(cti.getEdge(18, 17), graph)));
     }
 
     private void assertExploredButNotWalkedEdgesNotVisited17to26Left(CellRunnerTestInputs cti) {
