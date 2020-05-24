@@ -12,7 +12,6 @@ import java.util.Map;
 
 abstract class CellRunner {
     final LinkedList<ReflectiveEdge> edgesOnCell = new LinkedList<>();
-    private final BinaryHashFunction<AscendingEdge> localVisitedManager;
     final BinaryHashFunction<AscendingEdge> visitedManager;
     private final VectorAngleCalculator vectorAngleCalculator;
     private final ReflectiveEdge startEdge;
@@ -24,7 +23,6 @@ abstract class CellRunner {
     CellRunner(final RoadGraph graph, final BinaryHashFunction<AscendingEdge> visitedManager,
                final VectorAngleCalculator vectorAngleCalculator, final Edge startEdge,
                Map<Node, SortedNeighbors> sortedNeighborsMap) {
-        this.localVisitedManager = new BinaryHashFunction<>();
         this.visitedManager = visitedManager;
         this.vectorAngleCalculator = vectorAngleCalculator;
 
@@ -89,7 +87,6 @@ abstract class CellRunner {
 
     private void settleEdge(ReflectiveEdge edge) {
         final AscendingEdge ascendingEdge = new AscendingEdge(edge);
-        localVisitedManager.set(ascendingEdge, true);
         visitedManager.set(ascendingEdge, true);
         edgesOnCell.add(edge);
     }
