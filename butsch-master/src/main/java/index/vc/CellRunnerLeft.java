@@ -14,7 +14,7 @@ class CellRunnerLeft extends CellRunner {
     public CellRunnerLeft(final RoadGraph graph,
                           final BinaryHashFunction<AscendingEdge> visitedManager,
                           final Edge startEdge, final Map<Node, SortedNeighbors> sortedNeighborsMap) {
-        super(graph, visitedManager, new VectorAngleCalculatorLeft(graph), startEdge, sortedNeighborsMap);
+        super(graph, visitedManager, startEdge, sortedNeighborsMap);
     }
 
     @Override

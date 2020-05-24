@@ -13,18 +13,15 @@ import java.util.Map;
 abstract class CellRunner {
     final LinkedList<ReflectiveEdge> edgesOnCell = new LinkedList<>();
     final BinaryHashFunction<AscendingEdge> visitedManager;
-    private final VectorAngleCalculator vectorAngleCalculator;
     private final ReflectiveEdge startEdge;
     private final Map<Node, SortedNeighbors> sortedNeighborsMap;
 
     private ReflectiveEdge lastNonZeroLengthEdge;
 
 
-    CellRunner(final RoadGraph graph, final BinaryHashFunction<AscendingEdge> visitedManager,
-               final VectorAngleCalculator vectorAngleCalculator, final Edge startEdge,
+    CellRunner(final RoadGraph graph, final BinaryHashFunction<AscendingEdge> visitedManager, final Edge startEdge,
                Map<Node, SortedNeighbors> sortedNeighborsMap) {
         this.visitedManager = visitedManager;
-        this.vectorAngleCalculator = vectorAngleCalculator;
 
         this.startEdge = forceEdgeAscendingNodeIDs(new ReflectiveEdge(startEdge, graph));
         this.sortedNeighborsMap = sortedNeighborsMap;

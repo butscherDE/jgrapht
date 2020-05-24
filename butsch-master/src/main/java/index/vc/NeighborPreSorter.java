@@ -51,10 +51,14 @@ public class NeighborPreSorter {
     }
 
     private void addSortedNeighbors(final Set<Node> allNodes) {
+        final VectorAngleCalculatorLeft vectorAngleCalculatorLeft = new VectorAngleCalculatorLeft(graph);
+        final VectorAngleCalculatorRight vectorAngleCalculatorRight = new VectorAngleCalculatorRight(graph);
+        final Node doNotIgnoreNode = SortedNeighbors.DO_NOT_IGNORE_NODE;
+
         for (final Node node : allNodes) {
-            final SortedNeighbors sortedNeighborsLeft = new SortedNeighbors(graph, node, SortedNeighbors.DO_NOT_IGNORE_NODE, new VectorAngleCalculatorLeft(graph));
+            final SortedNeighbors sortedNeighborsLeft = new SortedNeighbors(graph, node, doNotIgnoreNode, vectorAngleCalculatorLeft);
             allSortedNeighborsLeft.put(node, sortedNeighborsLeft);
-            final SortedNeighbors sortedNeighborsRight = new SortedNeighbors(graph, node, SortedNeighbors.DO_NOT_IGNORE_NODE, new VectorAngleCalculatorRight(graph));
+            final SortedNeighbors sortedNeighborsRight = new SortedNeighbors(graph, node, doNotIgnoreNode, vectorAngleCalculatorRight);
             allSortedNeighborsRight.put(node, sortedNeighborsRight);
         }
     }
