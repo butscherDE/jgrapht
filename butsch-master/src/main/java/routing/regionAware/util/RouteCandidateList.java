@@ -19,8 +19,8 @@ public class RouteCandidateList<T extends RouteCandidate> {
         Collections.sort(this.candidates, (Comparator<RouteCandidate>) (rc1, rc2) -> (-1) * Double.compare(rc1.getTimeInROI(), rc2.getTimeInROI()));
     }
 
-    public List<Path> getFirstN(final int numberOfFirstElements) {
-        final List<Path> paths = new ArrayList<>(numberOfFirstElements);
+    public List<RouteCandidate> getFirstN(final int numberOfFirstElements) {
+        final List<RouteCandidate> paths = new ArrayList<>(numberOfFirstElements);
 
         final int endOfCandidates = this.candidates.size() - 1;
         paths.addAll(addNonIntersectedPaths(numberOfFirstElements, endOfCandidates));
@@ -29,24 +29,24 @@ public class RouteCandidateList<T extends RouteCandidate> {
         return paths;
     }
 
-    private Collection<? extends Path> addNonIntersectedPaths(final int numberOfFirstElements,
+    private Collection<RouteCandidate> addNonIntersectedPaths(final int numberOfFirstElements,
                                                               final int endOfCandidates) {
         return addPathsBasedOnIntersectionStatus(numberOfFirstElements, endOfCandidates, false);
     }
 
-    private Collection<? extends Path> fillWithIntersectedPaths(final int numberOfAdditionalElements, final int endOfCandidates) {
+    private Collection<RouteCandidate> fillWithIntersectedPaths(final int numberOfAdditionalElements, final int endOfCandidates) {
         return addPathsBasedOnIntersectionStatus(numberOfAdditionalElements, endOfCandidates, true);
     }
 
-    private List<Path> addPathsBasedOnIntersectionStatus(int nOfFirstElements, int endOfCandidates,
+    private List<RouteCandidate> addPathsBasedOnIntersectionStatus(int nOfFirstElements, int endOfCandidates,
                                                          boolean addSelfIntersecting) {
-        List<Path> paths = new ArrayList<>(nOfFirstElements);
+        List<RouteCandidate> paths = new ArrayList<>(nOfFirstElements);
         int indexIntoCandidates = endOfCandidates;
         while (indexIntoCandidates >= 0 && paths.size() < nOfFirstElements) {
             final RouteCandidate candidate = this.candidates.get(indexIntoCandidates);
 
             if (candidate.isDetourSelfIntersecting() == addSelfIntersecting) {
-                paths.add(candidate.getMergedPath());
+                paths.add(candidate);
             }
 
             indexIntoCandidates--;

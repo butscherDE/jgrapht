@@ -64,11 +64,11 @@ public class RouteCandidateListTest {
         this.candidateList.pruneDominatedCandidateRoutes();
         this.candidateList.sortByGainNonAscending();
 
-        List<Path> topCandidates = this.candidateList.getFirstN(3);
+        List<RouteCandidate> topCandidates = this.candidateList.getFirstN(3);
 
-        assertEquals("c", ((TestPath) topCandidates.get(0)).name);
-        assertEquals("a", ((TestPath) topCandidates.get(1)).name);
-        assertEquals("b", ((TestPath) topCandidates.get(2)).name);
+        assertEquals("c", ((TestPath) topCandidates.get(0).getMergedPath()).name);
+        assertEquals("a", ((TestPath) topCandidates.get(1).getMergedPath()).name);
+        assertEquals("b", ((TestPath) topCandidates.get(2).getMergedPath()).name);
         assertEquals(3, topCandidates.size());
     }
 

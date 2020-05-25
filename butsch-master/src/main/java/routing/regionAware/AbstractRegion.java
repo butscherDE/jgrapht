@@ -45,7 +45,7 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
     @Override
     public List<Path> findPaths(final Set<Node> sources, final Set<Node> targets) {
         calcPathsWithoutBacktracking(sources, targets);
-
+        // TODO clean!
         final int numPaths = sources.size() * targets.size();
         final List<RouteCandidate> optimalCandidates = new ArrayList<>(numPaths);
         for (final Node source : sources) {
@@ -68,7 +68,7 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
                 routeCandidates.pruneDominatedCandidateRoutes();
                 routeCandidates.pruneLowerQuantileInROI();
                 routeCandidates.sortByGainNonAscending();
-                final RouteCandidate bestCandidate = routeCandidates.get(0);
+                final RouteCandidate bestCandidate = routeCandidates.getFirstN(1).get(0);
                 optimalCandidates.add(bestCandidate);
             }
         }
