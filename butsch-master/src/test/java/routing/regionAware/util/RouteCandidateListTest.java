@@ -52,10 +52,11 @@ public class RouteCandidateListTest {
     public void assertCorrectListContentAfterPruning() {
         addTestingCandidates();
         this.candidateList.pruneDominatedCandidateRoutes();
+        this.candidateList.sortByGainNonAscending();
 
-        assertEquals("a", ((RouteCandidateMocker) this.candidateList.get(0)).name);
-        assertEquals("c", ((RouteCandidateMocker) this.candidateList.get(1)).name);
-        assertEquals("b", ((RouteCandidateMocker) this.candidateList.get(2)).name);
+        assertEquals("b", ((RouteCandidateMocker) this.candidateList.get(0)).name);
+        assertEquals("a", ((RouteCandidateMocker) this.candidateList.get(1)).name);
+        assertEquals("c", ((RouteCandidateMocker) this.candidateList.get(2)).name);
     }
 
     @Test
