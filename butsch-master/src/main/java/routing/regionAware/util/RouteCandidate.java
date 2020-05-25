@@ -58,7 +58,7 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
 
     @Override
     public int compareTo(RouteCandidate o) {
-        return (-1) * Double.compare(this.getGain(), o.getGain());
+        return Double.compare(this.getGain(), o.getGain());
     }
 
     @Override

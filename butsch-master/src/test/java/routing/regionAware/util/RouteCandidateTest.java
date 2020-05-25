@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RouteCandidateTest {
     private final static PolygonRoutingTestGraph GRAPH_MOCKER = PolygonRoutingTestGraph.DEFAULT_INSTANCE;
     private static RoadGraph GRAPH = GRAPH_MOCKER.graph;
-    private static RegionOfInterest ROI = GRAPH_MOCKER.roi;
 
     private static Map<Pair<Node, Node>, Path> allPaths;
     private static RouteCandidate smallerSimpleCandidate;
@@ -42,7 +41,8 @@ public class RouteCandidateTest {
 
     @BeforeEach
     public void setGreaterSimpleCandidate() {
-        greaterSimpleCandidate = new RouteCandidate(GRAPH.getVertex(0), GRAPH.getVertex(4), GRAPH.getVertex(28),
+        greaterSimpleCandidate = new RouteCandidate(GRAPH.getVertex(0), GRAPH.getVertex(
+                4), GRAPH.getVertex(28),
                                                     GRAPH.getVertex(9), allPaths);
     }
 
