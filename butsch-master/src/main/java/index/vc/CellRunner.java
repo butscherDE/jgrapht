@@ -93,22 +93,16 @@ abstract class CellRunner {
 
     private ReflectiveEdge getMostLeftOrRightOrientedEdge() {
         final ReflectiveEdge lastEdge = edgesOnCell.getLast();
-        final Node ignoreBackwardsEdge = getIgnoreBackwardsEdge(lastEdge);
-        final ReflectiveEdge mostOrientedEdge = getMostOrientedEdgeFromSortedNeighbors(lastEdge, ignoreBackwardsEdge);
+        final ReflectiveEdge mostOrientedEdge = getMostOrientedEdgeFromSortedNeighbors(lastEdge);
 
         updateLastNonZeroLengthEdge(mostOrientedEdge);
 
         return mostOrientedEdge;
     }
 
-    private Node getIgnoreBackwardsEdge(ReflectiveEdge lastEdge) {
-        final Node lastEdgeBaseNode = lastEdge.source;
-        return hasEdgeEndPointsWithEqualCoordinates(lastEdge) ? lastEdgeBaseNode : SortedNeighbors.DO_NOT_IGNORE_NODE;
-    }
-
-    private ReflectiveEdge getMostOrientedEdgeFromSortedNeighbors(ReflectiveEdge lastEdge, Node ignoreBackwardsEdge) {
+    private ReflectiveEdge getMostOrientedEdgeFromSortedNeighbors(ReflectiveEdge lastEdge) {
         final Node lastEdgeAdjNode = lastEdge.target;
-        final SortedNeighbors sortedNeighbors = sortedNeighborsMap.get(lastEdgeAdjNode); //new SortedNeighbors(graph, lastEdgeAdjNode, ignoreBackwardsEdge, vectorAngleCalculator);
+        final SortedNeighbors sortedNeighbors = sortedNeighborsMap.get(lastEdgeAdjNode);
         final ReflectiveEdge reversed = lastNonZeroLengthEdge.getReversed();
         return sortedNeighbors.getMostOrientedEdge(reversed);
     }
