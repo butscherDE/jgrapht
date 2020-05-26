@@ -166,7 +166,7 @@ public class CircularListTest {
     }
 
     @Test
-    public void isSizeUpdatedOnListIteratorModificiation() {
+    public void isSizeUpdatedOnListIteratorModification() {
         final List<Integer> list = getIntegers();
 
         final ListIterator<Integer> it = list.listIterator();
