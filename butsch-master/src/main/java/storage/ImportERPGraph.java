@@ -104,7 +104,7 @@ public class ImportERPGraph implements GraphImporter {
             latitude = Double.parseDouble(currentNodeTokens[2]);
             elevation = Double.parseDouble(currentNodeTokens[3]);
         } else {
-            throw new InputMismatchException("Node has not the required number of fields");
+            throw new NumberFormatException("Node has not the required number of fields");
         }
 
         return new Node(id, longitude, latitude, elevation);
