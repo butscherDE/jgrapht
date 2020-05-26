@@ -165,6 +165,17 @@ public class CircularListTest {
         assertFalse(listIt.hasPrevious());
     }
 
+    @Test
+    public void isSizeUpdatedOnListIteratorModificiation() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> it = list.listIterator();
+        it.next();
+        it.remove();
+
+        assertEquals(4, list.size());
+    }
+
     private List<Integer> getIntegers() {
         final List<Integer> list = new CircularList<>(new LinkedList<>());
         list.add(1);
