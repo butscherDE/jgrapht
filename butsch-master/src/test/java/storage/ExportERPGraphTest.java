@@ -38,20 +38,20 @@ class ExportERPGraphTest {
     }
 
     private void assertNodeAssociatedData(RoadGraph graph, RoadGraph graphReImp) {
-        for (int i = 0; i < graph.vertexSet().size(); i++) {
-            assertNodeData(graph, graphReImp, i);
+        for (final Node vertex : graph.vertexSet()) {
+            assertNodeData(vertex, graphReImp);
 
-            assertNeighbors(graph, graphReImp, i);
+            assertNeighbors(vertex, graph, graphReImp);
         }
     }
 
-    private void assertNodeData(RoadGraph graph, RoadGraph graphReImp, int i) {
-        assertEquals(graph.getVertex(i), graphReImp.getVertex(i));
+    private void assertNodeData(final Node vertex, RoadGraph graphReImp) {
+        assertEquals(vertex, graphReImp.getVertex(vertex.id));
     }
 
-    private void assertNeighbors(RoadGraph graph, RoadGraph graphReImp, int i) {
-        final Node graphNodeI = graph.getVertex(i);
-        final Node reImpGraphNodeI = graphReImp.getVertex(i);
+    private void assertNeighbors(final Node vertex, final RoadGraph graph, final RoadGraph graphReImp) {
+        final Node graphNodeI = graph.getVertex(vertex.id);
+        final Node reImpGraphNodeI = graphReImp.getVertex(vertex.id);
 
         Set<Edge> edges = graph.outgoingEdgesOf(graphNodeI);
         Set<Edge> edgesReImp = graphReImp.outgoingEdgesOf(reImpGraphNodeI);

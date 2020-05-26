@@ -10,8 +10,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ImportERPGraph implements GraphImporter {
     private final FileReader fileReader;
@@ -57,44 +56,14 @@ public class ImportERPGraph implements GraphImporter {
 
     @SuppressWarnings("UnnecessaryLocalVariable")
     private void parseGraph(int numNodes, int numEdges) throws IOException {
-        final List<Node> nodeList = new ArrayList<>(numNodes);
+        final Map<Long, Node> nodeList = new HashMap<>(numNodes);
         for (int i = 0; i < numNodes; i++) {
             parseNextNode(nodeList);
         }
 
-        final List<Node> filteredNodeList = nodeList;
-//        final List<Node> filteredNodeList = getFilteredNodeList(numNodes, nodeList);
-
-
         for (int i = 0; i < numEdges; i++) {
-            parseNextEdge(filteredNodeList);
+            parseNextEdge(nodeList);
         }
-    }
-
-    private List<Node> getFilteredNodeList(final int numNodes, final List<Node> nodeList) {
-        double maxLatitude = Double.NEGATIVE_INFINITY;
-        double minLatitude = Double.POSITIVE_INFINITY;
-        double maxLongitude = Double.NEGATIVE_INFINITY;
-        double minLongitude = Double.POSITIVE_INFINITY;
-        for (final Node node : nodeList) {
-            maxLatitude = Math.max(maxLatitude, node.latitude);
-            minLatitude = Math.min(minLatitude, node.latitude);
-            maxLongitude = Math.max(maxLongitude, node.longitude);
-            minLongitude = Math.min(minLongitude, node.longitude);
-        }
-        double latDivisionLine = minLatitude + (maxLatitude - minLatitude) / 4;
-        double lonDivisionLine = minLongitude + (maxLongitude - minLongitude) / 4;
-
-        int newId = 0;
-        final List<Node> filteredNodeList = new ArrayList<>(numNodes);
-        for (final Node node : nodeList) {
-            if (node.latitude < latDivisionLine && node.longitude < lonDivisionLine) {
-                final Node newNode = new Node(newId++, node.longitude, node.latitude, node.elevation);
-                graph.addVertex(newNode);
-                filteredNodeList.add(newNode);
-            }
-        }
-        return filteredNodeList;
     }
 
     private int getNumNodes() throws IOException {
@@ -110,37 +79,53 @@ public class ImportERPGraph implements GraphImporter {
         return Integer.parseInt(metaLine);
     }
 
-    private void parseNextNode(List<Node> nodeList) throws IOException {
+    private void parseNextNode(final Map<Long, Node> nodeList) throws IOException {
         final String[] currentNodeTokens = getTokenizedNextLine();
 
         final Node newNode = createNodeFromTokens(currentNodeTokens);
 
         graph.addVertex(newNode);
-        nodeList.add(newNode);
+        nodeList.put(newNode.id, newNode);
     }
 
     private Node createNodeFromTokens(String[] currentNodeTokens) {
-        final double longitude = Double.parseDouble(currentNodeTokens[0]);
-        final double latitude = Double.parseDouble(currentNodeTokens[1]);
-        final double elevation = Double.parseDouble(currentNodeTokens[2]);
+        final long id;
+        final double longitude;
+        final double latitude;
+        final double elevation;
+        if (currentNodeTokens.length == 3) {
+            id = autoId++;
+            longitude = Double.parseDouble(currentNodeTokens[0]);
+            latitude = Double.parseDouble(currentNodeTokens[1]);
+            elevation = Double.parseDouble(currentNodeTokens[2]);
+        } else if (currentNodeTokens.length == 4) {
+            id = Long.parseLong(currentNodeTokens[0]);
+            longitude = Double.parseDouble(currentNodeTokens[1]);
+            latitude = Double.parseDouble(currentNodeTokens[2]);
+            elevation = Double.parseDouble(currentNodeTokens[3]);
+        } else {
+            throw new InputMismatchException("Node has not the required number of fields");
+        }
 
-        return new Node(autoId++, longitude, latitude, elevation);
+        return new Node(id, longitude, latitude, elevation);
     }
 
-    private void parseNextEdge(List<Node> nodes) throws IOException {
+    private void parseNextEdge(final Map<Long, Node> nodes) throws IOException {
         final String[] currentEdgeTokens = getTokenizedNextLine();
 
         createEdgeFromTokens(currentEdgeTokens, nodes);
     }
 
-    private void createEdgeFromTokens(String[] currentEdgeTokens, List<Node> nodes) {
-        final int baseNode = Integer.parseInt(currentEdgeTokens[0]);
-        final int adjNode = Integer.parseInt(currentEdgeTokens[1]);
+    private void createEdgeFromTokens(String[] currentEdgeTokens, final Map<Long, Node> nodes) {
+        final long baseNode = Long.parseLong(currentEdgeTokens[0]);
+        final long adjNode = Long.parseLong(currentEdgeTokens[1]);
         final double cost = Double.parseDouble(currentEdgeTokens[2]);
 
-        final Edge edge = graph.addEdge(nodes.get(baseNode), nodes.get(adjNode));
-        if (edge != null) {
-            graph.setEdgeWeight(edge, cost);
+        if (baseNode >= 0 && adjNode >= 0) {
+            final Edge edge = graph.addEdge(nodes.get(baseNode), nodes.get(adjNode));
+            if (edge != null) {
+                graph.setEdgeWeight(edge, cost);
+            }
         }
     }
 
