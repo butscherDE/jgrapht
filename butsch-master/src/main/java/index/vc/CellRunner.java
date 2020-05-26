@@ -110,12 +110,6 @@ abstract class CellRunner {
     private void updateLastNonZeroLengthEdge(ReflectiveEdge mostOrientedEdge) {
         if (!hasEdgeEndPointsWithEqualCoordinates(mostOrientedEdge)) {
             this.lastNonZeroLengthEdge = mostOrientedEdge;
-            if ((lastNonZeroLengthEdge.source.id == 6 && lastNonZeroLengthEdge.target.id == 14) ||
-                 lastNonZeroLengthEdge.source.id == 14 && lastNonZeroLengthEdge.target.id == 6) {
-                System.out.println(lastNonZeroLengthEdge);
-                System.out.println(this.getClass());
-                System.out.println(visitedManager.isVisited(lastNonZeroLengthEdge));
-            }
         }
     }
 
