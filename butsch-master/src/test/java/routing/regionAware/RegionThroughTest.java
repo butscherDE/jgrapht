@@ -3,13 +3,11 @@ package routing.regionAware;
 import data.*;
 import index.Index;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Polygon;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegionThroughTest extends AbstractRegionTest {
     @Test

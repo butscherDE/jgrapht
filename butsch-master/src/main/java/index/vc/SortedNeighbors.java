@@ -1,7 +1,7 @@
 package index.vc;
 
-import data.RoadGraph;
 import data.Node;
+import data.RoadGraph;
 
 import java.util.*;
 import java.util.stream.Collectors;

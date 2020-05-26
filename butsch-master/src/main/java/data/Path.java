@@ -4,7 +4,6 @@ import org.jgrapht.GraphPath;
 import org.jgrapht.graph.GraphWalk;
 import util.BinaryHashFunction;
 
-
 import java.util.LinkedList;
 import java.util.List;
 

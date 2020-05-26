@@ -1,7 +1,7 @@
 package index.vc;
 
-import data.Node;
 import data.Edge;
+import data.Node;
 import org.junit.jupiter.api.Test;
 import util.PolygonRoutingTestGraph;
 

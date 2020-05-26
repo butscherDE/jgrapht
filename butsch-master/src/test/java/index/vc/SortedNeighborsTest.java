@@ -1,15 +1,14 @@
 package index.vc;
 
-import java.util.List;
-import java.util.Arrays;
-import java.util.LinkedList;
-
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import org.jgrapht.alg.util.Pair;
 import org.junit.jupiter.api.Test;
 import util.PolygonRoutingTestGraph;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -3,7 +3,6 @@ package routing.regionAware;
 import data.*;
 import index.Index;
 import org.jgrapht.alg.util.Pair;
-import org.locationtech.jts.geom.Polygon;
 import routing.DijkstraCH;
 import routing.RPHAST;
 import routing.RoutingAlgorithm;
@@ -12,7 +11,6 @@ import routing.regionAware.util.LOTNodeExtractor;
 import routing.regionAware.util.RouteCandidate;
 import routing.regionAware.util.RouteCandidateList;
 
-import javax.swing.plaf.synth.Region;
 import java.util.*;
 
 public abstract class AbstractRegion implements RoutingAlgorithm {

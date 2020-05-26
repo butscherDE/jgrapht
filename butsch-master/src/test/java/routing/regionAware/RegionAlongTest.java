@@ -3,14 +3,8 @@ package routing.regionAware;
 import data.*;
 import index.Index;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Polygon;
-import util.PolygonRoutingTestGraph;
 
-import javax.swing.plaf.synth.Region;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 

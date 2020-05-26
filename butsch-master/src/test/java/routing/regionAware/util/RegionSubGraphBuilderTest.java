@@ -9,7 +9,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import util.PolygonRoutingTestGraph;
 
-import javax.swing.plaf.synth.Region;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;

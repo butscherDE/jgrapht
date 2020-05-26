@@ -1,8 +1,6 @@
 package index.vc;
 
-import data.Node;
 import data.VisibilityCell;
-import index.GridIndex;
 import index.Index;
 import org.locationtech.jts.geom.Coordinate;
 

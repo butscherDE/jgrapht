@@ -1,9 +1,5 @@
 package data;
 
-import data.Edge;
-import data.Node;
-import data.RoadGraph;
-import data.VisibilityCell;
 import geometry.BoundingBox;
 import index.vc.ReflectiveEdge;
 import org.junit.jupiter.api.Test;

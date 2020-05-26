@@ -3,7 +3,6 @@ package routing.regionAware.util;
 import data.RegionOfInterest;
 import data.VisibilityCell;
 import geometry.RedBlueSegmentIntersectionCrossProductFactory;
-import geometry.RedBlueSegmentIntersectionFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,8 +1,8 @@
 package index.vc;
 
 import data.Edge;
-import data.RoadGraph;
 import data.Node;
+import data.RoadGraph;
 import data.VisibilityCell;
 import org.jgrapht.alg.util.Pair;
 import org.junit.jupiter.api.Test;

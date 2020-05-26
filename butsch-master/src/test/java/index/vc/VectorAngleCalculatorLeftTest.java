@@ -5,8 +5,6 @@ import data.RoadGraph;
 import org.junit.jupiter.api.Test;
 import util.PolygonRoutingTestGraph;
 
-import java.util.Objects;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class VectorAngleCalculatorLeftTest {

@@ -1,7 +1,7 @@
 package index.vc;
 
-import data.Node;
 import data.Edge;
+import data.Node;
 import data.RoadGraph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.math.Vector2D;

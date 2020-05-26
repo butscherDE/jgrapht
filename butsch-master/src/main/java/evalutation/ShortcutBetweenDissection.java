@@ -1,8 +1,8 @@
 package evalutation;
 
+import data.Node;
 import data.NodeRelation;
 import data.RoadGraph;
-import data.Node;
 import geometry.BoundingBox;
 import geometry.DistanceCalculator;
 import geometry.PolygonContainsChecker;
@@ -15,9 +15,12 @@ import storage.CsvColumnDumper;
 import storage.ImportPBF;
 import util.BinaryHashFunction;
 
-import java.io.IOException;
-import java.util.*;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 

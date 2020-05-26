@@ -5,8 +5,8 @@ import geometry.util.PolygonHelper;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
 public class RedBlueSegmentIntersectionCrossProductFactory extends RedBlueSegmentIntersectionFactory {
     @Override

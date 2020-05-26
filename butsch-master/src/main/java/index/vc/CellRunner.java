@@ -4,7 +4,6 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
-import util.BinaryHashFunction;
 
 import java.util.LinkedList;
 import java.util.List;

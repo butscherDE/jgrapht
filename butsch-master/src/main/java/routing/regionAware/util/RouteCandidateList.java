@@ -1,7 +1,5 @@
 package routing.regionAware.util;
 
-import data.Path;
-
 import java.util.*;
 
 public class RouteCandidateList<T extends RouteCandidate> {

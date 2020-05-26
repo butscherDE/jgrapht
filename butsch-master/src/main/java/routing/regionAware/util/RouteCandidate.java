@@ -1,11 +1,9 @@
 package routing.regionAware.util;
 
-import data.*;
+import data.Node;
+import data.Path;
 import org.jgrapht.alg.util.Pair;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Polygon;
 
-import java.util.Iterator;
 import java.util.Map;
 
 public class RouteCandidate implements Comparable<RouteCandidate> {

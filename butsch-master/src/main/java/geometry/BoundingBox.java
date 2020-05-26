@@ -1,13 +1,10 @@
 package geometry;
 
-import data.RoadGraph;
 import data.Node;
+import data.RoadGraph;
 import data.VisibilityCell;
-import org.jgrapht.Graph;
 import org.locationtech.jts.geom.*;
-import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
-import org.locationtech.jts.triangulate.quadedge.Vertex;
 
 import java.util.*;
 import java.util.function.Consumer;

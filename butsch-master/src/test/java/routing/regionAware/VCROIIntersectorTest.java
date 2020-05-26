@@ -1,6 +1,5 @@
 package routing.regionAware;
 
-import data.Node;
 import data.RegionOfInterest;
 import data.VisibilityCell;
 import geometry.BoundingBox;
@@ -8,11 +7,9 @@ import index.GridIndex;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.w3c.dom.ls.LSOutput;
 import routing.regionAware.util.VCROIIntersector;
 import util.PolygonRoutingTestGraph;
 
-import javax.swing.plaf.synth.Region;
 import java.util.*;
 import java.util.stream.Collectors;
 

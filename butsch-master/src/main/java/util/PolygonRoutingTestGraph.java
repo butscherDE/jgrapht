@@ -7,7 +7,10 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class PolygonRoutingTestGraph {
     public static final PolygonRoutingTestGraph DEFAULT_INSTANCE = new PolygonRoutingTestGraph();
