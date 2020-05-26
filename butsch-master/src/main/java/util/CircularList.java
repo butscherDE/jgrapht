@@ -125,6 +125,7 @@ public class CircularList<T> implements List<T> {
             ListIterator<T> iterator = list.listIterator(index);
             int poppedElements = 0;
             final int maxElementsToPop = list.size();
+            int direction = 0; //0: neither next nor previous was called, 1: next was called last, -1: previous was called last
 
             @Override
             public boolean hasNext() {
@@ -133,13 +134,20 @@ public class CircularList<T> implements List<T> {
 
             @Override
             public T next() {
+                if (direction == -1) {
+                    iterator.next();
+                }
+                reinstantiateIteratorForward();
+                direction = 1;
+                return iterator.next();
+            }
+
+            private void reinstantiateIteratorForward() {
                 if (iterator.hasNext()) {
                     poppedElements++;
-                    return iterator.next();
                 } else if (hasNext()) {
                     iterator = list.listIterator(0);
                     poppedElements++;
-                    return iterator.next();
                 } else {
                     throw new NoSuchElementException("There are no more elements");
                 }
@@ -152,13 +160,20 @@ public class CircularList<T> implements List<T> {
 
             @Override
             public T previous() {
+                if (direction == 1) {
+                    iterator.previous();
+                }
+                reinstantiateIteratorBackward();
+                direction = -1;
+                return iterator.previous();
+            }
+
+            private void reinstantiateIteratorBackward() {
                 if (iterator.hasPrevious()) {
                     poppedElements--;
-                    return iterator.previous();
                 } else if (hasPrevious()) {
                     iterator = list.listIterator(list.size());
                     poppedElements--;
-                    return iterator.previous();
                 } else {
                     throw new NoSuchElementException("There are no more elements");
                 }

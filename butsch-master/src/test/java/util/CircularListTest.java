@@ -143,7 +143,6 @@ public class CircularListTest {
         assertEquals(5, listIt.next());
         assertFalse(listIt.hasNext());
 
-        assertEquals(5, listIt.previous());
         assertTrue(listIt.hasPrevious());
         assertEquals(4, listIt.previous());
         assertTrue(listIt.hasPrevious());
@@ -189,12 +188,12 @@ public class CircularListTest {
         it.next();
         it.next();
         it.previous();
-        it.set(14);
+        it.set(13);
 
         assertEquals(11, list.get(0));
         assertEquals(12, list.get(1));
-        assertEquals(3, list.get(2));
-        assertEquals(14, list.get(3));
+        assertEquals(13, list.get(2));
+        assertEquals(4, list.get(3));
         assertEquals(5, list.get(4));
     }
 
@@ -221,10 +220,9 @@ public class CircularListTest {
         final List<Integer> list = getIntegers();
 
         final ListIterator<Integer> it = list.listIterator();
-        System.out.println(it.next());
+        it.next();
         it.set(11);
-        System.out.println(it.previous());
-        System.out.println(it.previous());
+        it.previous();
         it.set(15);
 
         assertEquals(11, list.get(0));
@@ -252,6 +250,35 @@ public class CircularListTest {
         it.next();
         it.next();
         assertEquals(2, it.previous());
+        assertEquals(1, it.previous());
+        assertEquals(1, it.next());
+        assertEquals(2, it.next());
+    }
+
+    @Test
+    public void learningTestBuiltInListIteratorIndex() {
+        final List<Integer> list = new LinkedList<>(Arrays.asList(1,2,3,4,5));
+
+        final ListIterator<Integer> it = list.listIterator();
+        it.next();
+        it.next();
+        assertEquals(1, it.previousIndex());
+        assertEquals(2, it.previous());
+        assertEquals(1, it.previous());
+        assertEquals(1, it.next());
+        assertEquals(2, it.next());
+    }
+
+    @Test
+    public void backAndForthIterationDoesntTakeExtraStepsAsInNormalListIteratorImplementation() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> it = list.listIterator();
+        assertEquals(1, it.next());
+        assertEquals(2, it.next());
+        assertEquals(1, it.previous());
+        assertEquals(5, it.previous());
+        assertEquals(1, it.next());
     }
 
     private List<Integer> getIntegers() {
