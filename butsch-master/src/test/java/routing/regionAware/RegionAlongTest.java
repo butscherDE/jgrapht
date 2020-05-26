@@ -18,11 +18,9 @@ public class RegionAlongTest extends AbstractRegionTest{
     @Test
     public void quickStartingTest() {
         // Just to let something run
-        final long[] expectedNodeIds = new long[] {19L, 0L, 1L, 28L, 29L, 3L, 4L};
+        final long[] expectedNodeIds = new long[] {0L, 7L, 44L, 46L, 47L, 48L, 31L, 9L, 4L, 5L, 6L};
         final Path pathForCoordinates = getPathForCoordinates(0, 25, 46, 25);
         final long[] actualNodeIds = getNodeIdsFrom(pathForCoordinates);
-
-        System.out.println(Arrays.toString(actualNodeIds));
 
         assertArrayEquals(expectedNodeIds, actualNodeIds);
     }
