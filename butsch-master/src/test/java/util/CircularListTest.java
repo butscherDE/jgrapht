@@ -3,6 +3,7 @@ package util;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -174,6 +175,83 @@ public class CircularListTest {
         it.remove();
 
         assertEquals(4, list.size());
+    }
+
+    @Test
+    public void setElement() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> it = list.listIterator();
+        it.next();
+        it.set(11);
+        it.next();
+        it.set(12);
+        it.next();
+        it.next();
+        it.previous();
+        it.set(14);
+
+        assertEquals(11, list.get(0));
+        assertEquals(12, list.get(1));
+        assertEquals(3, list.get(2));
+        assertEquals(14, list.get(3));
+        assertEquals(5, list.get(4));
+    }
+
+    @Test
+    public void setElementCircularForward() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> it = list.listIterator(4);
+        it.next();
+        it.set(15);
+        it.next();
+        it.set(11);
+
+        assertEquals(11, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(3, list.get(2));
+        assertEquals(4, list.get(3));
+        assertEquals(15, list.get(4));
+    }
+
+
+    @Test
+    public void setElementCircularReverse() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> it = list.listIterator();
+        System.out.println(it.next());
+        it.set(11);
+        System.out.println(it.previous());
+        System.out.println(it.previous());
+        it.set(15);
+
+        assertEquals(11, list.get(0));
+        assertEquals(2, list.get(1));
+        assertEquals(3, list.get(2));
+        assertEquals(4, list.get(3));
+        assertEquals(15, list.get(4));
+    }
+
+    @Test
+    public void listIteratorIdentity() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> itParameterLess = list.listIterator();
+        final ListIterator<Integer> itParameter = list.listIterator(0);
+
+        assertEquals(itParameterLess.next(), itParameter.next());
+    }
+
+    @Test
+    public void learningTestBuiltInListIterator() {
+        final List<Integer> list = new LinkedList<>(Arrays.asList(1,2,3,4,5));
+
+        final ListIterator<Integer> it = list.listIterator();
+        it.next();
+        it.next();
+        assertEquals(2, it.previous());
     }
 
     private List<Integer> getIntegers() {

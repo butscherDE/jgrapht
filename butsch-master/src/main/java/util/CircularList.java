@@ -111,7 +111,7 @@ public class CircularList<T> implements List<T> {
 
     @Override
     public ListIterator<T> listIterator() {
-        return list.listIterator();
+        return listIterator(0);
     }
 
     @Override
