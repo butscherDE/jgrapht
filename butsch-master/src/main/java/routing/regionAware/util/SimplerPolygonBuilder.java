@@ -44,28 +44,46 @@ public class SimplerPolygonBuilder {
     }
 
     public List<LineSegment> removeForward() {
+        failOnToSmallPolygon();
+        reduceForward();
+
+        return segments;
+    }
+
+    private void reduceForward() {
         final LineSegment followingSegment = segmentsIterator.next();
         segmentsIterator.remove();
+        segmentsIterator.next();
         final LineSegment segmentToEnlarge = segmentsIterator.previous();
 
         final LineSegment enlargedSegment = new LineSegment(segmentToEnlarge.p0, followingSegment.p1);
         segmentsIterator.set(enlargedSegment);
+    }
+
+    public List<LineSegment> removeBackward() {
+        failOnToSmallPolygon();
+        reduceBackward();
 
         return segments;
     }
 
-    public List<LineSegment> removeBackward() {
+    private void reduceBackward() {
         final LineSegment previousSegment = segmentsIterator.previous();
         segmentsIterator.remove();
+        segmentsIterator.previous();
         final LineSegment segmentToEnlarge = segmentsIterator.next();
 
         final LineSegment enlargedSegment = new LineSegment(previousSegment.p0, segmentToEnlarge.p1);
         segmentsIterator.set(enlargedSegment);
-
-        return segments;
     }
 
-    public boolean isEnlargeable() {
+    private void failOnToSmallPolygon() {
+        if (!isReducable()) {
+            throw new IllegalStateException("Polygon cannot be further reduces");
+        }
+    }
+
+    public boolean isReducable() {
         return segments.size() > 3;
     }
 
