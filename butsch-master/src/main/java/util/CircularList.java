@@ -122,13 +122,11 @@ public class CircularList<T> implements List<T> {
 
         return new ListIterator<>() {
             ListIterator<T> iterator = list.listIterator(index);
-            int poppedElements = 0;
-            final int maxElementsToPop = list.size();
             int direction = 0; //0: neither next nor previous was called, 1: next was called last, -1: previous was called last
 
             @Override
             public boolean hasNext() {
-                return poppedElements < maxElementsToPop;
+                return true;
             }
 
             @Override
@@ -142,19 +140,14 @@ public class CircularList<T> implements List<T> {
             }
 
             private void reinstantiateIteratorForward() {
-                if (iterator.hasNext()) {
-                    poppedElements++;
-                } else if (hasNext()) {
+                if (!iterator.hasNext()) {
                     iterator = list.listIterator(0);
-                    poppedElements++;
-                } else {
-                    throw new NoSuchElementException("There are no more elements");
                 }
             }
 
             @Override
             public boolean hasPrevious() {
-                return poppedElements > (maxElementsToPop * -1);
+                return true;
             }
 
             @Override
@@ -168,13 +161,8 @@ public class CircularList<T> implements List<T> {
             }
 
             private void reinstantiateIteratorBackward() {
-                if (iterator.hasPrevious()) {
-                    poppedElements--;
-                } else if (hasPrevious()) {
+                if (!iterator.hasPrevious()) {
                     iterator = list.listIterator(list.size());
-                    poppedElements--;
-                } else {
-                    throw new NoSuchElementException("There are no more elements");
                 }
             }
 

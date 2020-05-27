@@ -26,7 +26,7 @@ public class CircularListTest {
         assertEquals(4, listIt.next());
         assertTrue(listIt.hasNext());
         assertEquals(5, listIt.next());
-        assertFalse(listIt.hasNext());
+        assertTrue(listIt.hasNext());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class CircularListTest {
         assertEquals(1, listIt.next());
         assertTrue(listIt.hasNext());
         assertEquals(2, listIt.next());
-        assertFalse(listIt.hasNext());
+        assertTrue(listIt.hasNext());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class CircularListTest {
         assertEquals(3, listIt.next());
         assertTrue(listIt.hasNext());
         assertEquals(4, listIt.next());
-        assertFalse(listIt.hasNext());
+        assertTrue(listIt.hasNext());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class CircularListTest {
         assertEquals(2, listIt.previous());
         assertTrue(listIt.hasPrevious());
         assertEquals(1, listIt.previous());
-        assertFalse(listIt.hasPrevious());
+        assertTrue(listIt.hasPrevious());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class CircularListTest {
         assertEquals(4, listIt.previous());
         assertTrue(listIt.hasPrevious());
         assertEquals(3, listIt.previous());
-        assertFalse(listIt.hasPrevious());
+        assertTrue(listIt.hasPrevious());
     }
 
     @Test
@@ -123,7 +123,7 @@ public class CircularListTest {
         assertEquals(2, listIt.previous());
         assertTrue(listIt.hasPrevious());
         assertEquals(1, listIt.previous());
-        assertFalse(listIt.hasPrevious());
+        assertTrue(listIt.hasPrevious());
     }
 
     @Test
@@ -141,7 +141,7 @@ public class CircularListTest {
         assertEquals(4, listIt.next());
         assertTrue(listIt.hasNext());
         assertEquals(5, listIt.next());
-        assertFalse(listIt.hasNext());
+        assertTrue(listIt.hasNext());
 
         assertTrue(listIt.hasPrevious());
         assertEquals(4, listIt.previous());
@@ -164,7 +164,7 @@ public class CircularListTest {
         assertEquals(1, listIt.previous());
         assertTrue(listIt.hasPrevious());
         assertEquals(5, listIt.previous());
-        assertFalse(listIt.hasPrevious());
+        assertTrue(listIt.hasPrevious());
     }
 
     @Test
@@ -281,6 +281,63 @@ public class CircularListTest {
         assertEquals(1, it.previous());
         assertEquals(5, it.previous());
         assertEquals(1, it.next());
+    }
+
+    @Test
+    public void moveBackInstantly() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> it = list.listIterator();
+        it.next();
+        it.previous();
+    }
+
+    @Test
+    public void moveBackAfterRemove() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> it = list.listIterator();
+        assertEquals(1, it.next());
+        it.remove();
+        assertEquals(2, it.next());
+        assertEquals(5, it.previous());
+    }
+
+    @Test
+    public void fullCircleAfterRemove() {
+        final List<Integer> list = getIntegers();
+
+        final ListIterator<Integer> listIt = list.listIterator(2);
+        assertTrue(listIt.hasNext());
+        assertEquals(3, listIt.next());
+        listIt.remove();
+        assertTrue(listIt.hasNext());
+        assertEquals(4, listIt.next());
+        assertTrue(listIt.hasNext());
+        assertEquals(5, listIt.next());
+        assertTrue(listIt.hasNext());
+        assertEquals(1, listIt.next());
+        assertTrue(listIt.hasNext());
+        assertEquals(2, listIt.next());
+        assertTrue(listIt.hasNext());
+
+        assertTrue(listIt.hasPrevious());
+        assertEquals(1, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(5, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(4, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(2, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(1, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(5, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(4, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(2, listIt.previous());
+        assertTrue(listIt.hasPrevious());
     }
 
     private List<Integer> getIntegers() {

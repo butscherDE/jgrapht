@@ -11,12 +11,14 @@ import java.util.ListIterator;
 import java.util.stream.IntStream;
 
 public class SimplerPolygonBuilder {
+    private final CircularList<LineSegment> segments;
     private final ListIterator<LineSegment> segmentsIterator;
 
     public SimplerPolygonBuilder(final Polygon polygon, final Coordinate startCoordinate) {
-        final CircularList<LineSegment> segments = getSegments(polygon);
+        this.segments = getSegments(polygon);
         final int indexOfStartCoordinate = indexOf(polygon, startCoordinate);
         segmentsIterator = segments.listIterator(indexOfStartCoordinate);
+        segmentsIterator.next();
     }
 
     private CircularList<LineSegment> getSegments(final Polygon polygon) {
@@ -42,8 +44,29 @@ public class SimplerPolygonBuilder {
     }
 
     public List<LineSegment> removeForward() {
-        segmentsIterator.next();
-        return null;
+        final LineSegment followingSegment = segmentsIterator.next();
+        segmentsIterator.remove();
+        final LineSegment segmentToEnlarge = segmentsIterator.previous();
+
+        final LineSegment enlargedSegment = new LineSegment(segmentToEnlarge.p0, followingSegment.p1);
+        segmentsIterator.set(enlargedSegment);
+
+        return segments;
+    }
+
+    public List<LineSegment> removeBackward() {
+        final LineSegment previousSegment = segmentsIterator.previous();
+        segmentsIterator.remove();
+        final LineSegment segmentToEnlarge = segmentsIterator.next();
+
+        final LineSegment enlargedSegment = new LineSegment(previousSegment.p0, segmentToEnlarge.p1);
+        segmentsIterator.set(enlargedSegment);
+
+        return segments;
+    }
+
+    public boolean isEnlargeable() {
+        return segments.size() > 3;
     }
 
 
