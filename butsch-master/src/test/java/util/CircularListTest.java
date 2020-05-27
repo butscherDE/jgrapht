@@ -162,6 +162,8 @@ public class CircularListTest {
         assertEquals(2, listIt.previous());
         assertTrue(listIt.hasPrevious());
         assertEquals(1, listIt.previous());
+        assertTrue(listIt.hasPrevious());
+        assertEquals(5, listIt.previous());
         assertFalse(listIt.hasPrevious());
     }
 

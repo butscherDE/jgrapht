@@ -121,7 +121,6 @@ public class CircularList<T> implements List<T> {
         }
 
         return new ListIterator<>() {
-            boolean restarted = false;
             ListIterator<T> iterator = list.listIterator(index);
             int poppedElements = 0;
             final int maxElementsToPop = list.size();
@@ -151,6 +150,7 @@ public class CircularList<T> implements List<T> {
                 } else {
                     throw new NoSuchElementException("There are no more elements");
                 }
+                System.out.println("popped: " + poppedElements);
             }
 
             @Override
@@ -177,6 +177,7 @@ public class CircularList<T> implements List<T> {
                 } else {
                     throw new NoSuchElementException("There are no more elements");
                 }
+                System.out.println("popped: " + poppedElements);
             }
 
             @Override
