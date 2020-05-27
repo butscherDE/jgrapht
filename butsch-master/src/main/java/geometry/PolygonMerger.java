@@ -152,7 +152,7 @@ public class PolygonMerger {
     private void addInnerCoordinatesBackward(final int innerIterationStartIndex) {
         final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(
                 innerIterationStartIndex + 1);
-        while (innerCircularIterator.hasPrevious()) {
+        for (int i = 0; i < innerCoordinates.size(); i++) {
             final Coordinate previous = innerCircularIterator.previous();
             mergedCoordinates[mergedCoordinatesPointer++] = previous;
         }
@@ -164,7 +164,7 @@ public class PolygonMerger {
 
     private void addInnerCoordinatesForward(final int innerIterationStartIndex) {
         final ListIterator<Coordinate> innerCircularIterator = innerCoordinates.listIterator(innerIterationStartIndex);
-        while (innerCircularIterator.hasNext()) {
+        for (int i = 0; i < innerCoordinates.size(); i++) {
             final Coordinate next = innerCircularIterator.next();
             mergedCoordinates[mergedCoordinatesPointer++] = next;
         }
