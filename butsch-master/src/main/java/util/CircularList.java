@@ -150,7 +150,6 @@ public class CircularList<T> implements List<T> {
                 } else {
                     throw new NoSuchElementException("There are no more elements");
                 }
-                System.out.println("popped: " + poppedElements);
             }
 
             @Override
@@ -177,7 +176,6 @@ public class CircularList<T> implements List<T> {
                 } else {
                     throw new NoSuchElementException("There are no more elements");
                 }
-                System.out.println("popped: " + poppedElements);
             }
 
             @Override
