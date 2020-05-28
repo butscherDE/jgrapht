@@ -12,9 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SimplerPolygonBuilderTest {
     @Test
@@ -283,6 +281,28 @@ public class SimplerPolygonBuilderTest {
         }
 
         assertFalse(actualIt.hasNext());
+    }
+
+    @Test
+    public void failEnlargeForwardWhenPolygonToSmall() {
+        failOnToManyRemoveInvocations(SimplerPolygonBuilder::removeForward);
+    }
+
+    @Test
+    public void failEnlargeBackwardWhenPolygonToSmall() {
+        failOnToManyRemoveInvocations(SimplerPolygonBuilder::removeBackward);
+    }
+
+    private void failOnToManyRemoveInvocations(final Function<SimplerPolygonBuilder, List<LineSegment>> removeFunction) {
+        final Polygon defaultPolygon = createDefaultPolygon();
+        final SimplerPolygonBuilder spb = new SimplerPolygonBuilder(defaultPolygon, createDefaultStartCoordinate());
+
+        removeFunction.apply(spb);
+        removeFunction.apply(spb);
+        removeFunction.apply(spb);
+        removeFunction.apply(spb);
+        removeFunction.apply(spb);
+        assertThrows(IllegalStateException.class, () -> removeFunction.apply(spb));
     }
 
     private Polygon createDefaultPolygon() {
