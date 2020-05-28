@@ -8,20 +8,35 @@ import util.CircularList;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SimplerPolygonBuilder {
+    private final Polygon polygon;
+    private final Coordinate startCoordinate;
     private final CircularList<LineSegment> segments;
     private final ListIterator<LineSegment> segmentsIterator;
 
     public SimplerPolygonBuilder(final Polygon polygon, final Coordinate startCoordinate) {
-        this.segments = getSegments(polygon);
-        final int indexOfStartCoordinate = indexOf(polygon, startCoordinate);
+        this.polygon = polygon;
+        this.startCoordinate = startCoordinate;
+        this.segments = getSegments(this.polygon);
+        final int indexOfStartCoordinate = indexOf(segments, startCoordinate);
         segmentsIterator = segments.listIterator(indexOfStartCoordinate);
         segmentsIterator.next();
     }
 
-    private CircularList<LineSegment> getSegments(final Polygon polygon) {
+    public SimplerPolygonBuilder restartAt(final int numForwards) {
+        final SimplerPolygonBuilder restartedSPB = new SimplerPolygonBuilder(polygon, startCoordinate);
+
+        for (int i = 0; i < numForwards; i++) {
+            restartedSPB.removeForward();
+        }
+
+        return restartedSPB;
+    }
+
+    private static CircularList<LineSegment> getSegments(final Polygon polygon) {
         final Coordinate[] coordinates = polygon.getCoordinates();
 
         final CircularList<LineSegment> segments = new CircularList<>(new ArrayList<>(coordinates.length - 1));
@@ -32,8 +47,8 @@ public class SimplerPolygonBuilder {
         return segments;
     }
 
-    public int indexOf(final Polygon polygon, final Coordinate startCoordinate) {
-        final Coordinate[] coordinates = polygon.getCoordinates();
+    public int indexOf(final List<LineSegment> segments, final Coordinate startCoordinate) {
+        final Object[] coordinates = segments.stream().map(a -> a.p0).collect(Collectors.toList()).toArray();
         final int index = IntStream
                 .range(0, coordinates.length)
                 .filter(i -> startCoordinate.equals(coordinates[i]))
@@ -43,7 +58,7 @@ public class SimplerPolygonBuilder {
         return index;
     }
 
-    public List<LineSegment> removeForward() {
+    public CircularList<LineSegment> removeForward() {
         failOnToSmallPolygon();
         reduceForward();
 
@@ -60,7 +75,7 @@ public class SimplerPolygonBuilder {
         segmentsIterator.set(enlargedSegment);
     }
 
-    public List<LineSegment> removeBackward() {
+    public CircularList<LineSegment> removeBackward() {
         failOnToSmallPolygon();
         reduceBackward();
 

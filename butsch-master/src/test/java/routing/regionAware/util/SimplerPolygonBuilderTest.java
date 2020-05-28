@@ -5,6 +5,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
+import util.CircularList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -303,6 +304,87 @@ public class SimplerPolygonBuilderTest {
         removeFunction.apply(spb);
         removeFunction.apply(spb);
         assertThrows(IllegalStateException.class, () -> removeFunction.apply(spb));
+    }
+
+    @Test
+    public void restartForwardContraction() {
+        restartContractionSameDirection(
+                SimplerPolygonBuilder::removeForward,
+                SimplerPolygonBuilder::removeForward,
+                createForwardExpectedSegmentsMiddle(createDefaultPolygon().getCoordinates())
+        );
+    }
+
+    @Test
+    public void restartBackwardContraction() {
+        restartContractionSameDirection(
+                SimplerPolygonBuilder::removeForward,
+                SimplerPolygonBuilder::removeBackward,
+                createForThenBackwardExpectedSegmentsMiddle(createDefaultPolygon().getCoordinates())
+        );
+    }
+
+    private List<List<LineSegment>> createForThenBackwardExpectedSegmentsMiddle(Coordinate[] polygonCoordinates) {
+        final List<List<LineSegment>>  expectedSegments = new ArrayList<>(5);
+
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[2]),
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[3]),
+                new LineSegment(polygonCoordinates[3], polygonCoordinates[4]),
+                new LineSegment(polygonCoordinates[4], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[2]),
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[3]),
+                new LineSegment(polygonCoordinates[3], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[2]),
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        return expectedSegments;
+    }
+
+    private void restartContractionSameDirection(final Function<SimplerPolygonBuilder, CircularList<LineSegment>> removeFunction1,
+                                                 final Function<SimplerPolygonBuilder, CircularList<LineSegment>> removeFunction2,
+                                                 final List<List<LineSegment>> expectedSegments) {
+        final Iterator<List<LineSegment>> expectedIt = expectedSegments.iterator();
+        final Polygon defaultPolygon = createDefaultPolygon();
+        final SimplerPolygonBuilder spb = new SimplerPolygonBuilder(defaultPolygon, createMiddleStartCoordinate());
+
+        final CircularList<LineSegment> reduced = removeFunction1.apply(spb);
+        assertEqualsLineSegmentWise(expectedIt.next(), reduced);
+
+        final SimplerPolygonBuilder spbRestarted = spb.restartAt(1);
+        assertTrue(spbRestarted.isReducable());
+        assertEqualsLineSegmentWise(expectedIt.next(), removeFunction2.apply(spbRestarted));
+        assertTrue(spbRestarted.isReducable());
+        assertEqualsLineSegmentWise(expectedIt.next(), removeFunction2.apply(spbRestarted));
+        assertTrue(spbRestarted.isReducable());
+        assertEqualsLineSegmentWise(expectedIt.next(), removeFunction2.apply(spbRestarted));
+        assertTrue(spbRestarted.isReducable());
+        assertEqualsLineSegmentWise(expectedIt.next(), removeFunction2.apply(spbRestarted));
+        assertFalse(spbRestarted.isReducable());
     }
 
     private Polygon createDefaultPolygon() {
