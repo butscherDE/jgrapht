@@ -50,7 +50,11 @@ public class SimplerPolygonBuilderTest {
         final Coordinate[] polygonCoordinates = defaultPolygon.getCoordinates();
         final List<List<LineSegment>> expectedSegments = createForwardExpectedSegments(polygonCoordinates);
 
-        assertCorrectLineSegmentAfterEachRemoval(defaultPolygon, expectedSegments, SimplerPolygonBuilder::removeForward);
+        assertCorrectLineSegmentAfterEachRemoval(
+                defaultPolygon,
+                expectedSegments,
+                SimplerPolygonBuilder::removeForward,
+                createDefaultStartCoordinate());
     }
 
     private List<List<LineSegment>> createForwardExpectedSegments(Coordinate[] polygonCoordinates) {
@@ -95,12 +99,70 @@ public class SimplerPolygonBuilderTest {
     }
 
     @Test
+    public void enlargeForwardMiddle() {
+        final Polygon defaultPolygon = createDefaultPolygon();
+        final Coordinate[] polygonCoordinates = defaultPolygon.getCoordinates();
+        final List<List<LineSegment>> expectedSegments = createForwardExpectedSegmentsMiddle(polygonCoordinates);
+
+        assertCorrectLineSegmentAfterEachRemoval(
+                defaultPolygon,
+                expectedSegments,
+                SimplerPolygonBuilder::removeForward,
+                createMiddleStartCoordinate());
+    }
+
+    private List<List<LineSegment>> createForwardExpectedSegmentsMiddle(Coordinate[] polygonCoordinates) {
+        final List<List<LineSegment>>  expectedSegments = new ArrayList<>(5);
+
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[2]),
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[3]),
+                new LineSegment(polygonCoordinates[3], polygonCoordinates[4]),
+                new LineSegment(polygonCoordinates[4], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[2]),
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[3]),
+                new LineSegment(polygonCoordinates[3], polygonCoordinates[4]),
+                new LineSegment(polygonCoordinates[4], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[2]),
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[3]),
+                new LineSegment(polygonCoordinates[3], polygonCoordinates[4]),
+                new LineSegment(polygonCoordinates[4], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[2]),
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[3]),
+                new LineSegment(polygonCoordinates[3], polygonCoordinates[4]),
+                new LineSegment(polygonCoordinates[4], polygonCoordinates[1])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[3]),
+                new LineSegment(polygonCoordinates[3], polygonCoordinates[4]),
+                new LineSegment(polygonCoordinates[4], polygonCoordinates[2])
+        ));
+        return expectedSegments;
+    }
+
+    @Test
     public void enlargeBackward() {
         final Polygon defaultPolygon = createDefaultPolygon();
         final Coordinate[] polygonCoordinates = defaultPolygon.getCoordinates();
         final List<List<LineSegment>> expectedSegments = createBackwardExpectedSegments(polygonCoordinates);
 
-        assertCorrectLineSegmentAfterEachRemoval(defaultPolygon, expectedSegments, SimplerPolygonBuilder::removeBackward);
+        assertCorrectLineSegmentAfterEachRemoval(
+                defaultPolygon,
+                expectedSegments,
+                SimplerPolygonBuilder::removeBackward,
+                createDefaultStartCoordinate());
     }
 
     private List<List<LineSegment>> createBackwardExpectedSegments(Coordinate[] polygonCoordinates) {
@@ -143,9 +205,64 @@ public class SimplerPolygonBuilderTest {
         return expectedSegments;
     }
 
-    private void assertCorrectLineSegmentAfterEachRemoval(Polygon defaultPolygon, List<List<LineSegment>> expectedSegmentsSet,
-                                                          Function<SimplerPolygonBuilder, List<LineSegment>> removalFunction) {
-        SimplerPolygonBuilder spb = new SimplerPolygonBuilder(defaultPolygon, createDefaultStartCoordinate());
+    @Test
+    public void enlargeBackwardMiddle() {
+        final Polygon defaultPolygon = createDefaultPolygon();
+        final Coordinate[] polygonCoordinates = defaultPolygon.getCoordinates();
+        final List<List<LineSegment>> expectedSegments = createBackwardExpectedSegmentsMiddle(polygonCoordinates);
+
+        assertCorrectLineSegmentAfterEachRemoval(
+                defaultPolygon,
+                expectedSegments,
+                SimplerPolygonBuilder::removeBackward,
+                createMiddleStartCoordinate());
+    }
+
+    private List<List<LineSegment>> createBackwardExpectedSegmentsMiddle(Coordinate[] polygonCoordinates) {
+        final List<List<LineSegment>>  expectedSegments = new ArrayList<>(5);
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[2]),
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[3]),
+                new LineSegment(polygonCoordinates[3], polygonCoordinates[5]),
+                new LineSegment(polygonCoordinates[5], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[2]),
+                new LineSegment(polygonCoordinates[2], polygonCoordinates[5]),
+                new LineSegment(polygonCoordinates[5], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[1]),
+                new LineSegment(polygonCoordinates[1], polygonCoordinates[5]),
+                new LineSegment(polygonCoordinates[5], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[0], polygonCoordinates[5]),
+                new LineSegment(polygonCoordinates[5], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7]),
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[8])
+        ));
+        expectedSegments.add(Arrays.asList(
+                new LineSegment(polygonCoordinates[7], polygonCoordinates[5]),
+                new LineSegment(polygonCoordinates[5], polygonCoordinates[6]),
+                new LineSegment(polygonCoordinates[6], polygonCoordinates[7])
+        ));
+        return expectedSegments;
+    }
+
+    private void assertCorrectLineSegmentAfterEachRemoval(final Polygon defaultPolygon,
+                                                          final List<List<LineSegment>> expectedSegmentsSet,
+                                                          final Function<SimplerPolygonBuilder, List<LineSegment>> removalFunction,
+                                                          final Coordinate defaultStartCoordinate) {
+        SimplerPolygonBuilder spb = new SimplerPolygonBuilder(defaultPolygon, defaultStartCoordinate);
         for (List<LineSegment> expectedSegments : expectedSegmentsSet) {
             assertTrue(spb.isReducable());
             assertEqualsLineSegmentWise(expectedSegments, removalFunction.apply(spb));
@@ -185,5 +302,9 @@ public class SimplerPolygonBuilderTest {
 
     private Coordinate createDefaultStartCoordinate() {
         return new Coordinate(1,3);
+    }
+
+    private Coordinate createMiddleStartCoordinate() {
+        return new Coordinate(2, 0);
     }
 }
