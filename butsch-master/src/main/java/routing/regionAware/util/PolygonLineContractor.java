@@ -11,23 +11,22 @@ import java.util.ListIterator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class SimplerPolygonBuilder {
+public class PolygonLineContractor {
     private final Polygon polygon;
-    private final Coordinate startCoordinate;
+    private final int startCoordinateIndex;
     private final CircularList<LineSegment> segments;
     private final ListIterator<LineSegment> segmentsIterator;
 
-    public SimplerPolygonBuilder(final Polygon polygon, final Coordinate startCoordinate) {
+    public PolygonLineContractor(final Polygon polygon, final int startCoordinateIndex) {
         this.polygon = polygon;
-        this.startCoordinate = startCoordinate;
+        this.startCoordinateIndex = startCoordinateIndex;
         this.segments = getSegments(this.polygon);
-        final int indexOfStartCoordinate = indexOf(segments, startCoordinate);
-        segmentsIterator = segments.listIterator(indexOfStartCoordinate);
+        segmentsIterator = segments.listIterator(startCoordinateIndex);
         segmentsIterator.next();
     }
 
-    public SimplerPolygonBuilder restartAt(final int numForwards) {
-        final SimplerPolygonBuilder restartedSPB = new SimplerPolygonBuilder(polygon, startCoordinate);
+    public PolygonLineContractor restartAt(final int numForwards) {
+        final PolygonLineContractor restartedSPB = new PolygonLineContractor(polygon, startCoordinateIndex);
 
         for (int i = 0; i < numForwards; i++) {
             restartedSPB.removeForward();
@@ -45,17 +44,6 @@ public class SimplerPolygonBuilder {
         }
 
         return segments;
-    }
-
-    public int indexOf(final List<LineSegment> segments, final Coordinate startCoordinate) {
-        final Object[] coordinates = segments.stream().map(a -> a.p0).collect(Collectors.toList()).toArray();
-        final int index = IntStream
-                .range(0, coordinates.length)
-                .filter(i -> startCoordinate.equals(coordinates[i]))
-                .findFirst()
-                .orElse(-1);
-
-        return index;
     }
 
     public CircularList<LineSegment> removeForward() {

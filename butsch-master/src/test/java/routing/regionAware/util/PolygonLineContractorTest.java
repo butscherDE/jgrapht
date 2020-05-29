@@ -15,21 +15,21 @@ import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SimplerPolygonBuilderTest {
+public class PolygonLineContractorTest {
     @Test
     public void enlargeForwardSize() {
-        assertEnlargeLimit(SimplerPolygonBuilder::removeForward);
+        assertEnlargeLimit(PolygonLineContractor::removeForward);
     }
 
     @Test
     public void enlargeBackwardSize() {
-        assertEnlargeLimit(SimplerPolygonBuilder::removeBackward);
+        assertEnlargeLimit(PolygonLineContractor::removeBackward);
     }
 
-    private void assertEnlargeLimit(Function<SimplerPolygonBuilder, List<LineSegment>> function) {
+    private void assertEnlargeLimit(Function<PolygonLineContractor, List<LineSegment>> function) {
         final Polygon polygon = createDefaultPolygon();
 
-        final SimplerPolygonBuilder spb = new SimplerPolygonBuilder(polygon, createDefaultStartCoordinate());
+        final PolygonLineContractor spb = new PolygonLineContractor(polygon, createDefaultStartCoordinate());
         assertTrue(spb.isReducable());
         function.apply(spb);
         assertTrue(spb.isReducable());
@@ -52,7 +52,7 @@ public class SimplerPolygonBuilderTest {
         assertCorrectLineSegmentAfterEachRemoval(
                 defaultPolygon,
                 expectedSegments,
-                SimplerPolygonBuilder::removeForward,
+                PolygonLineContractor::removeForward,
                 createDefaultStartCoordinate());
     }
 
@@ -106,7 +106,7 @@ public class SimplerPolygonBuilderTest {
         assertCorrectLineSegmentAfterEachRemoval(
                 defaultPolygon,
                 expectedSegments,
-                SimplerPolygonBuilder::removeForward,
+                PolygonLineContractor::removeForward,
                 createMiddleStartCoordinate());
     }
 
@@ -160,7 +160,7 @@ public class SimplerPolygonBuilderTest {
         assertCorrectLineSegmentAfterEachRemoval(
                 defaultPolygon,
                 expectedSegments,
-                SimplerPolygonBuilder::removeBackward,
+                PolygonLineContractor::removeBackward,
                 createDefaultStartCoordinate());
     }
 
@@ -213,7 +213,7 @@ public class SimplerPolygonBuilderTest {
         assertCorrectLineSegmentAfterEachRemoval(
                 defaultPolygon,
                 expectedSegments,
-                SimplerPolygonBuilder::removeBackward,
+                PolygonLineContractor::removeBackward,
                 createMiddleStartCoordinate());
     }
 
@@ -259,9 +259,9 @@ public class SimplerPolygonBuilderTest {
 
     private void assertCorrectLineSegmentAfterEachRemoval(final Polygon defaultPolygon,
                                                           final List<List<LineSegment>> expectedSegmentsSet,
-                                                          final Function<SimplerPolygonBuilder, List<LineSegment>> removalFunction,
-                                                          final Coordinate defaultStartCoordinate) {
-        SimplerPolygonBuilder spb = new SimplerPolygonBuilder(defaultPolygon, defaultStartCoordinate);
+                                                          final Function<PolygonLineContractor, List<LineSegment>> removalFunction,
+                                                          final int defaultStartCoordinate) {
+        PolygonLineContractor spb = new PolygonLineContractor(defaultPolygon, defaultStartCoordinate);
         for (List<LineSegment> expectedSegments : expectedSegmentsSet) {
             assertTrue(spb.isReducable());
             assertEqualsLineSegmentWise(expectedSegments, removalFunction.apply(spb));
@@ -286,17 +286,17 @@ public class SimplerPolygonBuilderTest {
 
     @Test
     public void failEnlargeForwardWhenPolygonToSmall() {
-        failOnToManyRemoveInvocations(SimplerPolygonBuilder::removeForward);
+        failOnToManyRemoveInvocations(PolygonLineContractor::removeForward);
     }
 
     @Test
     public void failEnlargeBackwardWhenPolygonToSmall() {
-        failOnToManyRemoveInvocations(SimplerPolygonBuilder::removeBackward);
+        failOnToManyRemoveInvocations(PolygonLineContractor::removeBackward);
     }
 
-    private void failOnToManyRemoveInvocations(final Function<SimplerPolygonBuilder, List<LineSegment>> removeFunction) {
+    private void failOnToManyRemoveInvocations(final Function<PolygonLineContractor, List<LineSegment>> removeFunction) {
         final Polygon defaultPolygon = createDefaultPolygon();
-        final SimplerPolygonBuilder spb = new SimplerPolygonBuilder(defaultPolygon, createDefaultStartCoordinate());
+        final PolygonLineContractor spb = new PolygonLineContractor(defaultPolygon, createDefaultStartCoordinate());
 
         removeFunction.apply(spb);
         removeFunction.apply(spb);
@@ -309,8 +309,8 @@ public class SimplerPolygonBuilderTest {
     @Test
     public void restartForwardContraction() {
         restartContractionSameDirection(
-                SimplerPolygonBuilder::removeForward,
-                SimplerPolygonBuilder::removeForward,
+                PolygonLineContractor::removeForward,
+                PolygonLineContractor::removeForward,
                 createForwardExpectedSegmentsMiddle(createDefaultPolygon().getCoordinates())
         );
     }
@@ -318,8 +318,8 @@ public class SimplerPolygonBuilderTest {
     @Test
     public void restartBackwardContraction() {
         restartContractionSameDirection(
-                SimplerPolygonBuilder::removeForward,
-                SimplerPolygonBuilder::removeBackward,
+                PolygonLineContractor::removeForward,
+                PolygonLineContractor::removeBackward,
                 createForThenBackwardExpectedSegmentsMiddle(createDefaultPolygon().getCoordinates())
         );
     }
@@ -365,17 +365,17 @@ public class SimplerPolygonBuilderTest {
         return expectedSegments;
     }
 
-    private void restartContractionSameDirection(final Function<SimplerPolygonBuilder, CircularList<LineSegment>> removeFunction1,
-                                                 final Function<SimplerPolygonBuilder, CircularList<LineSegment>> removeFunction2,
+    private void restartContractionSameDirection(final Function<PolygonLineContractor, CircularList<LineSegment>> removeFunction1,
+                                                 final Function<PolygonLineContractor, CircularList<LineSegment>> removeFunction2,
                                                  final List<List<LineSegment>> expectedSegments) {
         final Iterator<List<LineSegment>> expectedIt = expectedSegments.iterator();
         final Polygon defaultPolygon = createDefaultPolygon();
-        final SimplerPolygonBuilder spb = new SimplerPolygonBuilder(defaultPolygon, createMiddleStartCoordinate());
+        final PolygonLineContractor spb = new PolygonLineContractor(defaultPolygon, createMiddleStartCoordinate());
 
         final CircularList<LineSegment> reduced = removeFunction1.apply(spb);
         assertEqualsLineSegmentWise(expectedIt.next(), reduced);
 
-        final SimplerPolygonBuilder spbRestarted = spb.restartAt(1);
+        final PolygonLineContractor spbRestarted = spb.restartAt(1);
         assertTrue(spbRestarted.isReducable());
         assertEqualsLineSegmentWise(expectedIt.next(), removeFunction2.apply(spbRestarted));
         assertTrue(spbRestarted.isReducable());
@@ -389,7 +389,7 @@ public class SimplerPolygonBuilderTest {
 
     private Polygon createDefaultPolygon() {
         final Coordinate[] polygonCoordinates = new Coordinate[] {
-                createDefaultStartCoordinate(),
+                new Coordinate(1, 3),
                 new Coordinate(2, 3),
                 new Coordinate(3, 2),
                 new Coordinate(3, 1),
@@ -397,16 +397,16 @@ public class SimplerPolygonBuilderTest {
                 new Coordinate(1, 0),
                 new Coordinate(0, 1),
                 new Coordinate(0, 2),
-                createDefaultStartCoordinate()
+                new Coordinate(1,3)
         };
         return new GeometryFactory().createPolygon(polygonCoordinates);
     }
 
-    private Coordinate createDefaultStartCoordinate() {
-        return new Coordinate(1,3);
+    private int createDefaultStartCoordinate() {
+        return 0;
     }
 
-    private Coordinate createMiddleStartCoordinate() {
-        return new Coordinate(2, 0);
+    private int createMiddleStartCoordinate() {
+        return 4;
     }
 }
