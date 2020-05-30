@@ -45,8 +45,6 @@ public class SimplerPolygonContractionSetBuilder {
         plc = plc.restartAt(forwardMax);
         int backwardMax = maxContractions(PolygonLineContractor::removeBackward);
 
-        System.out.println("Forward: " + forwardMax + ", Backward: " + backwardMax);
-
         return forwardMax + backwardMax;
     }
 

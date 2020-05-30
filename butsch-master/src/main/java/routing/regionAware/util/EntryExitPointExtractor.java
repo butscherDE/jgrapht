@@ -54,8 +54,6 @@ public class EntryExitPointExtractor {
             final boolean isSourceContained = containsChecker.contains(source.getPoint());
             final boolean isTargetContained = containsChecker.contains(target.getPoint());
 
-            System.out.println(source.id + "-" + target.id + "(" + isSourceContained + "/" + isTargetContained + ")");
-
             if (isSourceEntryExitPoint(isSourceContained, isTargetContained)) {
                 entryExitNodes.add(source);
             } else if (isTargetEntryExitPoint(isSourceContained, isTargetContained)) {
