@@ -6,6 +6,7 @@ import data.RegionOfInterest;
 import data.RoadGraph;
 import geometry.BoundingBox;
 import geometry.PolygonContainsChecker;
+import index.GridIndex;
 import index.Index;
 import org.locationtech.jts.geom.Polygon;
 
@@ -17,9 +18,9 @@ public class EntryExitPointExtractor {
     private final RoadGraph graph;
     private final Index gridIndex;
 
-    public EntryExitPointExtractor(final RegionOfInterest region, final RoadGraph graph, final Index gridIndex) {
+    public EntryExitPointExtractor(final RegionOfInterest region, final GridIndex gridIndex) {
         this.region = region;
-        this.graph = graph;
+        this.graph = gridIndex.graph;
         this.gridIndex = gridIndex;
     }
 
@@ -52,6 +53,8 @@ public class EntryExitPointExtractor {
         public void addIfOneIsEntryExitNode(final Node source, final Node target) {
             final boolean isSourceContained = containsChecker.contains(source.getPoint());
             final boolean isTargetContained = containsChecker.contains(target.getPoint());
+
+            System.out.println(source.id + "-" + target.id + "(" + isSourceContained + "/" + isTargetContained + ")");
 
             if (isSourceEntryExitPoint(isSourceContained, isTargetContained)) {
                 entryExitNodes.add(source);

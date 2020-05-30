@@ -4,11 +4,12 @@ import data.CHPreprocessing;
 import data.RegionOfInterest;
 import data.RoadCH;
 import data.RoadGraph;
+import index.GridIndex;
 import index.Index;
 import routing.regionAware.util.RegionSubGraphBuilder;
 
 public class RegionThrough extends AbstractRegion {
-    public RegionThrough(final RoadGraph globalGraph, final RoadCH globalCH, final Index globalIndex,
+    public RegionThrough(final RoadGraph globalGraph, final RoadCH globalCH, final GridIndex globalIndex,
                          final RegionOfInterest region) {
         super(globalGraph, globalCH, globalIndex, region);
     }

@@ -79,9 +79,20 @@ public class PolygonContainsChecker {
 
     public int getLeftMostPossiblyIntersectingLineSegment(final Coordinate coordinate) {
         final LineSegment searchKey = new LineSegment(coordinate, coordinate);
-        final Comparator<LineSegment> xComparator = Comparator.comparingDouble(a -> a.getCoordinate(1).x);
-        final int index = Collections.binarySearch(polygon, searchKey, xComparator);
+        final Comparator<LineSegment> p1XComparator = Comparator.comparingDouble(a -> a.getCoordinate(1).x);
+        final int index = Collections.binarySearch(polygon, searchKey, p1XComparator);
         final int nonNegativeIndex = index < 0 ? (index + 1) * (-1) : index;
+
+        final int spooledIndex = spoolBackToReallyFindFirstOccurence(searchKey, nonNegativeIndex);
+
+        return spooledIndex;
+    }
+
+    private int spoolBackToReallyFindFirstOccurence(LineSegment searchKey, int nonNegativeIndex) {
+        final ListIterator<LineSegment> polygonListIterator = polygon.listIterator(nonNegativeIndex);
+        while (polygonListIterator.hasPrevious() && polygonListIterator.previous().p1.x == searchKey.p1.x) {
+            nonNegativeIndex--;
+        }
         return nonNegativeIndex;
     }
 

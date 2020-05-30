@@ -1,6 +1,7 @@
 package routing.regionAware;
 
 import data.*;
+import index.GridIndex;
 import index.Index;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ public class RegionAlongTest extends AbstractRegionTest{
     private Path getPathForCoordinates(final int startLongitude, final int startLatitude, final int endLongitude,
                                        final int endLatitude) {
         final RoadGraph graph = GRAPH_MOCKER.graph;
-        final Index index = GRAPH_MOCKER.gridIndex;
+        final GridIndex index = GRAPH_MOCKER.gridIndex;
         final RoadCH ch = GRAPH_MOCKER.ch;
         final RegionOfInterest roi = GRAPH_MOCKER.roi;
 

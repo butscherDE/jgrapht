@@ -19,7 +19,7 @@ public class GridIndex implements Index {
     private final static double LONGITUDE_RANGE = 360d;
     private final static double LATITUDE_RANGE = 180d;
 
-    private final RoadGraph graph;
+    public final RoadGraph graph;
     private final BoundingBox indexBounds;
     private final double longitudeCellSize;
     private final double latitudeCellSize;
