@@ -73,11 +73,11 @@ public class PolygonContainsChecker {
         }
     }
 
-    public LineSegment getRay(final Coordinate coordinate) {
-        return new LineSegment(coordinate, new Coordinate(coordinate.x, boundingBox.maxLongitude + 1));
+    private LineSegment getRay(final Coordinate coordinate) {
+        return new LineSegment(coordinate, new Coordinate(boundingBox.maxLongitude + 1, coordinate.y + 1E-10));
     }
 
-    public int getLeftMostPossiblyIntersectingLineSegment(final Coordinate coordinate) {
+    private int getLeftMostPossiblyIntersectingLineSegment(final Coordinate coordinate) {
         final LineSegment searchKey = new LineSegment(coordinate, coordinate);
         final Comparator<LineSegment> p1XComparator = Comparator.comparingDouble(a -> a.getCoordinate(1).x);
         final int index = Collections.binarySearch(polygon, searchKey, p1XComparator);
@@ -96,7 +96,7 @@ public class PolygonContainsChecker {
         return nonNegativeIndex;
     }
 
-    public int getIntersectionCount(final Coordinate coordinate, final int startIndex) {
+    private int getIntersectionCount(final Coordinate coordinate, final int startIndex) {
         final LineSegment ray = getRay(coordinate);
         int intersectionCount = 0;
         final ListIterator<LineSegment> lineSegments = polygon.listIterator(startIndex);
@@ -113,19 +113,20 @@ public class PolygonContainsChecker {
         return intersectionCount;
     }
 
-    public boolean isPointOnPolygonBorder(final Coordinate coordinate, final LineSegment lineSegment) {
+    private boolean isPointOnPolygonBorder(final Coordinate coordinate, final LineSegment lineSegment) {
         return lineSegment.distance(coordinate) == 0;
     }
 
-    public int countIntersection(final LineSegment ray, int intersectionCount,
+    private int countIntersection(final LineSegment ray, int intersectionCount,
                                  final LineSegment lineSegment) {
-        final boolean intersecting = isIntersecting(ray, lineSegment);
+        final Coordinate intersection = ray.intersection(lineSegment);
+        final boolean intersecting = isIntersecting(intersection);
 
         intersectionCount = intersecting ? intersectionCount + 1 : intersectionCount;
         return intersectionCount;
     }
 
-    private boolean isIntersecting(final LineSegment ray, final LineSegment other) {
-        return ray.intersection(other) != null;
+    private boolean isIntersecting(final Coordinate intersection) {
+        return intersection != null;
     }
 }
