@@ -143,7 +143,7 @@ public class ShortcutBetweenDissection {
 
         @Override
         public void accept(final Node node) {
-            final Point point = (Point) node.getPoint();
+            final Point point = node.getPoint();
 
             if (polygonContainsChecker.contains(point)) {
                 nodes.add(node);

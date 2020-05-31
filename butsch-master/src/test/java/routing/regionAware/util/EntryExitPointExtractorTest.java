@@ -16,7 +16,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EntryExitPointExtractorTest {
-    private static PolygonRoutingTestGraph GRAPH_MOCKER = new PolygonRoutingTestGraph();
+    private static final PolygonRoutingTestGraph GRAPH_MOCKER = new PolygonRoutingTestGraph();
 
     @Test
     public void entryExitNodes() {

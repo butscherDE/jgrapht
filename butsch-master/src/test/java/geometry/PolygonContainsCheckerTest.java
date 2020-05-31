@@ -18,37 +18,37 @@ public class PolygonContainsCheckerTest {
 
     @Test
     public void testContainsInSquare() {
-        assertTrue(this.square.contains(GF.createPoint(new Coordinate(10, 10))));
-        assertTrue(this.square.contains(GF.createPoint(new Coordinate(10, 16))));
-        assertFalse(this.square.contains(GF.createPoint(new Coordinate(-20, 10))));
-        assertTrue(this.square.contains(GF.createPoint(new Coordinate(0, 10))));
-        assertTrue(this.square.contains(GF.createPoint(new Coordinate(20, 10))));
-        assertTrue(this.square.contains(GF.createPoint(new Coordinate(16, 10))));
-        assertTrue(this.square.contains(GF.createPoint(new Coordinate(20, 20))));
+        assertTrue(square.contains(GF.createPoint(new Coordinate(10, 10))));
+        assertTrue(square.contains(GF.createPoint(new Coordinate(10, 16))));
+        assertFalse(square.contains(GF.createPoint(new Coordinate(-20, 10))));
+        assertTrue(square.contains(GF.createPoint(new Coordinate(0, 10))));
+        assertTrue(square.contains(GF.createPoint(new Coordinate(20, 10))));
+        assertTrue(square.contains(GF.createPoint(new Coordinate(16, 10))));
+        assertTrue(square.contains(GF.createPoint(new Coordinate(20, 20))));
     }
 
     @Test
     public void testContainsInSquareHole() {
-        assertFalse(this.squareHole.contains(GF.createPoint(new Coordinate(10, 10))));
-        assertTrue(this.squareHole.contains(GF.createPoint(new Coordinate(10, 16))));
-        assertFalse(this.squareHole.contains(GF.createPoint(new Coordinate(-20, 10))));
-        assertFalse(this.squareHole.contains(GF.createPoint(new Coordinate(0, 10))));
-        assertTrue(this.squareHole.contains(GF.createPoint(new Coordinate(20, 10))));
-        assertTrue(this.squareHole.contains(GF.createPoint(new Coordinate(16, 10))));
-        assertTrue(this.squareHole.contains(GF.createPoint(new Coordinate(20, 20))));
+        assertFalse(squareHole.contains(GF.createPoint(new Coordinate(10, 10))));
+        assertTrue(squareHole.contains(GF.createPoint(new Coordinate(10, 16))));
+        assertFalse(squareHole.contains(GF.createPoint(new Coordinate(-20, 10))));
+        assertFalse(squareHole.contains(GF.createPoint(new Coordinate(0, 10))));
+        assertTrue(squareHole.contains(GF.createPoint(new Coordinate(20, 10))));
+        assertTrue(squareHole.contains(GF.createPoint(new Coordinate(16, 10))));
+        assertTrue(squareHole.contains(GF.createPoint(new Coordinate(20, 20))));
     }
 
     @Test
     public void testContainsInSmallSquare() {
-        assertTrue(this.smallSquare.contains(GF.createPoint(new Coordinate(1.5,1.5))));
-        assertFalse(this.smallSquare.contains(GF.createPoint(new Coordinate(1.5,0.5))));
+        assertTrue(smallSquare.contains(GF.createPoint(new Coordinate(1.5,1.5))));
+        assertFalse(smallSquare.contains(GF.createPoint(new Coordinate(1.5,0.5))));
     }
 
     @Test
     public void testContainsInSmallSquareHole() {
-        assertTrue(this.smallSquareHole.contains(GF.createPoint(new Coordinate(1.1,1.1))));
-        assertFalse(this.smallSquareHole.contains(GF.createPoint(new Coordinate(1.5,1.5))));
-        assertFalse(this.smallSquareHole.contains(GF.createPoint(new Coordinate(1.5,0.5))));
+        assertTrue(smallSquareHole.contains(GF.createPoint(new Coordinate(1.1,1.1))));
+        assertFalse(smallSquareHole.contains(GF.createPoint(new Coordinate(1.5,1.5))));
+        assertFalse(smallSquareHole.contains(GF.createPoint(new Coordinate(1.5,0.5))));
     }
 
     @Test
@@ -60,45 +60,45 @@ public class PolygonContainsCheckerTest {
     }
 
     private void testUCorners() {
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(0,20))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(20,20))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(20,10))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(40,10))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(40,20))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(60,20))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(60,0))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(40,0))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(20,0))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(0,0))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(0,20))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(20,20))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(20,10))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(40,10))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(40,20))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(60,20))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(60,0))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(40,0))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(20,0))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(0,0))));
     }
 
     private void testUEdges() {
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(10,20))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(20,15))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(30, 10))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(40, 15))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(50, 20))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(10,20))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(20,15))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(30, 10))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(40, 15))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(50, 20))));
     }
 
     private void testUInner() {
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(10,10))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(30, 5))));
-        assertTrue(this.u.contains(GF.createPoint(new Coordinate(50, 10))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(10,10))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(30, 5))));
+        assertTrue(u.contains(GF.createPoint(new Coordinate(50, 10))));
     }
 
     private void testUOuter() {
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(-10, -10))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(-10, 0))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(-10, 10))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(-10, 20))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(-10, 30))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(0, 30))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(10, 30))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(20, 30))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(30, 30))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(30, 20))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(30, 11))));
-        assertFalse(this.u.contains(GF.createPoint(new Coordinate(40, 30))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(-10, -10))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(-10, 0))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(-10, 10))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(-10, 20))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(-10, 30))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(0, 30))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(10, 30))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(20, 30))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(30, 30))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(30, 20))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(30, 11))));
+        assertFalse(u.contains(GF.createPoint(new Coordinate(40, 30))));
     }
 
     /*

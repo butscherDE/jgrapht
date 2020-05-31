@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RouteCandidateListTest {
     private final static PolygonRoutingTestGraph GRAPH_MOCKER = PolygonRoutingTestGraph.DEFAULT_INSTANCE;
-    private static RoadGraph GRAPH = GRAPH_MOCKER.graph;
-    private static Polygon REGION = GRAPH_MOCKER.polygon;
+    private static final RoadGraph GRAPH = GRAPH_MOCKER.graph;
+    private static final Polygon REGION = GRAPH_MOCKER.polygon;
 
     private final RouteCandidateList<RouteCandidate> candidateList = new RouteCandidateList<>();
     private static Map<Pair<Node, Node>, Path> allPaths;

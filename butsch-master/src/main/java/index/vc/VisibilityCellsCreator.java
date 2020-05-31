@@ -18,12 +18,12 @@ import java.util.Set;
  */
 public class VisibilityCellsCreator {
     private final RoadGraph graph;
-    private final VisitedEdgesHashFunction visitedManagerLeft = new VisitedEdgesHashFunction();;
-    private final VisitedEdgesHashFunction visitedManagerRight = new VisitedEdgesHashFunction();;
+    private final VisitedEdgesHashFunction visitedManagerLeft = new VisitedEdgesHashFunction();
+    private final VisitedEdgesHashFunction visitedManagerRight = new VisitedEdgesHashFunction();
     private final Map<Node, SortedNeighbors> sortedNeighborListLeft;
     private final Map<Node, SortedNeighbors> sortedNeighborListRight;
 
-    private final List<VisibilityCell> allFoundCells = new LinkedList<>();;
+    private final List<VisibilityCell> allFoundCells = new LinkedList<>();
     private final Set<Edge> allEdges;
 
     public VisibilityCellsCreator(final RoadGraph graph) {

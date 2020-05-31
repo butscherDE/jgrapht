@@ -16,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 // TODO Visibility Cell now created by ingoring the first node, change it to have the first nodeId to be the first element of the polygon (cell shape).
 public class VisibilityCellTest {
-    private static GeometryFactory gf = new GeometryFactory();
+    private static final GeometryFactory gf = new GeometryFactory();
     private static PolygonRoutingTestGraph graphMocker = graphMocker = PolygonRoutingTestGraph.DEFAULT_INSTANCE;
-    private static RoadGraph graph = graphMocker.graph;
+    private static final RoadGraph graph = graphMocker.graph;
 
     private VisibilityCell createDefaultVisibilityCell() {
         final List<Node> visibilityCellNodeIds = Arrays.asList(

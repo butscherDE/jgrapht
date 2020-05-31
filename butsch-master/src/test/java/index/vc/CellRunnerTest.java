@@ -18,9 +18,9 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CellRunnerTest {
-    private static PolygonRoutingTestGraph GRAPH_MOCKER = new PolygonRoutingTestGraph();
-    private static RoadGraph graph = GRAPH_MOCKER.graph;
-    private static GeometryFactory gf = new GeometryFactory();
+    private static final PolygonRoutingTestGraph GRAPH_MOCKER = new PolygonRoutingTestGraph();
+    private static final RoadGraph graph = GRAPH_MOCKER.graph;
+    private static final GeometryFactory gf = new GeometryFactory();
 
     @Test
     public void simpleCell17to26Left() {

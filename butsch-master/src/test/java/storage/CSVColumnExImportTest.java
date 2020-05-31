@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CSVColumnExImportTest {
-    private static String TEST_PATH = System.getProperty("user.dir") + "\\csvimportexporttest.csv";
+    private static final String TEST_PATH = System.getProperty("user.dir") + "\\csvimportexporttest.csv";
 
     @Test
     public void exAndImport() {

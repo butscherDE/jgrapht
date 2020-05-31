@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RouteCandidateTest {
     private final static PolygonRoutingTestGraph GRAPH_MOCKER = PolygonRoutingTestGraph.DEFAULT_INSTANCE;
-    private static RoadGraph GRAPH = GRAPH_MOCKER.graph;
+    private static final RoadGraph GRAPH = GRAPH_MOCKER.graph;
 
     private static Map<Pair<Node, Node>, Path> allPaths;
     private static RouteCandidate smallerSimpleCandidate;

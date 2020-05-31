@@ -7,7 +7,7 @@ import org.locationtech.jts.geom.Point;
 import java.util.Objects;
 
 public class Node implements Comparable<Node> {
-    private static GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
+    private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     public final long id;
 
     public final double longitude;

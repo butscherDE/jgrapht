@@ -10,7 +10,7 @@ import org.locationtech.jts.geom.*;
 import java.util.*;
 
 public class VisibilityCell implements PolygonSegmentCollection {
-    private static GeometryFactory gf = new GeometryFactory();
+    private static final GeometryFactory gf = new GeometryFactory();
     public final List<LineSegment> lineSegments;
     private final Coordinate[] coordinates;
     private final List<ReflectiveEdge> edges;
@@ -58,7 +58,7 @@ public class VisibilityCell implements PolygonSegmentCollection {
         }
         coordinates[coordinates.length - 1] = nodes.get(0).getPoint().getCoordinate();
 
-        return create((Coordinate[]) coordinates, edges);
+        return create(coordinates, edges);
     }
 
     @Override

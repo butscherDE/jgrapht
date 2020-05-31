@@ -6,8 +6,8 @@ import org.locationtech.jts.geom.Coordinate;
  * https://www.geodatasource.com/developers/java
  */
 public class DistanceCalculator {
-    private static double NAUTIC_FACTOR = 0.8684;
-    private static double METRIC_FACTOR = 1.609344;
+    private static final double NAUTIC_FACTOR = 0.8684;
+    private static final double METRIC_FACTOR = 1.609344;
 
     private DistanceCalculator() {
 
@@ -69,7 +69,7 @@ public class DistanceCalculator {
         return dist;
     }
 
-    public static enum Unit {
-        METRIC, IMPERIAL, NAUTIC;
+    public enum Unit {
+        METRIC, IMPERIAL, NAUTIC
     }
 }
