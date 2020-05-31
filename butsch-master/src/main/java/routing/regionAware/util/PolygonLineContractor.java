@@ -1,11 +1,14 @@
 package routing.regionAware.util;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 import util.CircularList;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
 public class PolygonLineContractor {
@@ -25,9 +28,7 @@ public class PolygonLineContractor {
     public PolygonLineContractor restartAt(final int numForwards) {
         final PolygonLineContractor restartedSPB = new PolygonLineContractor(polygon, startCoordinateIndex);
 
-        for (int i = 0; i < numForwards; i++) {
-            restartedSPB.removeForward();
-        }
+        contractForward(numForwards, restartedSPB);
 
         return restartedSPB;
     }
@@ -87,5 +88,37 @@ public class PolygonLineContractor {
         return segments.size() > 3;
     }
 
+    public Polygon getPolygon(final int forwardContractions, final int backwardContractions) {
+        final PolygonLineContractor plc = new PolygonLineContractor(polygon, startCoordinateIndex);
+
+        contractForward(forwardContractions, plc);
+        contractBackward(backwardContractions, plc);
+
+        return toPolygon(segments);
+    }
+
+    private void contractForward(int forwardContractions, PolygonLineContractor plc) {
+        for (int i = 0; i < forwardContractions; i++) {
+            plc.removeForward();
+        }
+    }
+
+    private void contractBackward(int backwardContractions, PolygonLineContractor plc) {
+        for (int i = 0; i < backwardContractions; i++) {
+            plc.removeBackward();
+        }
+    }
+
+    private static Polygon toPolygon(final List<LineSegment> segments) {
+        final Coordinate[] coordinates = new Coordinate[segments.size() + 1];
+
+        final Iterator<LineSegment> segmentsIt = segments.iterator();
+        for (int i = 0; i < segments.size(); i++) {
+            coordinates[i] = segmentsIt.next().p0;
+        }
+
+        coordinates[coordinates.length - 1] = coordinates[0];
+        return new GeometryFactory().createPolygon(coordinates);
+    }
 
 }

@@ -22,7 +22,6 @@ public class SimplerPolygonContractionSetBuilder {
     private final Set<Node> entryExitNodes;
     private PolygonLineContractor plc;
 
-
     public SimplerPolygonContractionSetBuilder(final GridIndex gridIndex, Polygon polygon) {
         this.gridIndex = gridIndex;
         this.polygon = polygon;
@@ -32,13 +31,13 @@ public class SimplerPolygonContractionSetBuilder {
         entryExitNodes = eepe.extract();
     }
 
-    public int getContractionSetSize(final int startCoordinateIndex) {
+    public int[] getContractionSetSize(final int startCoordinateIndex) {
         plc = new PolygonLineContractor(polygon, startCoordinateIndex);
         int forwardMax = maxContractions(PolygonLineContractor::removeForward);
         plc = plc.restartAt(forwardMax);
         int backwardMax = maxContractions(PolygonLineContractor::removeBackward);
 
-        return forwardMax + backwardMax;
+        return new int[] {forwardMax, backwardMax};
     }
 
     private int maxContractions(Function<PolygonLineContractor, CircularList<LineSegment>> removeFunction) {

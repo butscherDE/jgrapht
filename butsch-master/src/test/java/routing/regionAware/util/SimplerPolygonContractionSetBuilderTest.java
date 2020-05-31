@@ -20,8 +20,9 @@ public class SimplerPolygonContractionSetBuilderTest {
         final Polygon polygon = getTestPolygonGeneral();
 
         SimplerPolygonContractionSetBuilder sp = new SimplerPolygonContractionSetBuilder(GRAPH_MOCKER.gridIndex, polygon);
-        final int actualSetSize = sp.getContractionSetSize(12);
-        assertEquals(7, actualSetSize);
+        final int[] actualSetSize = sp.getContractionSetSize(12);
+        final int actualSetSizeSum = actualSetSize[0] + actualSetSize[1];
+        assertEquals(7, actualSetSizeSum);
     }
 
 
@@ -54,8 +55,9 @@ public class SimplerPolygonContractionSetBuilderTest {
         final Polygon polygon = getTestPolygonExtendingFurtherHelps();
 
         SimplerPolygonContractionSetBuilder sp = new SimplerPolygonContractionSetBuilder(index, polygon);
-        final int actualSetSize = sp.getContractionSetSize(4);
-        assertEquals(3, actualSetSize);
+        final int[] actualSetSize = sp.getContractionSetSize(4);
+        final int actualSetSizeSum = actualSetSize[0] + actualSetSize[1];
+        assertEquals(3, actualSetSizeSum);
     }
 
     private GridIndex getTestPolygonExtendingFurtherHelpsGraph() {
