@@ -189,8 +189,8 @@ public class PolygonMerger {
         final boolean[] isNotIntersected = areEndVisibilityCheckLinesIntersectionFree(innerLayerAsLineSegments,
                                                                                       endVisibilityCheckLines);
 
-        final boolean is0And3Intersecting = !isIntersecting(endVisibilityCheckLines[0], endVisibilityCheckLines[3]);
-        final boolean is1And2Intersecting = !isIntersecting(endVisibilityCheckLines[1], endVisibilityCheckLines[2]);
+        final boolean is0And3Intersecting = isNotIntersecting(endVisibilityCheckLines[0], endVisibilityCheckLines[3]);
+        final boolean is1And2Intersecting = isNotIntersecting(endVisibilityCheckLines[1], endVisibilityCheckLines[2]);
 
         if (isNotIntersected[0] && isNotIntersected[3] && is0And3Intersecting) {
             return new LineSegment[]{endVisibilityCheckLines[0], endVisibilityCheckLines[3]};
@@ -240,8 +240,8 @@ public class PolygonMerger {
         return new LineSegment[]{line00, line01, line10, line11};
     }
 
-    private boolean isIntersecting(final LineSegment line1, final LineSegment line2) {
+    private boolean isNotIntersecting(final LineSegment line1, final LineSegment line2) {
         final Coordinate intersection = line1.intersection(line2);
-        return intersection != null;
+        return intersection == null;
     }
 }

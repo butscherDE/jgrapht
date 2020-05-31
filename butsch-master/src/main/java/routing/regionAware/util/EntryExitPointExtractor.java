@@ -10,7 +10,6 @@ import index.GridIndex;
 import index.Index;
 import org.locationtech.jts.geom.Polygon;
 
-import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

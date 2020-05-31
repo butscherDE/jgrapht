@@ -67,9 +67,8 @@ public class PolygonContainsChecker {
             return false;
         } else {
             final int intersectionCount = getIntersectionCount(coordinate, startIndex);
-            final boolean containedByRayCast = intersectionCount % 2 == 1;
 
-            return containedByRayCast;
+            return intersectionCount % 2 == 1;
         }
     }
 
@@ -83,9 +82,7 @@ public class PolygonContainsChecker {
         final int index = Collections.binarySearch(polygon, searchKey, p1XComparator);
         final int nonNegativeIndex = index < 0 ? (index + 1) * (-1) : index;
 
-        final int spooledIndex = spoolBackToReallyFindFirstOccurence(searchKey, nonNegativeIndex);
-
-        return spooledIndex;
+        return spoolBackToReallyFindFirstOccurence(searchKey, nonNegativeIndex);
     }
 
     private int spoolBackToReallyFindFirstOccurence(LineSegment searchKey, int nonNegativeIndex) {

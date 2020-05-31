@@ -2,10 +2,8 @@ package routing.regionAware.util;
 
 import data.Edge;
 import data.Node;
-import data.RoadCH;
 import data.RoadGraph;
 import index.GridIndex;
-import org.jgrapht.Graph;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;

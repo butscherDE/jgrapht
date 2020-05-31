@@ -2,22 +2,17 @@ package routing.regionAware.util;
 
 import data.Node;
 import data.RegionOfInterest;
-import data.RoadGraph;
 import index.GridIndex;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 import util.CircularList;
-import util.PolygonRoutingTestGraph;
 
-import javax.swing.plaf.synth.Region;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class SimplerPolygonContractionSetBuilder {
     private final static GeometryFactory GF = new GeometryFactory();

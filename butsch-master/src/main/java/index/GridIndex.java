@@ -227,7 +227,7 @@ public class GridIndex implements Index {
         double cellLowerRightLongitude = getCellLongitudeStart(gridCellLongitudeIndex + 1);
         double cellLowerRightLatitude = cellLowerLeftLatitude;
 
-        double cellUpperRightLongitude = cellLowerRightLongitude;
+        @SuppressWarnings("UnnecessaryLocalVariable") double cellUpperRightLongitude = cellLowerRightLongitude;
         double cellUpperRightLatitude = cellUpperLeftLatitude;
 
         boundingBoxLineSegments[0] = new LineSegment(cellLowerLeftLongitude, cellLowerLeftLatitude, cellUpperLeftLongitude, cellUpperLeftLatitude);

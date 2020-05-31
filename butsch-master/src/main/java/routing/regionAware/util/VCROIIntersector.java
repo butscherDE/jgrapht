@@ -11,14 +11,12 @@ public class VCROIIntersector {
     public List<VisibilityCell> getIntersectingCells(final List<VisibilityCell> inVC, final RegionOfInterest roi) {
         RedBlueSegmentIntersectionCrossProductFactory intersectionFactory = new RedBlueSegmentIntersectionCrossProductFactory();
 
-        final List<VisibilityCell> intersectingVCs = inVC
+        return inVC
                 .stream()
                 .filter(a -> intersectionFactory
                         .createInstance(a.getSortedLineSegments(), roi.getSortedLineSegments())
                         .isIntersectionPresent())
                 .collect(Collectors.toList());
-
-        return intersectingVCs;
     }
 
 }

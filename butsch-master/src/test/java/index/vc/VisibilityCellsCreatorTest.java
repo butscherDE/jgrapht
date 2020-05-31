@@ -31,9 +31,8 @@ public class VisibilityCellsCreatorTest {
 
         final List<VisibilityCell> visibilityCells = createVCs(graph);
         final Set<List<Long>> cellsAsNodesUnique = convertToNodeIds(index, visibilityCells);
-        final List<List<Long>> cellsAsNodes = asSortedList(cellsAsNodesUnique);
 
-        return cellsAsNodes;
+        return asSortedList(cellsAsNodesUnique);
     }
 
     public List<VisibilityCell> createVCs(final RoadGraph graph) {

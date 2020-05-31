@@ -40,7 +40,7 @@ public class SortedNeighbors {
     private void addAllNeighborsMaybeIncludingCompareEdge(final Node ignore, final Set<ReflectiveEdge> incidentEdges,
                                                           final List<ComparableEdge> comparableEdges) {
         for (final ReflectiveEdge incidentEdge : incidentEdges) {
-            if (isNodeToIgnore(ignore, incidentEdge) && !isImpasseSubNode(incidentEdge)) {
+            if (isNodeToIgnore(ignore, incidentEdge) && isNotImpasseSubNode(incidentEdge)) {
                 if (!hasEdgeEqualCoordinates(incidentEdge)) {
                     comparableEdges.add(new ComparableEdge(incidentEdge));
                 } else {
@@ -54,7 +54,7 @@ public class SortedNeighbors {
         return !incidentEdge.target.equals(ignore);
     }
 
-    private boolean isImpasseSubNode(final ReflectiveEdge edge) {
+    private boolean isNotImpasseSubNode(final ReflectiveEdge edge) {
         boolean isImpasse;
 
         if (hasEdgeEqualCoordinates(edge)) {
@@ -63,7 +63,7 @@ public class SortedNeighbors {
             isImpasse = false;
         }
 
-        return isImpasse;
+        return !isImpasse;
     }
 
     private boolean hasANeighborNonZeroLengthEdge(ReflectiveEdge edge) {
@@ -80,7 +80,7 @@ public class SortedNeighbors {
         final boolean hasEqualCoordinates = hasEdgeEqualCoordinates(neighbor);
 
         if (hasEqualCoordinates && !areEdgesEqual(neighborPredecessor, neighbor)) {
-            return !isImpasseSubNode(neighbor);
+            return isNotImpasseSubNode(neighbor);
         } else {
             return !hasEqualCoordinates;
         }
@@ -103,21 +103,18 @@ public class SortedNeighbors {
     }
 
     private Set<ReflectiveEdge> getNeighbors(final Node node) {
-        final Set<ReflectiveEdge> outgoingEdgesAsReflective = graph
+        return graph
                 .outgoingEdgesOf(node)
                 .stream()
                 .map(a -> new ReflectiveEdge(a, graph))
                 .collect(Collectors.toSet());
-        return outgoingEdgesAsReflective;
     }
 
     private int indexIfEdgeWasAdded(final ReflectiveEdge lastEdge) {
         final ComparableEdge lastEdgeComparable = new ComparableEdge(lastEdge);
         final Iterator<ComparableEdge> allNeighborEdges = sortedEdges.iterator();
 
-        int i = findIndex(lastEdgeComparable, allNeighborEdges);
-
-        return i;
+        return findIndex(lastEdgeComparable, allNeighborEdges);
     }
 
     private int findIndex(ComparableEdge lastEdgeComparable, Iterator<ComparableEdge> allNeighborEdges) {
@@ -143,9 +140,8 @@ public class SortedNeighbors {
 
     public ReflectiveEdge get(final int index) {
         final ComparableEdge comparableEdge = sortedEdges.get(index);
-        final ReflectiveEdge edge = new ReflectiveEdge(graph.getEdge(comparableEdge.baseNode, comparableEdge.adjNode), graph);
 
-        return edge;
+        return new ReflectiveEdge(graph.getEdge(comparableEdge.baseNode, comparableEdge.adjNode), graph);
     }
 
     public int size() {

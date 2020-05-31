@@ -61,7 +61,7 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
 
     @Override
     public String toString() {
-        String sb = "startNodeID: " + mergedPath.getStartVertex() + ", " +
+        return "startNodeID: " + mergedPath.getStartVertex() + ", " +
                     "endNodeID: " + mergedPath.getEndVertex() + ", " +
                     "polygonEntryNodeID: " + regionEntryToRegionExit.getStartVertex() + ", " +
                     "polygonExitNodeID: " + regionEntryToRegionExit.getEndVertex() + ", " +
@@ -69,7 +69,6 @@ public class RouteCandidate implements Comparable<RouteCandidate> {
                     "TimeInROI: " + getTimeInROI() + ", " +
                     "TimeDetour: " + getDetourTime() + ", " +
                     "gain: " + this.getGain();
-        return sb;
     }
 
     public boolean isLegalCandidate() {

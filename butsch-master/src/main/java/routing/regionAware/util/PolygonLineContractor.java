@@ -5,11 +5,8 @@ import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 import util.CircularList;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class PolygonLineContractor {
     private final Polygon polygon;

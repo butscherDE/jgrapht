@@ -2,7 +2,6 @@ package routing.regionAware;
 
 import data.*;
 import index.GridIndex;
-import index.Index;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -10,6 +9,7 @@ import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
+@SuppressWarnings("SameParameterValue")
 public class RegionThroughTest extends AbstractRegionTest {
     @Test
     public void quickStartingTest() {

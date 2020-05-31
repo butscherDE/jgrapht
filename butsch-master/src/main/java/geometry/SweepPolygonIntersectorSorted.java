@@ -65,20 +65,12 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
 
     private class LSEntity implements Comparable {
         private final double x;
-        private final double y;
-        private final boolean side; // Startpoint or endpoint
-        private final boolean origin; // Red or blue
-        private final LSEntity endpoint;
-        private final LineSegment segment;
 
         public LSEntity(final double x, final double y, final boolean side, final boolean origin,
                         final LSEntity endpoint, final LineSegment segment) {
             this.x = x;
-            this.y = y;
-            this.side = side;
-            this.origin = origin;
-            this.endpoint = endpoint;
-            this.segment = segment;
+            // Startpoint or endpoint
+            // Red or blue
         }
 
         @Override

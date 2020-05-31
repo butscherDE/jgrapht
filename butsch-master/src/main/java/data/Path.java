@@ -64,7 +64,7 @@ public class Path {
     }
 
     public boolean containsDuplicateVertices() {
-        final BinaryHashFunction<Node> hashFunction = new BinaryHashFunction();
+        final BinaryHashFunction<Node> hashFunction = new BinaryHashFunction<>();
 
         for (final Edge edge : path.getEdgeList()) {
             final Node node = getGraph().getEdgeSource(edge);

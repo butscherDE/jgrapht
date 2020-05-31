@@ -2,7 +2,6 @@ package routing.regionAware;
 
 import data.*;
 import index.GridIndex;
-import index.Index;
 import org.jgrapht.alg.util.Pair;
 import routing.DijkstraCH;
 import routing.RPHAST;
@@ -17,10 +16,9 @@ import java.util.*;
 public abstract class AbstractRegion implements RoutingAlgorithm {
     final RoadGraph globalGraph;
     private final RoadCH globalCH;
-    private final Index globalIndex;
     final RegionOfInterest region;
     private final RoadCH regionCH;
-    private final Map<Pair<Node, Node>, Path> allPathsNonBacktracked = new HashMap();
+    private final Map<Pair<Node, Node>, Path> allPathsNonBacktracked = new HashMap<>();
     final Set<Node> entryExitNodes;
     LOTNodeExtractor lotNodeExtractor;
 
@@ -28,7 +26,6 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
                           final RegionOfInterest region) {
         this.globalGraph = globalGraph;
         this.globalCH = globalCH;
-        this.globalIndex = globalIndex;
         this.region = region;
 
         this.entryExitNodes = new EntryExitPointExtractor(region, globalIndex).extract();

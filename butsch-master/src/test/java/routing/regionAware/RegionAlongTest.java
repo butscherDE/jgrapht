@@ -2,7 +2,6 @@ package routing.regionAware;
 
 import data.*;
 import index.GridIndex;
-import index.Index;
 import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;

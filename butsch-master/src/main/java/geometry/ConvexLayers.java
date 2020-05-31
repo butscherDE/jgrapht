@@ -115,14 +115,4 @@ public class ConvexLayers {
         }
         return Arrays.asList(lineSegments);
     }
-
-    public List<List<LineSegment>> getLayersAsLineSegments() {
-        final List<List<LineSegment>> layersAsLS = new ArrayList<>(layers.length);
-
-        for (int i = 0; i < layers.length; i++) {
-            layersAsLS.add(getLayerAsLineSegments(i));
-        }
-
-        return layersAsLS;
-    }
 }

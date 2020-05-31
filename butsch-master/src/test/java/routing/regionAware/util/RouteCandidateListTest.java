@@ -30,10 +30,8 @@ public class RouteCandidateListTest {
         final Set<Node> nodes = GRAPH_MOCKER.graph.vertexSet();
 
         final RPHAST rphast = new RPHAST(ch, true);
-        final Set<Node> allSourceNodes = nodes;
-        final Set<Node> allTargetNodes = nodes;
 
-        allPaths = rphast.findPathsAsMap(allSourceNodes, allTargetNodes);
+        allPaths = rphast.findPathsAsMap(nodes, nodes);
     }
 
     private void addTestingCandidates() {
@@ -201,8 +199,7 @@ public class RouteCandidateListTest {
         @Override
         public String toString() {
 
-            String sb = super.toString() + ", name: " + name;
-            return sb;
+            return super.toString() + ", name: " + name;
         }
 
         @Override

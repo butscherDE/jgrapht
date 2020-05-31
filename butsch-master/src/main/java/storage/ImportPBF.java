@@ -169,10 +169,11 @@ public class ImportPBF implements GraphImporter {
             final Relation relation = relationEntry.getValue();
             final List<Long> nodeIds = recurseToFindNodes(relation);
 
-            final NodeRelation newRelation = NodeRelation.createFromNodeIds(relation.getId(),
-                                                                            relation.getInfo().toString(),
-                                                                            relation.getTags(), nodeIds, onNodes.nodes);
-            return newRelation;
+            return NodeRelation.createFromNodeIds(relation.getId(),
+                                                  relation.getInfo().toString(),
+                                                  relation.getTags(),
+                                                  nodeIds,
+                                                  onNodes.nodes);
         }
 
         private List<Long> recurseToFindNodes(final Relation relation) {

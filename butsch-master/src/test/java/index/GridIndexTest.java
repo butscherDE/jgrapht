@@ -293,21 +293,14 @@ public class GridIndexTest {
 
     private class EdgeVisitor implements Index.IndexVisitor<Edge> {
         private final Set<Edge> edges = new LinkedHashSet<>();
-        private final BoundingBox boundingBox;
-        public int acceptCounts = 0;
+        public final int acceptCounts = 0;
 
         public EdgeVisitor(final BoundingBox boundingBox) {
-            this.boundingBox = boundingBox;
         }
 
         @Override
         public void accept(final Edge entity) {
-            final Node edgeSource = graph.getEdgeSource(entity);
-            final Node edgeTarget = graph.getEdgeTarget(entity);
-
-//            if (boundingBox.contains(edgeSource.getPoint()) || boundingBox.contains(edgeTarget.getPoint())) {
-                edges.add(entity);
-//            }
+            edges.add(entity);
         }
 
         public List<Edge> getEdges() {

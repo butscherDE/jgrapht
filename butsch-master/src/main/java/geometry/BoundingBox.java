@@ -72,11 +72,7 @@ public class BoundingBox extends Polygon {
             return true;
         } else if (contains(otherGeometry)) {
             return true;
-        } else if (otherGeometry.contains(this)) {
-            return true;
-        } else {
-            return false;
-        }
+        } else return otherGeometry.contains(this);
     }
 
     public List<LineSegment> getLineSegmentRepresentation() {

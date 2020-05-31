@@ -72,9 +72,9 @@ public class SortedNeighborsTest {
                 new Node(3, 0, 3, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0L,2L));
-        edges.add(new Pair(1L,2L));
-        edges.add(new Pair(2L,3L));
+        edges.add(new Pair<>(0L,2L));
+        edges.add(new Pair<>(1L,2L));
+        edges.add(new Pair<>(2L,3L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -103,9 +103,9 @@ public class SortedNeighborsTest {
                 new Node(3, 0, 3, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0L,1L));
-        edges.add(new Pair(1L,2L));
-        edges.add(new Pair(1L,3L));
+        edges.add(new Pair<>(0L,1L));
+        edges.add(new Pair<>(1L,2L));
+        edges.add(new Pair<>(1L,3L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -132,9 +132,9 @@ public class SortedNeighborsTest {
                 new Node(3, 0, 2, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0L,1L));
-        edges.add(new Pair(1L,2L));
-        edges.add(new Pair(1L,3L));
+        edges.add(new Pair<>(0L,1L));
+        edges.add(new Pair<>(1L,2L));
+        edges.add(new Pair<>(1L,3L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -159,9 +159,9 @@ public class SortedNeighborsTest {
                 new Node(3, 0, 2, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0L,1L));
-        edges.add(new Pair(1L,2L));
-        edges.add(new Pair(2L,3L));
+        edges.add(new Pair<>(0L,1L));
+        edges.add(new Pair<>(1L,2L));
+        edges.add(new Pair<>(2L,3L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -188,11 +188,11 @@ public class SortedNeighborsTest {
                 new Node(5, 0, 2, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0L,1L));
-        edges.add(new Pair(1L,2L));
-        edges.add(new Pair(2L,3L));
-        edges.add(new Pair(3L,4L));
-        edges.add(new Pair(4L,5L));
+        edges.add(new Pair<>(0L,1L));
+        edges.add(new Pair<>(1L,2L));
+        edges.add(new Pair<>(2L,3L));
+        edges.add(new Pair<>(3L,4L));
+        edges.add(new Pair<>(4L,5L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -214,8 +214,8 @@ public class SortedNeighborsTest {
                 new Node(2, 0, 1, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0L,1L));
-        edges.add(new Pair(1L,2L));
+        edges.add(new Pair<>(0L,1L));
+        edges.add(new Pair<>(1L,2L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -239,10 +239,10 @@ public class SortedNeighborsTest {
                 new Node(4, 0, 1, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0L,1L));
-        edges.add(new Pair(1L,2L));
-        edges.add(new Pair(2L,3L));
-        edges.add(new Pair(3L,4L));
+        edges.add(new Pair<>(0L,1L));
+        edges.add(new Pair<>(1L,2L));
+        edges.add(new Pair<>(2L,3L));
+        edges.add(new Pair<>(3L,4L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 
@@ -287,8 +287,8 @@ public class SortedNeighborsTest {
                 new Node(2, 0, 2, 0)
         };
         final List<Pair<Long, Long>> edges = new LinkedList<>();
-        edges.add(new Pair(0L,1L));
-        edges.add(new Pair(1L,2L));
+        edges.add(new Pair<>(0L,1L));
+        edges.add(new Pair<>(1L,2L));
         return new PolygonRoutingTestGraph(nodes, edges);
     }
 

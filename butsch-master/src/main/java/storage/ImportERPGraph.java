@@ -55,7 +55,6 @@ public class ImportERPGraph implements GraphImporter {
         reader.close();
     }
 
-    @SuppressWarnings("UnnecessaryLocalVariable")
     private void parseGraph(int numNodes, int numEdges) throws IOException {
         final Map<Long, Node> nodeList = new HashMap<>(numNodes);
         for (int i = 0; i < numNodes; i++) {
