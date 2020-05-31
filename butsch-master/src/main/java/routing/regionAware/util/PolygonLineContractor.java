@@ -94,7 +94,7 @@ public class PolygonLineContractor {
         contractForward(forwardContractions, plc);
         contractBackward(backwardContractions, plc);
 
-        return toPolygon(segments);
+        return plc.toPolygon();
     }
 
     private void contractForward(int forwardContractions, PolygonLineContractor plc) {
@@ -109,7 +109,7 @@ public class PolygonLineContractor {
         }
     }
 
-    private static Polygon toPolygon(final List<LineSegment> segments) {
+    private Polygon toPolygon() {
         final Coordinate[] coordinates = new Coordinate[segments.size() + 1];
 
         final Iterator<LineSegment> segmentsIt = segments.iterator();

@@ -3,6 +3,8 @@ package routing.regionAware.util;
 import index.GridIndex;
 import org.locationtech.jts.geom.Polygon;
 
+import java.util.Arrays;
+
 public class PolygonSimplifierFullGreedy implements PolygonSimplifier {
     private final GridIndex gridIndex;
 
@@ -29,9 +31,11 @@ public class PolygonSimplifierFullGreedy implements PolygonSimplifier {
             }
 
             simplified = maxSetSize[0] + maxSetSize[1] > 0;
-            polygon = new PolygonLineContractor(polygon, maxSetIndex).getPolygon(maxSetSize[0], maxSetSize[1]);
+            if (simplified) {
+                polygon = new PolygonLineContractor(polygon, maxSetIndex).getPolygon(maxSetSize[0], maxSetSize[1]);
+            }
         }
 
-        return null;
+        return polygon;
     }
 }

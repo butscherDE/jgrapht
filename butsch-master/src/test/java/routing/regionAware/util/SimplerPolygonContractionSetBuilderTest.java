@@ -26,7 +26,7 @@ public class SimplerPolygonContractionSetBuilderTest {
     }
 
 
-    private Polygon getTestPolygonGeneral() {
+    public static Polygon getTestPolygonGeneral() {
         final Coordinate[] coordinates = new Coordinate[] {
                 new Coordinate(16, 15),
                 new Coordinate(17, 16),
