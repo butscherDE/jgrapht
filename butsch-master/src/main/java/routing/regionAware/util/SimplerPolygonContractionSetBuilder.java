@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 public class SimplerPolygonContractionSetBuilder {
     private final static GeometryFactory GF = new GeometryFactory();
 
-    private final RoadGraph graph;
     private final GridIndex gridIndex;
     private final Polygon polygon;
     private final Set<Node> entryExitNodes;
@@ -30,7 +29,6 @@ public class SimplerPolygonContractionSetBuilder {
 
 
     public SimplerPolygonContractionSetBuilder(final GridIndex gridIndex, Polygon polygon) {
-        this.graph = gridIndex.graph;
         this.gridIndex = gridIndex;
         this.polygon = polygon;
 
