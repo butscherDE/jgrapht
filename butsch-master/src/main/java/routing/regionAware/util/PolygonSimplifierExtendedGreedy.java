@@ -3,11 +3,12 @@ package routing.regionAware.util;
 import index.GridIndex;
 import org.locationtech.jts.geom.Polygon;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class PolygonSimplifierExtendedGreedy implements PolygonSimplifier {
     private final GridIndex gridIndex;
-    private final Random random = new Random();
+    private Random random = new Random(513);
     private SimplerPolygonContractionSetBuilder cSetBuilder;
     private int optimalIndex;
     private int[] optimalContractionSetSize;
@@ -54,8 +55,8 @@ public class PolygonSimplifierExtendedGreedy implements PolygonSimplifier {
         if (getContractionSize(newContractionSize) > getContractionSize(contractionSize)) {
             expanded[0] += newContractionSize[0];
             expanded[1] += newContractionSize[1];
-            final int nextForwardIndex = (index + contractionSize[0]) % polygon.getNumPoints();
-            final int nextBackwardIndex = (index - contractionSize[1]) % polygon.getNumPoints();
+            final int nextForwardIndex = (index + newContractionSize[0]) % polygon.getNumPoints();
+            final int nextBackwardIndex = Math.floorMod((index - newContractionSize[1]), polygon.getNumPoints());
             recurseAroundPolygon(nextForwardIndex, newContractionSize, expanded);
             recurseAroundPolygon(nextBackwardIndex, newContractionSize,expanded);
         }
