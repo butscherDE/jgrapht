@@ -36,5 +36,8 @@ public abstract class PolygonSimplifierTest {
             final Point vertexLocation = vertexI.getPoint();
             assertTrue(pcc.contains(vertexLocation));
         }
+
+        assertTrue(simplified.getNumPoints() < polygon.getNumPoints());
+        System.out.println(simplified.getNumPoints());
     }
 }

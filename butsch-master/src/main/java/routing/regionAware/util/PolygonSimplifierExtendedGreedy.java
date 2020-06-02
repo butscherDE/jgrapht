@@ -9,8 +9,8 @@ public class PolygonSimplifierExtendedGreedy implements PolygonSimplifier {
     private final GridIndex gridIndex;
     private final Random random = new Random();
     private SimplerPolygonContractionSetBuilder cSetBuilder;
-    private int optimalIndex = -1;
-    private int[] optimalContractionSetSize = new int[] {-1, -1};
+    private int optimalIndex;
+    private int[] optimalContractionSetSize;
     private Polygon polygon;
 
     public PolygonSimplifierExtendedGreedy(GridIndex gridIndex) {
@@ -24,9 +24,10 @@ public class PolygonSimplifierExtendedGreedy implements PolygonSimplifier {
 
         while (simplified == true) {
             cSetBuilder = new SimplerPolygonContractionSetBuilder(gridIndex, this.polygon);
+            optimalIndex = -1;
+            optimalContractionSetSize = new int[] {-1, -1};
 
-            descent(random.nextInt(this.polygon.getNumPoints()), new int[] {-1, -1});
-
+            recurseAroundPolygon(random.nextInt(this.polygon.getNumPoints()), new int[] {-1, -1}, new int[] {0, 0});
 
             simplified = getContractionSize(optimalContractionSetSize) > 0;
             if (simplified) {
@@ -37,14 +38,31 @@ public class PolygonSimplifierExtendedGreedy implements PolygonSimplifier {
         return this.polygon;
     }
 
-    private void descent(final int index, final int[] contractionSize) {
+    private void recurseAroundPolygon(final int index, final int[] contractionSize, final int[] expanded) {
+        if (getContractionSize(expanded) > polygon.getNumPoints()) {
+            return;
+        }
+
+        final int[] newContractionSize = descent(index, contractionSize, expanded);
+
+        updateOptimalResult(index, newContractionSize);
+    }
+
+    private int[] descent(int index, int[] contractionSize, int[] expanded) {
         final int[] newContractionSize = cSetBuilder.getContractionSetSize(index);
 
         if (getContractionSize(newContractionSize) > getContractionSize(contractionSize)) {
-            descent((index + contractionSize[0]) % polygon.getNumPoints(), newContractionSize);
-            descent((index - contractionSize[1]) % polygon.getNumPoints(), newContractionSize);
+            expanded[0] += newContractionSize[0];
+            expanded[1] += newContractionSize[1];
+            final int nextForwardIndex = (index + contractionSize[0]) % polygon.getNumPoints();
+            final int nextBackwardIndex = (index - contractionSize[1]) % polygon.getNumPoints();
+            recurseAroundPolygon(nextForwardIndex, newContractionSize, expanded);
+            recurseAroundPolygon(nextBackwardIndex, newContractionSize,expanded);
         }
+        return newContractionSize;
+    }
 
+    private void updateOptimalResult(int index, int[] newContractionSize) {
         if (getContractionSize(newContractionSize) > getContractionSize(optimalContractionSetSize)) {
             optimalIndex = index;
             optimalContractionSetSize = newContractionSize;
