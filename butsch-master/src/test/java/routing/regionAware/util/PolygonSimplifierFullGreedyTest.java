@@ -1,9 +1,13 @@
 package routing.regionAware.util;
 
+import index.GridIndex;
+import org.locationtech.jts.geom.Polygon;
 import util.PolygonRoutingTestGraph;
 
 public class PolygonSimplifierFullGreedyTest extends PolygonSimplifierTest {
-    public PolygonSimplifierFullGreedyTest() {
-        super(new PolygonSimplifierFullGreedy(PolygonRoutingTestGraph.DEFAULT_INSTANCE.gridIndex));
+    @Override
+    Polygon getSimplifiedPolygon(final Polygon polygon, final GridIndex gridIndex) {
+        final PolygonSimplifierFullGreedy ps = new PolygonSimplifierFullGreedy(gridIndex);
+        return ps.simplify(polygon);
     }
 }

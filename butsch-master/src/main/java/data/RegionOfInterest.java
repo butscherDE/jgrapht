@@ -1,13 +1,11 @@
 package data;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Polygon;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class RegionOfInterest implements PolygonSegmentCollection {
     private final Polygon polygon;
@@ -16,6 +14,22 @@ public class RegionOfInterest implements PolygonSegmentCollection {
     public RegionOfInterest(final Polygon polygon) {
         this.polygon = polygon;
         this.segments = getSortedSegments(polygon);
+    }
+
+    public RegionOfInterest(final List<Node> nodes) {
+        this(toPolygon(nodes));
+    }
+
+    private static Polygon toPolygon(final List<Node> nodes) {
+        final Coordinate[] coordinates = new Coordinate[nodes.size() + 1];
+        final Iterator<Node> nodesIt = nodes.iterator();
+        for (int i = 0; i < nodes.size(); i++) {
+            final Node next = nodesIt.next();
+            coordinates[i] = next.getPoint().getCoordinate();
+        }
+        coordinates[coordinates.length - 1] = coordinates[0];
+
+        return new GeometryFactory().createPolygon(coordinates);
     }
 
     public List<LineSegment> getSortedSegments(final Polygon polygon) {

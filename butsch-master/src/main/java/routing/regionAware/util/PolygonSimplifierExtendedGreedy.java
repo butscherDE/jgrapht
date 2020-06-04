@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class PolygonSimplifierExtendedGreedy implements PolygonSimplifier {
     private final GridIndex gridIndex;
-    private Random random = new Random(513);
+    private final Random random = new Random();
     private SimplerPolygonContractionSetBuilder cSetBuilder;
     private int optimalIndex;
     private int[] optimalContractionSetSize;

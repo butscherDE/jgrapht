@@ -5,11 +5,16 @@ import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
 import evalutation.StopWatchVerbose;
+import util.BinaryHashFunction;
+import visualizations.GeometryVisualizer;
 
+import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * "Left" and "Right" are always imagined as walking from baseNode to adjacent node and then turn left or right.
@@ -27,12 +32,51 @@ public class VisibilityCellsCreator {
     private final Set<Edge> allEdges;
 
     public VisibilityCellsCreator(final RoadGraph graph) {
-        this.graph = graph;
+        this.graph = getPreprocessedGraph(graph);
         this.allEdges = graph.edgeSet();
 
         final NeighborPreSorter neighborPreSorter = new NeighborPreSorter(graph);
         this.sortedNeighborListLeft = neighborPreSorter.getAllSortedNeighborsLeft();
         this.sortedNeighborListRight = neighborPreSorter.getAllSortedNeighborsRight();
+    }
+
+    public RoadGraph getPreprocessedGraph(final RoadGraph graph) {
+        return getGraphWithOutgoingEdgesOnEachVertex(graph);
+    }
+
+    private RoadGraph getGraphWithOutgoingEdgesOnEachVertex(final RoadGraph graph) {
+        final BinaryHashFunction<Node> hashFunction = getHashIndicatingOutDegreeGreaterZero(graph);
+
+        final RoadGraph cleanedGraph = new RoadGraph(Edge.class);
+        addFilteredVertices(graph, hashFunction, cleanedGraph);
+        addFilteredEdges(graph, hashFunction, cleanedGraph);
+
+        return cleanedGraph;
+    }
+
+    private BinaryHashFunction<Node> getHashIndicatingOutDegreeGreaterZero(final RoadGraph graph) {
+        final BinaryHashFunction<Node> hashFunction = new BinaryHashFunction<>();
+        graph.vertexSet().stream().forEach(a -> hashFunction.set(a, graph.outDegreeOf(a) > 0));
+        hashFunction.set(graph.getVertex(-1), false);
+        return hashFunction;
+    }
+
+    private void addFilteredVertices(final RoadGraph graph, final BinaryHashFunction<Node> hashFunction,
+                                     final RoadGraph cleanedGraph) {
+        graph.vertexSet().stream().filter(a -> hashFunction.get(a)).forEach(a -> cleanedGraph.addVertex(a));
+    }
+
+    private void addFilteredEdges(final RoadGraph graph, final BinaryHashFunction<Node> hashFunction,
+                                  final RoadGraph cleanedGraph) {
+        for (final Edge edge : graph.edgeSet()) {
+            final Node edgeSource = graph.getEdgeSource(edge);
+            final Node edgeTarget = graph.getEdgeTarget(edge);
+
+            if (hashFunction.get(edgeSource) && hashFunction.get(edgeTarget)) {
+                final Edge newEdge = cleanedGraph.addEdge(edgeSource, edgeTarget);
+                cleanedGraph.setEdgeWeight(newEdge, graph.getEdgeWeight(edge));
+            }
+        }
     }
 
     public List<VisibilityCell> create() {
@@ -49,11 +93,13 @@ public class VisibilityCellsCreator {
             }
 
             if (!visibilityCellOnTheLeftFound(currentEdge)) {
-                addVisibilityCellToResults(new CellRunnerLeft(graph, visitedManagerLeft, currentEdge, sortedNeighborListLeft).extractVisibilityCell());
+                addVisibilityCellToResults(new CellRunnerLeft(graph, visitedManagerLeft, currentEdge,
+                                                              sortedNeighborListLeft).extractVisibilityCell());
             }
 
             if (!visibilityCellOnTheRightFound(currentEdge)) {
-                addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerRight, currentEdge, sortedNeighborListRight).extractVisibilityCell());
+                addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerRight, currentEdge,
+                                                               sortedNeighborListRight).extractVisibilityCell());
             }
         }
         swAll.printTimingIfVerbose();

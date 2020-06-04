@@ -1,5 +1,6 @@
 package index.vc;
 
+import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
@@ -163,5 +164,33 @@ public class VisibilityCellsCreatorTest {
         groundTruth.add(Arrays.asList(54L, 54L, 55L, 55L, 56L, 56L, 57L, 57L));
 
         return groundTruth;
+    }
+
+    @Test
+    public void stableOnNodesWithNoOutgoingNeighbors() {
+        final RoadGraph graph = new RoadGraph(Edge.class);
+
+        final Node[] nodes = new Node[] {
+                new Node(0, 0, 0, 0),
+                new Node(1, 1, 0, 0),
+                new Node(2, 0.5, 1, 0),
+                new Node(3, 0.5, 0.5, 0)
+        };
+        Arrays.stream(nodes).forEach(a -> graph.addVertex(a));
+
+        graph.addEdge(nodes[0], nodes[1]);
+        graph.addEdge(nodes[1], nodes[0]);
+        graph.addEdge(nodes[1], nodes[2]);
+        graph.addEdge(nodes[2], nodes[1]);
+        graph.addEdge(nodes[2], nodes[0]);
+        graph.addEdge(nodes[0], nodes[2]);
+        graph.addEdge(nodes[2], nodes[3]);
+
+        final VisibilityCellsCreator vcc = new VisibilityCellsCreator(graph);
+        final List<VisibilityCell> visibilityCells = vcc.create();
+
+        assertEquals(2, visibilityCells.size());
+        assertEquals(3, visibilityCells.get(0).lineSegments.size());
+        assertEquals(3, visibilityCells.get(1).lineSegments.size());
     }
 }
