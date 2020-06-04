@@ -70,4 +70,13 @@ public class RoadGraph extends DefaultDirectedWeightedGraph<Node, Edge> {
     public BoundingBox getBoundingBox() {
         return BoundingBox.createFrom(this);
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        vertexSet().stream().forEach(a -> sb.append(a.toString() + "\n"));
+        edgeSet().stream().forEach(a -> sb.append(a.toString() + "\n"));
+
+        return sb.toString();
+    }
 }
