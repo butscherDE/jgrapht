@@ -56,9 +56,13 @@ public class VisibilityCellsCreator {
 
     private BinaryHashFunction<Node> getHashIndicatingOutDegreeGreaterZero(final RoadGraph graph) {
         final BinaryHashFunction<Node> hashFunction = new BinaryHashFunction<>();
-        graph.vertexSet().stream().forEach(a -> hashFunction.set(a, graph.outDegreeOf(a) > 0));
+        graph.vertexSet().stream().forEach(a -> hashFunction.set(a, hasNeighbor(graph, a)));
         hashFunction.set(graph.getVertex(-1), false);
         return hashFunction;
+    }
+
+    private boolean hasNeighbor(RoadGraph graph, Node a) {
+        return graph.outDegreeOf(a) + graph.inDegreeOf(a) > 0;
     }
 
     private void addFilteredVertices(final RoadGraph graph, final BinaryHashFunction<Node> hashFunction,
