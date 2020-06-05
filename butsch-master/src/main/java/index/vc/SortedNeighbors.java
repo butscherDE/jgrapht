@@ -181,7 +181,7 @@ public class SortedNeighbors {
         public boolean equals(final Object o) {
             if (o instanceof ComparableEdge) {
                 final ComparableEdge ce = (ComparableEdge) o;
-                return id == ce.id && adjNode == ce.adjNode;
+                return baseNode.id == ce.baseNode.id && adjNode.id == ce.adjNode.id;
             } else {
                 return false;
             }
