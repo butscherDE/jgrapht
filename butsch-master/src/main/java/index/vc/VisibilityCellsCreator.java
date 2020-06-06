@@ -45,41 +45,17 @@ public class VisibilityCellsCreator {
     }
 
     private RoadGraph getGraphWithOutgoingEdgesOnEachVertex(final RoadGraph graph) {
-        final BinaryHashFunction<Node> hashFunction = getHashIndicatingOutDegreeGreaterZero(graph);
-
-        final RoadGraph cleanedGraph = new RoadGraph(Edge.class);
-        addFilteredVertices(graph, hashFunction, cleanedGraph);
-        addFilteredEdges(graph, hashFunction, cleanedGraph);
+        final RoadGraph cleanedGraph = graph.deepCopy();
+        cleanedGraph.vertexSet().stream().forEach(v -> remove(v, graph));
 
         return cleanedGraph;
     }
 
-    private BinaryHashFunction<Node> getHashIndicatingOutDegreeGreaterZero(final RoadGraph graph) {
-        final BinaryHashFunction<Node> hashFunction = new BinaryHashFunction<>();
-        graph.vertexSet().stream().forEach(a -> hashFunction.set(a, hasNeighbor(graph, a)));
-        hashFunction.set(graph.getVertex(-1), false);
-        return hashFunction;
-    }
+    private void remove(final Node node, final RoadGraph graph) {
+        if (graph.outDegreeOf(node) == 0) {
+            graph.removeVertex(node);
 
-    private boolean hasNeighbor(RoadGraph graph, Node a) {
-        return graph.outDegreeOf(a) + graph.inDegreeOf(a) > 0;
-    }
-
-    private void addFilteredVertices(final RoadGraph graph, final BinaryHashFunction<Node> hashFunction,
-                                     final RoadGraph cleanedGraph) {
-        graph.vertexSet().stream().filter(a -> hashFunction.get(a)).forEach(a -> cleanedGraph.addVertex(a));
-    }
-
-    private void addFilteredEdges(final RoadGraph graph, final BinaryHashFunction<Node> hashFunction,
-                                  final RoadGraph cleanedGraph) {
-        for (final Edge edge : graph.edgeSet()) {
-            final Node edgeSource = graph.getEdgeSource(edge);
-            final Node edgeTarget = graph.getEdgeTarget(edge);
-
-            if (hashFunction.get(edgeSource) && hashFunction.get(edgeTarget)) {
-                final Edge newEdge = cleanedGraph.addEdge(edgeSource, edgeTarget);
-                cleanedGraph.setEdgeWeight(newEdge, graph.getEdgeWeight(edge));
-            }
+            graph.incomingEdgesOf(node).stream().forEach(e -> remove(graph.getEdgeSource(e), graph));
         }
     }
 

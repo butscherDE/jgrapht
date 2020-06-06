@@ -79,4 +79,27 @@ public class RoadGraph extends DefaultDirectedWeightedGraph<Node, Edge> {
 
         return sb.toString();
     }
+
+    public RoadGraph deepCopy() {
+        final RoadGraph newGraph = new RoadGraph(Edge.class);
+
+        addVertices(newGraph);
+        addAllEdgesAndSetWeight(newGraph);
+
+        return newGraph;
+    }
+
+    private void addVertices(RoadGraph newGraph) {
+        vertexSet().stream().forEach(a -> newGraph.addVertex(a));
+    }
+
+    private void addAllEdgesAndSetWeight(RoadGraph newGraph) {
+        edgeSet().stream().forEach(e -> {
+            final Node edgeSource = getEdgeSource(e);
+            final Node edgeTarget = getEdgeTarget(e);
+
+            final Edge newEdge = newGraph.addEdge(edgeSource, edgeTarget);
+            newGraph.setEdgeWeight(newEdge, getEdgeWeight(e));
+        });
+    }
 }
