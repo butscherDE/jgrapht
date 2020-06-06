@@ -130,14 +130,6 @@ public class SortedNeighbors {
     }
 
     public ReflectiveEdge getMostOrientedEdge(final ReflectiveEdge lastEdge) {
-        if (sortedEdges.size() > 0) {
-            return getSortedPredecessor(lastEdge);
-        } else {
-            return lastEdge;
-        }
-    }
-
-    private ReflectiveEdge getSortedPredecessor(ReflectiveEdge lastEdge) {
         final int addIndex = indexIfEdgeWasAdded(lastEdge);
         int addIndexPredecessor = addIndex - 1;
         int indexOfEndOfList = sortedEdges.size() - 1;
