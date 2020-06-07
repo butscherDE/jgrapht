@@ -53,9 +53,9 @@ public class VisibilityCellsCreator {
 
     private void remove(final Node node, final RoadGraph graph) {
         if (graph.outDegreeOf(node) == 0) {
+            final Stream<Edge> stream = graph.incomingEdgesOf(node).stream();
             graph.removeVertex(node);
-
-            graph.incomingEdgesOf(node).stream().forEach(e -> remove(graph.getEdgeSource(e), graph));
+            stream.forEach(e -> remove(graph.getEdgeSource(e), graph));
         }
     }
 
@@ -68,23 +68,19 @@ public class VisibilityCellsCreator {
     private void startRunsOnEachEdgeInTheGraph() {
         StopWatchVerbose swAll = new StopWatchVerbose("VisibilityCells created");
         for (final Edge currentEdge : this.allEdges) {
-            System.out.println("lala0 " + currentEdge);
             if (continueOnLengthZeroEdge(currentEdge) || currentEdge.id == RoadGraph.INVALID_EDGE.id) {
                 continue;
             }
 
-            System.out.println("lala1 " + currentEdge);
             if (!visibilityCellOnTheLeftFound(currentEdge)) {
                 addVisibilityCellToResults(new CellRunnerLeft(graph, visitedManagerLeft, currentEdge,
                                                               sortedNeighborListLeft).extractVisibilityCell());
             }
-            System.out.println("lala2");
 
             if (!visibilityCellOnTheRightFound(currentEdge)) {
                 addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerRight, currentEdge,
                                                                sortedNeighborListRight).extractVisibilityCell());
             }
-            System.out.println("lala3");
         }
         swAll.printTimingIfVerbose();
     }

@@ -135,7 +135,14 @@ public class SortedNeighbors {
         int indexOfEndOfList = sortedEdges.size() - 1;
         int indexOfPredecessorOfLastEdge = addIndexPredecessor < 0 ? indexOfEndOfList : addIndexPredecessor;
 
-        return get(indexOfPredecessorOfLastEdge);
+        try {
+            return get(indexOfPredecessorOfLastEdge);
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            System.out.println(lastEdge);
+            throw new IllegalArgumentException();
+        }
     }
 
     public ReflectiveEdge get(final int index) {

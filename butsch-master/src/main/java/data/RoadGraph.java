@@ -94,7 +94,7 @@ public class RoadGraph extends DefaultDirectedWeightedGraph<Node, Edge> {
     }
 
     private void addAllEdgesAndSetWeight(RoadGraph newGraph) {
-        edgeSet().stream().forEach(e -> {
+        edgeSet().stream().filter(a -> newGraph.getEdgeSource(a).id >= 0).forEach(e -> {
             final Node edgeSource = getEdgeSource(e);
             final Node edgeTarget = getEdgeTarget(e);
 

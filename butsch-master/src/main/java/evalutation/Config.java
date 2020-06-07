@@ -14,6 +14,7 @@ public class Config {
     // PBF files
     public static final String PBF_FREIBURG = "C:\\pbffiles\\freiburg-regbez-latest.osm.pbf";
     public static final String PBF_TUEBINGEN = "C:\\pbffiles\\tuebingen-regbez-latest.osm.pbf";
+    public static final String PBF_ANDORRA = "C:\\pbffiles\\andorra-latest.osm.pbf";
     public static final String PBF_LUXEMBOURG = "C:\\pbffiles\\luxembourg-latest.osm.pbf";
     public static final String PBF_LUXEMBOURG_STATS = "C:\\pbffiles\\luxembourgstats.csv";
     public static final String PBF_GERMANY = "C:\\pbffiles\\germany-latest.osm.pbf";
