@@ -43,11 +43,17 @@ public class GridIndex implements Index {
 
     private void initCells() {
         final VisibilityCellsCreator vcc = new VisibilityCellsCreator(graph);
+        System.out.println("lala1");
         final List<VisibilityCell> visibilityCells = vcc.create();
+        System.out.println("lala2");
         instantiateCellObjects();
+        System.out.println("lala3");
         addNodesToIntersectingCells();
+        System.out.println("lala4");
         addEdgesToIntersectingCells();
+        System.out.println("lala5");
         addVisibilityCellsToOverlappingCells(visibilityCells);
+        System.out.println("lala6");
     }
 
     private void instantiateCellObjects() {
