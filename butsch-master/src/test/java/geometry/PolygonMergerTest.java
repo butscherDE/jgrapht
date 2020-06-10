@@ -5229,11 +5229,6 @@ public class PolygonMergerTest {
     private void drawForDebugging(final Coordinate[] merged, final List<Coordinate> expectedCoordinates) {
         System.out.println(expectedCoordinates);
         System.out.println(Arrays.toString(merged));
-
-        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
-        col.addLineSegmentsFromCoordinates(Color.BLACK, Arrays.asList(merged));
-        final GeometryVisualizer visualizer = new GeometryVisualizer(col);
-        visualizer.visualizeGraph(100_000);
     }
 
     private PolygonMerger getPolygonMerger() {
