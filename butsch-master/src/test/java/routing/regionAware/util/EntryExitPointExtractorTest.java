@@ -93,11 +93,6 @@ public class EntryExitPointExtractorTest {
                 new Coordinate(17, 14),
                 new Coordinate(16, 15)
         };
-        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
-        col.addGraph(Color.BLACK, GRAPH_MOCKER.graph);
-        col.addPolygon(Color.RED, new GeometryFactory().createPolygon(roiCoordinates));
-        final GeometryVisualizer vis = new GeometryVisualizer(col);
-//        vis.visualizeGraph(100000);
         assertInner4(roiCoordinates);
     }
 
