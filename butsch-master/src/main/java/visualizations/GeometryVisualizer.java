@@ -1,5 +1,6 @@
 package visualizations;
 
+import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import org.locationtech.jts.geom.Coordinate;
@@ -85,16 +86,16 @@ public class GeometryVisualizer {
 
     private void drawCoordinates() {
         g2d.setColor(NODES);
-        for (final Map.Entry<Color, Collection<Coordinate>> colorCollectionEntry : geometryDrawCollection.coordinates.entrySet()) {
+        for (final Map.Entry<Color, Collection<Node>> colorCollectionEntry : geometryDrawCollection.coordinates.entrySet()) {
             final Color color = colorCollectionEntry.getKey();
-            final Collection<Coordinate> coordinates = colorCollectionEntry.getValue();
+            final Collection<Node> nodes = colorCollectionEntry.getValue();
 
             g2d.setColor(color);
-            for (Coordinate coordinate : coordinates) {
-                final double x = (coordinate.getX() - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
-                final double y = (coordinate.getY() - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
+            for (Node node : nodes) {
+                final double x = (node.getPoint().getCoordinate().x - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
+                final double y = (node.getPoint().getCoordinate().y - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
                 g2d.fill(new Ellipse2D.Double(x - NODE_SIZE / 2d, y - NODE_SIZE / 2d, NODE_SIZE, NODE_SIZE));
-                g2d.drawString(coordinate.toString(), (float) x, (float) y);
+                g2d.drawString(String.valueOf(node.id), (float) x, (float) y);
             }
         }
     }
@@ -128,9 +129,9 @@ public class GeometryVisualizer {
     private double[] extractMinMax() {
         double[] minMax = {Double.MAX_VALUE, -Double.MAX_VALUE, Double.MAX_VALUE, -Double.MAX_VALUE};
 
-        for (final Collection<Coordinate> coordinates : geometryDrawCollection.coordinates.values()) {
-            for (Coordinate coordinate : coordinates) {
-                updateMinMaxWithCoordinate(minMax, coordinate);
+        for (final Collection<Node> nodes : geometryDrawCollection.coordinates.values()) {
+            for (Node node : nodes) {
+                updateMinMaxWithCoordinate(minMax, node.getPoint().getCoordinate());
             }
         }
 
@@ -186,7 +187,7 @@ public class GeometryVisualizer {
     }
 
     public static class GeometryDrawCollection {
-        private final HashMap<Color, Collection<Coordinate>> coordinates = new HashMap<>();
+        private final HashMap<Color, Collection<Node>> coordinates = new HashMap<>();
         private final HashMap<Color, Collection<LineSegment>> lineSegments = new HashMap<>();
 
         public GeometryDrawCollection() {
@@ -195,7 +196,7 @@ public class GeometryVisualizer {
         public void addGraph(final Color color, final RoadGraph graph) {
             graph.vertexSet().stream()
 							 .filter(a -> a.id >= 0)
-							 .forEach(a -> addCoordinate(color, a.getPoint().getCoordinate()));
+							 .forEach(a -> addNode(color, a));
             graph.edgeSet().stream()
 					       .forEach(a -> {
 							   final Node edgeSource = graph.getEdgeSource(a);
@@ -222,19 +223,19 @@ public class GeometryVisualizer {
 			addLineSegments(color, lineSegments);
 		}
 
-        public void addCoordinate(final Color color, final Coordinate coordinate) {
+        public void addNode(final Color color, final Node coordinate) {
             addCoordinates(color, Collections.singletonList(coordinate));
         }
 
-        public void addCoordinates(final Color color, final Collection<Coordinate> coordinate) {
-            Collection<Coordinate> coordinates = this.coordinates.get(color);
+        public void addCoordinates(final Color color, final Collection<Node> coordinate) {
+            Collection<Node> nodes = this.coordinates.get(color);
 
-            if (coordinates == null) {
+            if (nodes == null) {
                 this.coordinates.put(color, new LinkedList<>());
-                coordinates = this.coordinates.get(color);
+                nodes = this.coordinates.get(color);
             }
 
-            coordinates.addAll(coordinate);
+            nodes.addAll(coordinate);
         }
 
         public void addLineSegment(final Color color, final LineSegment segment) {
@@ -260,6 +261,17 @@ public class GeometryVisualizer {
             final Collection<LineSegment> lineSegments = coordinatesToLineSegments(coordinates);
 
             addLineSegments(color, lineSegments);
+        }
+
+        public void addEdge(final Color color, final Edge edge, final RoadGraph graph) {
+            final Node edgeSource = graph.getEdgeSource(edge);
+            final Node edgeTarget = graph.getEdgeTarget(edge);
+
+            final Coordinate sourceCoordinate = edgeSource.getPoint().getCoordinate();
+            final Coordinate targetCoordinate = edgeTarget.getPoint().getCoordinate();
+            final LineSegment lineSegment = new LineSegment(sourceCoordinate, targetCoordinate);
+
+            addLineSegment(color, lineSegment);
         }
 
         private Collection<LineSegment> coordinatesToLineSegments(final Collection<Coordinate> coordinates) {

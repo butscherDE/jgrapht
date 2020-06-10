@@ -72,11 +72,13 @@ public class VisibilityCellsCreator {
                 continue;
             }
 
+            System.out.println("lala1.1");
             if (!visibilityCellOnTheLeftFound(currentEdge)) {
                 addVisibilityCellToResults(new CellRunnerLeft(graph, visitedManagerLeft, currentEdge,
                                                               sortedNeighborListLeft).extractVisibilityCell());
             }
 
+            System.out.println("lala1.2");
             if (!visibilityCellOnTheRightFound(currentEdge)) {
                 addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerRight, currentEdge,
                                                                sortedNeighborListRight).extractVisibilityCell());
