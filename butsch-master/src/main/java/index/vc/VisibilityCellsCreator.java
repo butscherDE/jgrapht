@@ -67,22 +67,22 @@ public class VisibilityCellsCreator {
 
     private void startRunsOnEachEdgeInTheGraph() {
         StopWatchVerbose swAll = new StopWatchVerbose("VisibilityCells created");
+        int c = 0;
         for (final Edge currentEdge : this.allEdges) {
             if (continueOnLengthZeroEdge(currentEdge) || currentEdge.id == RoadGraph.INVALID_EDGE.id) {
                 continue;
             }
 
-            System.out.println("lala1.1");
             if (!visibilityCellOnTheLeftFound(currentEdge)) {
                 addVisibilityCellToResults(new CellRunnerLeft(graph, visitedManagerLeft, currentEdge,
                                                               sortedNeighborListLeft).extractVisibilityCell());
             }
 
-            System.out.println("lala1.2");
             if (!visibilityCellOnTheRightFound(currentEdge)) {
                 addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerRight, currentEdge,
                                                                sortedNeighborListRight).extractVisibilityCell());
             }
+            System.out.println(++c);
         }
         swAll.printTimingIfVerbose();
     }

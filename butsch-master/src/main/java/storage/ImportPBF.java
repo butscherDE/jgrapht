@@ -96,18 +96,64 @@ public class ImportPBF implements GraphImporter {
         private final List<Pair<Long, Long>> edges = Collections.synchronizedList(new LinkedList<>());
         private final Map<Long, Way> ways = Collections.synchronizedMap(new HashMap<>());
 
+        int c = 0;
+        int c2 = 0;
         @Override
         public void accept(final Way way) {
             ways.put(way.getId(), way);
+            c++;
             final List<Long> nodeIds = way.getNodes();
-
             if (isRoad(way)) {
-                rememberEdgesToAddToGraph(nodeIds);
+                addRoadData(way, nodeIds);
+                c2++;
+            } else {
+                System.out.println(way.getTags());
             }
+            System.out.println(c2 + "/" + c);
         }
 
         public boolean isRoad(final Way way) {
             return way.getTags().get("highway") != null;
+        }
+
+        private void addRoadData(Way way, List<Long> nodeIds) {
+            final String onewayTag = way.getTags().get("oneway").toLowerCase();
+            if (onewayTag == null || onewayTag.equals("no")) {
+                addEdgesBidirectional(nodeIds);
+            } else if (onewayTag.equals("yes") || way.getTags().get("junction").toLowerCase().equals("roundabout")) {
+                addEdgesForward(nodeIds);
+            } else if (onewayTag.equals("-1")) {
+                addEdgesOnlyReverse(nodeIds);
+            } else if (onewayTag.equals("reversible")) {
+                reversibleTagFoundError();
+                return;
+            } else {
+                unknownTagError(onewayTag);
+                return;
+            }
+        }
+
+        private void addEdgesBidirectional(List<Long> nodeIds) {
+            rememberEdgesToAddToGraph(nodeIds);
+            Collections.reverse(nodeIds);
+            rememberEdgesToAddToGraph(nodeIds);
+        }
+
+        private void addEdgesForward(List<Long> nodeIds) {
+            rememberEdgesToAddToGraph(nodeIds);
+        }
+
+        private void addEdgesOnlyReverse(List<Long> nodeIds) {
+            Collections.reverse(nodeIds);
+            rememberEdgesToAddToGraph(nodeIds);
+        }
+
+        private void reversibleTagFoundError() {
+            throw new InputMismatchException("Cannot handle reversible edges (tag oneway:reversible)");
+        }
+
+        private void unknownTagError(String onewayTag) {
+            throw new InputMismatchException("Value \"" + onewayTag + "\" is not known for oneway tag");
         }
 
         public void rememberEdgesToAddToGraph(final List<Long> nodeIds) {
@@ -153,16 +199,26 @@ public class ImportPBF implements GraphImporter {
         public List<NodeRelation> getNodeRelations() {
             final List<NodeRelation> nodeRelations = new LinkedList<>();
 
-            for (final Map.Entry<Long, Relation> relationEntry : relations.entrySet()) {
-                try {
-                    final NodeRelation relation = getRelation(relationEntry);
-                    nodeRelations.add(relation);
-                } catch (NullPointerException | NoSuchElementException e) {
-                    System.err.println("Relation " + relationEntry.getValue().getId() + " could not be processed because of invalid data.");
-                }
+            synchronized (relations) {
+                addAllRelationsSynced(nodeRelations);
             }
 
             return nodeRelations;
+        }
+
+        private void addAllRelationsSynced(List<NodeRelation> nodeRelations) {
+            for (final Map.Entry<Long, Relation> relationEntry : relations.entrySet()) {
+                addRelationEntry(nodeRelations, relationEntry);
+            }
+        }
+
+        private void addRelationEntry(List<NodeRelation> nodeRelations, Map.Entry<Long, Relation> relationEntry) {
+            try {
+                final NodeRelation relation = getRelation(relationEntry);
+                nodeRelations.add(relation);
+            } catch (NullPointerException | NoSuchElementException e) {
+                System.err.println("Relation " + relationEntry.getValue().getId() + " could not be processed because of invalid data.");
+            }
         }
 
         private NodeRelation getRelation(final Map.Entry<Long, Relation> relationEntry) {
