@@ -56,9 +56,13 @@ public abstract class PolygonSimplifierTest {
         final ImportPBF importPBF = new ImportPBF(Config.PBF_LUXEMBOURG);
         RoadGraph graph = null;
         try {
-            importPBF.createGraph();
-            final ImportERPGraph importERPGraph = new ImportERPGraph(Config.ERP_LUXEMBOURG);
-            graph = importERPGraph.createGraph();
+            graph = importPBF.createGraph();
+            System.out.println("stats:");
+            System.out.println("nodes: " + graph.vertexSet().size());
+            System.out.println("edges: " + graph.edgeSet().size());
+            System.out.println("polygon: " + importPBF.getNodeRelations().size());
+//            final ImportERPGraph importERPGraph = new ImportERPGraph(Config.ERP_LUXEMBOURG);
+//            graph = importERPGraph.createGraph();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             fail();

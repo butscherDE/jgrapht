@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
 public class ImportPBF implements GraphImporter {
@@ -96,16 +97,19 @@ public class ImportPBF implements GraphImporter {
     }
 
     private class RoadGraphEdgeAdder implements Consumer<Way> {
+        private final ReentrantLock lock = new ReentrantLock();
         private final List<Pair<Long, Long>> edges = Collections.synchronizedList(new LinkedList<>());
         private final Map<Long, Way> ways = Collections.synchronizedMap(new HashMap<>());
 
         @Override
         public void accept(final Way way) {
+            lock.lock();
             ways.put(way.getId(), way);
             final List<Long> nodeIds = way.getNodes();
             if (isRoad(way)) {
                 addRoadData(way, nodeIds);
             }
+            lock.unlock();
         }
 
         public boolean isRoad(final Way way) {
@@ -113,10 +117,11 @@ public class ImportPBF implements GraphImporter {
         }
 
         private void addRoadData(Way way, List<Long> nodeIds) {
-            final String onewayTag = way.getTags().get("oneway").toLowerCase();
+            final String onewayTag = way.getTags().get("oneway");
+            final String junctionTag = way.getTags().get("junction");
             if (onewayTag == null || onewayTag.equals("no")) {
                 addEdgesBidirectional(nodeIds);
-            } else if (onewayTag.equals("yes") || way.getTags().get("junction").toLowerCase().equals("roundabout")) {
+            } else if (onewayTag.equals("yes") || (junctionTag != null && junctionTag.equals("roundabout"))) {
                 addEdgesForward(nodeIds);
             } else if (onewayTag.equals("-1")) {
                 addEdgesOnlyReverse(nodeIds);
