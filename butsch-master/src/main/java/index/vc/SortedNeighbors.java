@@ -18,6 +18,13 @@ public class SortedNeighbors {
         this.vectorAngleCalculator = vectorAngleCalculator;
 
         this.sortedEdges = sort(baseNode, ignore);
+
+        if (sortedEdges.size() == 0 && baseNode.id >= 0) {
+            System.out.println(baseNode);
+            System.out.println(ignore);
+            System.out.println(graph.outgoingEdgesOf(baseNode).size());
+            throw new IllegalStateException("Never create Sorted Neighbors on node with no outgoing neighbors.");
+        }
     }
 
     private List<ComparableEdge> sort(final Node baseNode, final Node ignore) {
@@ -136,7 +143,11 @@ public class SortedNeighbors {
         int indexOfPredecessorOfLastEdge = addIndexPredecessor < 0 ? indexOfEndOfList : addIndexPredecessor;
 
         try {
-            return get(indexOfPredecessorOfLastEdge);
+            if (sortedEdges.size() > 1) {
+                return get(indexOfPredecessorOfLastEdge);
+            } else {
+                return lastEdge;
+            }
         } catch (Exception e) {
 
             e.printStackTrace();

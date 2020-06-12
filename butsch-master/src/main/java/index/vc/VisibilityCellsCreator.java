@@ -9,10 +9,8 @@ import util.BinaryHashFunction;
 import visualizations.GeometryVisualizer;
 
 import java.awt.*;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,17 +44,48 @@ public class VisibilityCellsCreator {
 
     private RoadGraph getGraphWithOutgoingEdgesOnEachVertex(final RoadGraph graph) {
         final RoadGraph cleanedGraph = graph.deepCopy();
-        cleanedGraph.vertexSet().stream().forEach(v -> remove(v, graph));
+
+        List<Node> checkNodes = getAllInitiallyDegreeZeroNodes(cleanedGraph);
+        while (checkNodes.size() > 0) {
+            final List<Node> neighbors = getAllNeighborsOfAllDegreeZeroNodes(cleanedGraph, checkNodes);
+            removeAllCurrentDegreeZeroNodes(cleanedGraph, checkNodes);
+            checkNodes = getAllNeighborsThatDegreeIsNowZero(cleanedGraph, neighbors);
+        }
+
+        System.out.println("Reduction: " + graph.vertexSet().size() + ", " + cleanedGraph.vertexSet().size());
 
         return cleanedGraph;
     }
 
-    private void remove(final Node node, final RoadGraph graph) {
-        if (graph.outDegreeOf(node) == 0) {
-            final Stream<Edge> stream = graph.incomingEdgesOf(node).stream();
-            graph.removeVertex(node);
-            stream.forEach(e -> remove(graph.getEdgeSource(e), graph));
-        }
+    private List<Node> getAllInitiallyDegreeZeroNodes(final RoadGraph cleanedGraph) {
+        return cleanedGraph
+                    .vertexSet()
+                    .stream()
+                    .filter(a -> cleanedGraph.outDegreeOf(a) == 0)
+                    .collect(Collectors.toList());
+    }
+
+    private List<Node> getAllNeighborsOfAllDegreeZeroNodes(final RoadGraph cleanedGraph, final List<Node> checkNodes) {
+        return checkNodes
+                        .stream()
+                        .map(a -> cleanedGraph.incomingEdgesOf(a))
+                        .flatMap(a -> a.stream())
+                        .map(a -> cleanedGraph.getEdgeSource(a))
+                        .collect(Collectors.toList());
+    }
+
+    private void removeAllCurrentDegreeZeroNodes(final RoadGraph cleanedGraph, final List<Node> checkNodes) {
+        checkNodes.forEach(a -> cleanedGraph.removeVertex(a));
+    }
+
+    private List<Node> getAllNeighborsThatDegreeIsNowZero(final RoadGraph cleanedGraph, final List<Node> neighbors) {
+        final List<Node> checkNodes;
+        checkNodes = neighbors
+                .stream()
+                .filter(a -> cleanedGraph.containsVertex(a))
+                .filter(a -> cleanedGraph.outDegreeOf(a) == 0)
+                .collect(Collectors.toList());
+        return checkNodes;
     }
 
     public List<VisibilityCell> create() {

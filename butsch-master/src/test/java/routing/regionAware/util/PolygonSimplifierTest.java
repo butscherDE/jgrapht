@@ -53,7 +53,7 @@ public abstract class PolygonSimplifierTest {
 
     @Test
     public void luxembourgROIsProduceEqualRoutesOnSimplifiedPolygons() {
-        final ImportPBF importPBF = new ImportPBF(Config.PBF_LUXEMBOURG);
+        final ImportPBF importPBF = new ImportPBF(Config.PBF_ANDORRA);
         RoadGraph graph = null;
         try {
             graph = importPBF.createGraph();
@@ -67,13 +67,13 @@ public abstract class PolygonSimplifierTest {
         }
         final List<NodeRelation> nodeRelations = importPBF.getNodeRelations();
         System.out.println("Num node relations: " + nodeRelations.size());
+        final GridIndex gridIndex = new GridIndex(graph, 10, 10);
+        System.out.println("index created");
         final ContractionHierarchyPrecomputation<Node, Edge> chPrecomp = new ContractionHierarchyPrecomputation<>(
                 graph);
         final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = chPrecomp.computeContractionHierarchy();
         final RoadCH roadCH = new RoadCH(ch);
         System.out.println("ch created");
-        final GridIndex gridIndex = new GridIndex(graph, 10, 10);
-        System.out.println("index created");
 
         final List<Node> nodes = new ArrayList<>(graph.vertexSet());
         final int size = nodes.size();

@@ -189,15 +189,12 @@ public class ImportPBF implements GraphImporter {
         private final ReentrantLock lock = new ReentrantLock();
         final Map<Long, Relation> relations = Collections.synchronizedMap(new HashMap<>());
 
-        final Set<String> types = Collections.synchronizedSet(new LinkedHashSet<>());
         @Override
         public void accept(final Relation relation) {
             lock.lock();
             final Map<String, String> tags = relation.getTags();
             final String type = tags.get("type");
             final String landuse = tags.get("landuse");
-            types.add(type);
-//            System.out.println(types.size());
             if ((type != null && type.equals("boundary")) ||
                 (landuse != null) && landuse.equals("forest") ||
                 (type != null) && type.equals("multipolygon")) {
@@ -207,7 +204,6 @@ public class ImportPBF implements GraphImporter {
         }
 
         public List<NodeRelation> getNodeRelations() {
-            System.out.println(types);
             final List<NodeRelation> nodeRelations = new LinkedList<>();
 
             synchronized (relations) {
@@ -228,7 +224,8 @@ public class ImportPBF implements GraphImporter {
                 final NodeRelation relation = getRelation(relationEntry);
                 nodeRelations.add(relation);
             } catch (NullPointerException | NoSuchElementException e) {
-                System.err.println("Relation " + relationEntry.getValue().getId() + " could not be processed because of invalid data.");
+//                System.err.println("Relation " + relationEntry.getValue().getId() + " could not be processed because of invalid data.");
+                // TODO uncomment
             }
         }
 
