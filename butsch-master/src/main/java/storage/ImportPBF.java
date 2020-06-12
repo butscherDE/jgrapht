@@ -86,13 +86,16 @@ public class ImportPBF implements GraphImporter {
     }
 
     private class RoadGraphNodeAdder implements Consumer<com.wolt.osm.parallelpbf.entity.Node> {
+        private final ReentrantLock lock = new ReentrantLock();
         final Map<Long, Node> nodes = Collections.synchronizedMap(new HashMap<>());
 
         @Override
         public void accept(final com.wolt.osm.parallelpbf.entity.Node node) {
+            lock.lock();
             final data.Node internalNodeFormat = new Node(node.getId(), node.getLon(), node.getLat(), 0);
 
             nodes.put(internalNodeFormat.id, internalNodeFormat);
+            lock.unlock();
         }
     }
 
@@ -183,11 +186,13 @@ public class ImportPBF implements GraphImporter {
     }
 
     private class NodeRelationAdder implements Consumer<Relation> {
+        private final ReentrantLock lock = new ReentrantLock();
         final Map<Long, Relation> relations = Collections.synchronizedMap(new HashMap<>());
 
         final Set<String> types = Collections.synchronizedSet(new LinkedHashSet<>());
         @Override
         public void accept(final Relation relation) {
+            lock.lock();
             final Map<String, String> tags = relation.getTags();
             final String type = tags.get("type");
             final String landuse = tags.get("landuse");
@@ -198,6 +203,7 @@ public class ImportPBF implements GraphImporter {
                 (type != null) && type.equals("multipolygon")) {
                 relations.put(relation.getId(), relation);
             }
+            lock.unlock();
         }
 
         public List<NodeRelation> getNodeRelations() {
