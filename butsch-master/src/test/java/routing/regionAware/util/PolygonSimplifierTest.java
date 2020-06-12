@@ -53,33 +53,18 @@ public abstract class PolygonSimplifierTest {
 
     @Test
     public void luxembourgROIsProduceEqualRoutesOnSimplifiedPolygons() {
-        final ImportPBF importPBF = new ImportPBF(Config.PBF_TUEBINGEN);
+        final ImportPBF importPBF = new ImportPBF(Config.PBF_LUXEMBOURG);
         RoadGraph graph = null;
         try {
+            importPBF.createGraph();
             final ImportERPGraph importERPGraph = new ImportERPGraph(Config.ERP_LUXEMBOURG);
             graph = importERPGraph.createGraph();
-
-            RoadGraph finalGraph = graph;
-            AtomicLong bidirectional = new AtomicLong();
-            AtomicLong unidirectional = new AtomicLong();
-            graph.edgeSet().forEach(e -> {
-                final Node edgeSource = finalGraph.getEdgeSource(e);
-                final Node edgeTarget = finalGraph.getEdgeTarget(e);
-
-                if (finalGraph.getEdge(edgeTarget, edgeSource) == null) {
-                    unidirectional.getAndIncrement();
-                } else {
-                    bidirectional.getAndIncrement();
-                }
-            });
-            System.out.println("Edgesummary");
-            System.out.println(unidirectional);
-            System.out.println(bidirectional);
-            System.out.println(graph.edgeSet().size());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             fail();
         }
+        final List<NodeRelation> nodeRelations = importPBF.getNodeRelations();
+        System.out.println("Num node relations: " + nodeRelations.size());
         final ContractionHierarchyPrecomputation<Node, Edge> chPrecomp = new ContractionHierarchyPrecomputation<>(
                 graph);
         final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = chPrecomp.computeContractionHierarchy();
@@ -87,9 +72,7 @@ public abstract class PolygonSimplifierTest {
         System.out.println("ch created");
         final GridIndex gridIndex = new GridIndex(graph, 10, 10);
         System.out.println("index created");
-        final List<NodeRelation> nodeRelations = importPBF.getNodeRelations();
 
-        try {Thread.sleep(1000);} catch (Exception e) {};
         final List<Node> nodes = new ArrayList<>(graph.vertexSet());
         final int size = nodes.size();
         final Random random = new Random();
@@ -111,6 +94,7 @@ public abstract class PolygonSimplifierTest {
             assertEquals(rt.findPath(source, target), rtSimple.findPath(source, target));
             assertEquals(ra.findPath(source, target), raSimple.findPath(source, target));
         }
+        System.out.println("Checked for " + i + " Polygons.");
     }
 
     abstract Polygon getSimplifiedPolygon(final Polygon polygon, final GridIndex gridIndex);

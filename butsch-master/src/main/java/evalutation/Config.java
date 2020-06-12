@@ -7,6 +7,7 @@ public class Config {
 //    public final static String ERP_PATH = "C:\\Users\\Daniel\\Documents\\ger.txt";
     public final static String ERP_PATH = "C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d.txt";
     public final static String ERP_LUXEMBOURG = "C:\\pbffiles\\luxembourg.txt";
+    public final static String ERP_TUEBINGEN = "C:\\pbffiles\\tuebingen.txt";
 
     // Polygons
     public final static String IMG_PATH = "C:\\Users\\Daniel\\Documents\\jpanelimg\\";

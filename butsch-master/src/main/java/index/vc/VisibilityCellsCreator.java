@@ -67,7 +67,6 @@ public class VisibilityCellsCreator {
 
     private void startRunsOnEachEdgeInTheGraph() {
         StopWatchVerbose swAll = new StopWatchVerbose("VisibilityCells created");
-        int c = 0;
         for (final Edge currentEdge : this.allEdges) {
             if (continueOnLengthZeroEdge(currentEdge) || currentEdge.id == RoadGraph.INVALID_EDGE.id) {
                 continue;
@@ -82,7 +81,6 @@ public class VisibilityCellsCreator {
                 addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerRight, currentEdge,
                                                                sortedNeighborListRight).extractVisibilityCell());
             }
-            System.out.println(++c);
         }
         swAll.printTimingIfVerbose();
     }

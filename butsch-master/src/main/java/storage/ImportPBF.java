@@ -49,12 +49,15 @@ public class ImportPBF implements GraphImporter {
         new ParallelBinaryParser(input, Runtime.getRuntime().availableProcessors() -2)
                 .onHeader(new HeaderPrinter())
                 .onBoundBox(new DummyBBox())
-                .onComplete(new Completer())
                 .onNode(onNodes)
                 .onWay(onWays)
                 .onRelation(onRelations)
                 .onChangeset(new DummyChangeSet())
+                .onComplete(new Completer())
                 .parse();
+
+        // TODO This is super dirty, but necessary as .parse() doesn't wait for thread termination in executor pool.
+        try {Thread.sleep(5000);} catch (Exception e) {}
     }
 
     private void addGraphData() {
@@ -96,20 +99,13 @@ public class ImportPBF implements GraphImporter {
         private final List<Pair<Long, Long>> edges = Collections.synchronizedList(new LinkedList<>());
         private final Map<Long, Way> ways = Collections.synchronizedMap(new HashMap<>());
 
-        int c = 0;
-        int c2 = 0;
         @Override
         public void accept(final Way way) {
             ways.put(way.getId(), way);
-            c++;
             final List<Long> nodeIds = way.getNodes();
             if (isRoad(way)) {
                 addRoadData(way, nodeIds);
-                c2++;
-            } else {
-                System.out.println(way.getTags());
             }
-            System.out.println(c2 + "/" + c);
         }
 
         public boolean isRoad(final Way way) {
@@ -184,11 +180,14 @@ public class ImportPBF implements GraphImporter {
     private class NodeRelationAdder implements Consumer<Relation> {
         final Map<Long, Relation> relations = Collections.synchronizedMap(new HashMap<>());
 
+        final Set<String> types = Collections.synchronizedSet(new LinkedHashSet<>());
         @Override
         public void accept(final Relation relation) {
             final Map<String, String> tags = relation.getTags();
             final String type = tags.get("type");
             final String landuse = tags.get("landuse");
+            types.add(type);
+//            System.out.println(types.size());
             if ((type != null && type.equals("boundary")) ||
                 (landuse != null) && landuse.equals("forest") ||
                 (type != null) && type.equals("multipolygon")) {
@@ -197,6 +196,7 @@ public class ImportPBF implements GraphImporter {
         }
 
         public List<NodeRelation> getNodeRelations() {
+            System.out.println(types);
             final List<NodeRelation> nodeRelations = new LinkedList<>();
 
             synchronized (relations) {
@@ -254,14 +254,6 @@ public class ImportPBF implements GraphImporter {
 
         private List<Long> recurseToFindNodes(final Way way) {
             return way.getNodes();
-        }
-
-        private void addEmptyRelation(final Map.Entry<Long, Relation> relationEntry) {
-            final Long relationId = relationEntry.getKey();
-            final String description = "INVALID";
-            @SuppressWarnings("unchecked") final Map<String, String> dummyMap = Collections.EMPTY_MAP;
-            @SuppressWarnings("unchecked") final List<Node> dummyNodes = Collections.EMPTY_LIST;
-            nodeRelations.add(new NodeRelation(relationId, description, dummyMap, dummyNodes));
         }
     }
 
