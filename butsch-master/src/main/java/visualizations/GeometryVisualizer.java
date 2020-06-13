@@ -95,6 +95,7 @@ public class GeometryVisualizer {
                 final double x = (node.getPoint().getCoordinate().x - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
                 final double y = (node.getPoint().getCoordinate().y - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
                 g2d.fill(new Ellipse2D.Double(x - NODE_SIZE / 2d, y - NODE_SIZE / 2d, NODE_SIZE, NODE_SIZE));
+                System.out.println(y + " => " + (float) y);
                 g2d.drawString(String.valueOf(node.id), (float) x, (float) y);
             }
         }

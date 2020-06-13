@@ -188,6 +188,7 @@ public class ImportPBF implements GraphImporter {
     private class NodeRelationAdder implements Consumer<Relation> {
         private final ReentrantLock lock = new ReentrantLock();
         final Map<Long, Relation> relations = Collections.synchronizedMap(new HashMap<>());
+        private List<Long> invalidRelations;
 
         @Override
         public void accept(final Relation relation) {
@@ -205,10 +206,13 @@ public class ImportPBF implements GraphImporter {
 
         public List<NodeRelation> getNodeRelations() {
             final List<NodeRelation> nodeRelations = new LinkedList<>();
+            invalidRelations  = new LinkedList<>();
 
             synchronized (relations) {
                 addAllRelationsSynced(nodeRelations);
             }
+
+            System.err.println(invalidRelations.size() + " invalid Relations: " + invalidRelations);
 
             return nodeRelations;
         }
@@ -224,8 +228,8 @@ public class ImportPBF implements GraphImporter {
                 final NodeRelation relation = getRelation(relationEntry);
                 nodeRelations.add(relation);
             } catch (NullPointerException | NoSuchElementException e) {
-//                System.err.println("Relation " + relationEntry.getValue().getId() + " could not be processed because of invalid data.");
-                // TODO uncomment
+                final long invalidRelationId = relationEntry.getValue().getId();
+                invalidRelations.add(invalidRelationId);
             }
         }
 

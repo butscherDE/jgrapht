@@ -52,8 +52,6 @@ public class VisibilityCellsCreator {
             checkNodes = getAllNeighborsThatDegreeIsNowZero(cleanedGraph, neighbors);
         }
 
-        System.out.println("Reduction: " + graph.vertexSet().size() + ", " + cleanedGraph.vertexSet().size());
-
         return cleanedGraph;
     }
 
@@ -97,19 +95,23 @@ public class VisibilityCellsCreator {
     private void startRunsOnEachEdgeInTheGraph() {
         StopWatchVerbose swAll = new StopWatchVerbose("VisibilityCells created");
         for (final Edge currentEdge : this.allEdges) {
+            System.out.println("lala2.1");
             if (continueOnLengthZeroEdge(currentEdge) || currentEdge.id == RoadGraph.INVALID_EDGE.id) {
                 continue;
             }
+            System.out.println("lala2.2");
 
             if (!visibilityCellOnTheLeftFound(currentEdge)) {
                 addVisibilityCellToResults(new CellRunnerLeft(graph, visitedManagerLeft, currentEdge,
                                                               sortedNeighborListLeft).extractVisibilityCell());
             }
+            System.out.println("lala2.3");
 
             if (!visibilityCellOnTheRightFound(currentEdge)) {
                 addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerRight, currentEdge,
                                                                sortedNeighborListRight).extractVisibilityCell());
             }
+            System.out.println("lala2.4");
         }
         swAll.printTimingIfVerbose();
     }
