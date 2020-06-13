@@ -34,7 +34,6 @@ public class GeometryVisualizer {
     }
 
     public void visualizeGraph(final long millisToSleep) {
-        final double[] before = extractMinMax();
         this.geometryDrawCollection.inverseY();
         // compute ranges of X and Y coordinates
         minMax = extractMinMax();
@@ -80,6 +79,7 @@ public class GeometryVisualizer {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
+        this.geometryDrawCollection.inverseY();
         try {
             Thread.sleep(millisToSleep);
         } catch (Exception e) {
