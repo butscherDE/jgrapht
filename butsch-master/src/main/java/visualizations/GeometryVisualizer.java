@@ -79,12 +79,12 @@ public class GeometryVisualizer {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
-        this.geometryDrawCollection.inverseY();
         try {
             Thread.sleep(millisToSleep);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        this.geometryDrawCollection.inverseY();
     }
 
     private void drawCoordinates() {
