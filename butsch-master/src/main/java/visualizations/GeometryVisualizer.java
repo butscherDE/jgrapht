@@ -12,6 +12,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GeometryVisualizer {
     public static final Color BACKGROUND = Color.WHITE;
@@ -33,6 +34,8 @@ public class GeometryVisualizer {
     }
 
     public void visualizeGraph(final long millisToSleep) {
+        final double[] before = extractMinMax();
+        this.geometryDrawCollection.inverseY();
         // compute ranges of X and Y coordinates
         minMax = extractMinMax();
         final double spreadX = minMax[1] - minMax[0];
@@ -92,10 +95,13 @@ public class GeometryVisualizer {
 
             g2d.setColor(color);
             for (Node node : nodes) {
-                final double x = (node.getPoint().getCoordinate().x - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
-                final double y = (node.getPoint().getCoordinate().y - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
+                final double x = (node
+                                          .getPoint()
+                                          .getCoordinate().x - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
+                final double y = (node
+                                          .getPoint()
+                                          .getCoordinate().y - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
                 g2d.fill(new Ellipse2D.Double(x - NODE_SIZE / 2d, y - NODE_SIZE / 2d, NODE_SIZE, NODE_SIZE));
-                System.out.println(y + " => " + (float) y);
                 g2d.drawString(String.valueOf(node.id), (float) x, (float) y);
             }
         }
@@ -194,35 +200,50 @@ public class GeometryVisualizer {
         public GeometryDrawCollection() {
         }
 
+        public void inverseY() {
+            coordinates.forEach((a, b) -> {
+                final List<Node> nodesForColor = b.stream().collect(Collectors.toList());
+//                coordinates.remove(a);
+                final ArrayList<Node> newList = new ArrayList<>(nodesForColor.size());
+                coordinates.put(a, newList);
+                nodesForColor.forEach(n -> newList.add(new Node(n.id, n.longitude, n.latitude * (-1), n.elevation)));
+
+            });
+
+            lineSegments.forEach((a, b) -> {
+                b.forEach(e -> {
+                    e.p0.y *= -1;
+                    e.p1.y *= -1;
+                });
+            });
+        }
+
         public void addGraph(final Color color, final RoadGraph graph) {
-            graph.vertexSet().stream()
-							 .filter(a -> a.id >= 0)
-							 .forEach(a -> addNode(color, a));
-            graph.edgeSet().stream()
-					       .forEach(a -> {
-							   final Node edgeSource = graph.getEdgeSource(a);
-							   final Node edgeTarget = graph.getEdgeTarget(a);
+            graph.vertexSet().stream().filter(a -> a.id >= 0).forEach(a -> addNode(color, a));
+            graph.edgeSet().stream().forEach(a -> {
+                final Node edgeSource = graph.getEdgeSource(a);
+                final Node edgeTarget = graph.getEdgeTarget(a);
 
-							   if (edgeSource.id >= 0 && edgeTarget.id >= 0) {
-								   final Coordinate startCoordinate = edgeSource.getPoint().getCoordinate();
-								   final Coordinate endCoordinate = edgeTarget.getPoint().getCoordinate();
-								   final LineSegment edgeAsLineSegment = new LineSegment(startCoordinate, endCoordinate);
+                if (edgeSource.id >= 0 && edgeTarget.id >= 0) {
+                    final Coordinate startCoordinate = edgeSource.getPoint().getCoordinate();
+                    final Coordinate endCoordinate = edgeTarget.getPoint().getCoordinate();
+                    final LineSegment edgeAsLineSegment = new LineSegment(startCoordinate, endCoordinate);
 
 
-								   addLineSegment(color, edgeAsLineSegment);
-							   }
+                    addLineSegment(color, edgeAsLineSegment);
+                }
             });
         }
 
         public void addPolygon(final Color color, final org.locationtech.jts.geom.Polygon polygon) {
-			final Coordinate[] coordinates = polygon.getCoordinates();
-			final List<LineSegment> lineSegments = new ArrayList<>(coordinates.length);
-			for (int i = 0; i < coordinates.length - 1; i++) {
-				lineSegments.add(new LineSegment(coordinates[i], coordinates[i + 1]));
-			}
+            final Coordinate[] coordinates = polygon.getCoordinates();
+            final List<LineSegment> lineSegments = new ArrayList<>(coordinates.length);
+            for (int i = 0; i < coordinates.length - 1; i++) {
+                lineSegments.add(new LineSegment(coordinates[i], coordinates[i + 1]));
+            }
 
-			addLineSegments(color, lineSegments);
-		}
+            addLineSegments(color, lineSegments);
+        }
 
         public void addNode(final Color color, final Node coordinate) {
             addCoordinates(color, Collections.singletonList(coordinate));
