@@ -105,7 +105,7 @@ private RoadGraph graph;
     private void foundRepetition(int from) {
         final List<Node> collect = edgesOnCell.stream().map(a -> a.source).collect(Collectors.toList());
         collect.add(edgesOnCell.getLast().target);
-        final List<Node> nodes = collect.subList(from - 15, collect.size());
+        final List<Node> nodes = collect.subList(from - 10, collect.size());
         final Set<Node> nodes1 = new LinkedHashSet<>(nodes);
         final LinkedList<Node> nodes2 = new LinkedList<>(nodes1);
 
