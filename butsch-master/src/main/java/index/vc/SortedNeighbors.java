@@ -127,9 +127,13 @@ public class SortedNeighbors {
         } else if (index == 0) {
             return sortedEdges.size() - 1;
         } else {
-            return (index + 1) * (-1) - 1;
+            final int insertionPoint = (index + 1) * (-1);
+            if (insertionPoint > 0) {
+                return insertionPoint - 1;
+            } else {
+                return sortedEdges.size() - 1;
+            }
         }
-//        return findIndex(lastEdgeComparable);
     }
 
     private int findIndex(ComparableEdge lastEdgeComparable) {
@@ -147,13 +151,9 @@ public class SortedNeighbors {
 
     public ReflectiveEdge getMostOrientedEdge(final ReflectiveEdge lastEdge) {
         final int addIndex = indexIfEdgeWasAdded(lastEdge);
-//        int addIndexPredecessor = addIndex - 1;
-//        int indexOfEndOfList = sortedEdges.size() - 1;
-//        int indexOfPredecessorOfLastEdge = addIndexPredecessor < 0 ? indexOfEndOfList : addIndexPredecessor;
 
         try {
             if (sortedEdges.size() > 1) {
-//                return get(indexOfPredecessorOfLastEdge);
                 return get(addIndex);
             } else {
                 return lastEdge;

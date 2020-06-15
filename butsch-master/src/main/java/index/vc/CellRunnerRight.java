@@ -9,8 +9,9 @@ import java.util.Map;
 
 class CellRunnerRight extends CellRunner {
 
-    public CellRunnerRight(final RoadGraph graph, final RoadGraph cellGraph, final VisitedEdgesHashFunction visitedManager,
-                           final Edge startEdge, final Map<Node, SortedNeighbors> sortedNeighborsMap) {
+    public CellRunnerRight(final RoadGraph graph, final RoadGraph cellGraph,
+                           final VisitedEdgesHashFunction visitedManager, final Edge startEdge,
+                           final Map<Node, SortedNeighbors> sortedNeighborsMap) {
         super(graph, cellGraph, visitedManager, startEdge, sortedNeighborsMap);
     }
 
