@@ -19,6 +19,6 @@ class CellRunnerLeft extends CellRunner {
     @Override
     VisibilityCell createVisibilityCell() {
         Collections.reverse(edgesOnCell);
-        return VisibilityCell.create(extractNodesFromVisitedEdges(), edgesOnCell);
+        return VisibilityCell.create(extractNodesFromVisitedEdges(), getActualGraphEdgeList());
     }
 }

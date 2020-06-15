@@ -4,7 +4,6 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
-import org.locationtech.jts.planargraph.Subgraph;
 import visualizations.SubGraphVisualizer;
 
 import java.util.*;
@@ -15,19 +14,15 @@ abstract class CellRunner {
     final VisitedEdgesHashFunction visitedManager;
     private final ReflectiveEdge startEdge;
     private final Map<Node, SortedNeighbors> sortedNeighborsMap;
-
+    private RoadGraph originalGraph;
     private ReflectiveEdge lastNonZeroLengthEdge;
 
-private RoadGraph graph;
-    CellRunner(final RoadGraph graph, final VisitedEdgesHashFunction visitedManager, final Edge startEdge,
+    CellRunner(final RoadGraph originalGraph, final VisitedEdgesHashFunction visitedManager, final Edge startEdge,
                Map<Node, SortedNeighbors> sortedNeighborsMap) {
-        this.graph = graph;
-
-
-
+        this.originalGraph = originalGraph;
         this.visitedManager = visitedManager;
 
-        this.startEdge = forceEdgeAscendingNodeIDs(new ReflectiveEdge(startEdge, graph));
+        this.startEdge = forceEdgeAscendingNodeIDs(new ReflectiveEdge(startEdge, originalGraph));
         this.sortedNeighborsMap = sortedNeighborsMap;
         this.lastNonZeroLengthEdge = this.startEdge;
     }
@@ -103,7 +98,9 @@ private RoadGraph graph;
     }
 
     private void foundRepetition(int from) {
-        final List<Node> collect = edgesOnCell.stream().map(a -> a.source).collect(Collectors.toList());
+        final List<Node> collect = edgesOnCell.stream()
+                .map(a -> a.source)
+                .collect(Collectors.toList());
         collect.add(edgesOnCell.getLast().target);
         final List<Node> nodes = collect.subList(from - 10, collect.size());
         final Set<Node> nodes1 = new LinkedHashSet<>(nodes);
@@ -111,7 +108,7 @@ private RoadGraph graph;
 
         nodes.forEach(a -> System.out.println(a));
 
-        final SubGraphVisualizer subGraphVisualizer = new SubGraphVisualizer(graph, nodes2);
+        final SubGraphVisualizer subGraphVisualizer = new SubGraphVisualizer(originalGraph, nodes2);
         subGraphVisualizer.visualize(1_000_000);
     }
 
@@ -170,7 +167,8 @@ private RoadGraph graph;
         final Node sourceNode = edge.source;
         final Node targetNode = edge.target;
 
-        final double distance = sourceNode.getPoint().distance(targetNode.getPoint());
+        final double distance = sourceNode.getPoint()
+                .distance(targetNode.getPoint());
         return distance < 0.0000000001;
     }
 
@@ -185,5 +183,19 @@ private RoadGraph graph;
     }
 
     abstract VisibilityCell createVisibilityCell();
+
+    List<ReflectiveEdge> getActualGraphEdgeList() {
+        final LinkedList<ReflectiveEdge> edges = new LinkedList<>();
+
+        edgesOnCell.stream()
+                .filter(e -> originalGraph.containsEdge(e.source, e.target))
+                .collect(Collectors.toCollection(() -> edges));
+        edgesOnCell.stream()
+                .filter(e -> originalGraph.containsEdge(e.target, e.source))
+                .map(e -> e.getReversed())
+                .collect(Collectors.toCollection(() -> edges));
+
+        return edges;
+    }
 
 }

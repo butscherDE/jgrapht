@@ -5,14 +5,10 @@ import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
 import evalutation.StopWatchVerbose;
-import util.BinaryHashFunction;
-import visualizations.GeometryVisualizer;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * "Left" and "Right" are always imagined as walking from baseNode to adjacent node and then turn left or right.
@@ -20,7 +16,8 @@ import java.util.stream.Stream;
  * General schema: For each edge in the allEdgesIterator: Check if it was used in a left run, if not run left. Check if it was used in a right run if not run right
  */
 public class VisibilityCellsCreator {
-    private final RoadGraph graph;
+    private final RoadGraph originalGraph;
+    private final RoadGraph cellGraph;
     private final VisitedEdgesHashFunction visitedManagerLeft = new VisitedEdgesHashFunction();
     private final VisitedEdgesHashFunction visitedManagerRight = new VisitedEdgesHashFunction();
     private final Map<Node, SortedNeighbors> sortedNeighborListLeft;
@@ -29,22 +26,38 @@ public class VisibilityCellsCreator {
     private final List<VisibilityCell> allFoundCells = new LinkedList<>();
     private final Set<Edge> allEdges;
 
-    public VisibilityCellsCreator(final RoadGraph graph) {
-        this.graph = getPreprocessedGraph(graph);
-        this.allEdges = this.graph.edgeSet();
+    public VisibilityCellsCreator(RoadGraph originalGraph, final RoadGraph cellGraph) {
+        this.originalGraph = originalGraph;
+        this.cellGraph = getPreprocessedGraph(cellGraph);
+        this.allEdges = this.cellGraph.edgeSet();
 
-        final NeighborPreSorter neighborPreSorter = new NeighborPreSorter(this.graph);
+        final NeighborPreSorter neighborPreSorter = new NeighborPreSorter(this.cellGraph);
         this.sortedNeighborListLeft = neighborPreSorter.getAllSortedNeighborsLeft();
         this.sortedNeighborListRight = neighborPreSorter.getAllSortedNeighborsRight();
     }
 
     public RoadGraph getPreprocessedGraph(final RoadGraph graph) {
-        return getGraphWithOutgoingEdgesOnEachVertex(graph);
+        final RoadGraph cleanedGraph = graph.deepCopy();
+        getGraphWithBidirectionalEdges(cleanedGraph);
+        getGraphWithOutgoingEdgesOnEachVertex(cleanedGraph);
+
+        return cleanedGraph;
     }
 
-    private RoadGraph getGraphWithOutgoingEdgesOnEachVertex(final RoadGraph graph) {
-        final RoadGraph cleanedGraph = graph.deepCopy();
+    private void getGraphWithBidirectionalEdges(RoadGraph cleanedGraph) {
+        cleanedGraph.edgeSet().stream().filter(e -> {
+            final Node edgeSource = cleanedGraph.getEdgeSource(e);
+            final Node edgeTarget = cleanedGraph.getEdgeTarget(e);
+            return !cleanedGraph.containsEdge(edgeTarget, edgeSource);
+        }).forEach(e -> {
+            final Node edgeSource = cleanedGraph.getEdgeSource(e);
+            final Node edgeTarget = cleanedGraph.getEdgeTarget(e);
+            cleanedGraph.addEdge(edgeTarget, edgeSource);
+        });
+    }
 
+
+    private RoadGraph getGraphWithOutgoingEdgesOnEachVertex(final RoadGraph cleanedGraph) {
         List<Node> checkNodes = getAllInitiallyDegreeZeroNodes(cleanedGraph);
         while (checkNodes.size() > 0) {
             final List<Node> neighbors = getAllNeighborsOfAllDegreeZeroNodes(cleanedGraph, checkNodes);
@@ -102,13 +115,13 @@ public class VisibilityCellsCreator {
             System.out.println("lala2.2");
 
             if (!visibilityCellOnTheLeftFound(currentEdge)) {
-                addVisibilityCellToResults(new CellRunnerLeft(graph, visitedManagerLeft, currentEdge,
+                addVisibilityCellToResults(new CellRunnerLeft(originalGraph, visitedManagerLeft, currentEdge,
                                                               sortedNeighborListLeft).extractVisibilityCell());
             }
             System.out.println("lala2.3");
 
             if (!visibilityCellOnTheRightFound(currentEdge)) {
-                addVisibilityCellToResults(new CellRunnerRight(graph, visitedManagerRight, currentEdge,
+                addVisibilityCellToResults(new CellRunnerRight(originalGraph, visitedManagerRight, currentEdge,
                                                                sortedNeighborListRight).extractVisibilityCell());
             }
             System.out.println("lala2.4");
@@ -118,16 +131,16 @@ public class VisibilityCellsCreator {
 
     private boolean continueOnLengthZeroEdge(final Edge currentEdge) {
         if (isCurrentEdgeLengthZero(currentEdge)) {
-            visitedManagerLeft.visited(new ReflectiveEdge(currentEdge, graph));
-            visitedManagerRight.visited(new ReflectiveEdge(currentEdge, graph));
+            visitedManagerLeft.visited(new ReflectiveEdge(currentEdge, cellGraph));
+            visitedManagerRight.visited(new ReflectiveEdge(currentEdge, cellGraph));
             return true;
         }
         return false;
     }
 
     private boolean isCurrentEdgeLengthZero(final Edge currentEdge) {
-        final Node sourceNode = graph.getEdgeSource(currentEdge);
-        final Node targetNode = graph.getEdgeTarget(currentEdge);
+        final Node sourceNode = cellGraph.getEdgeSource(currentEdge);
+        final Node targetNode = cellGraph.getEdgeTarget(currentEdge);
 
         return sourceNode.getPoint().distance(targetNode.getPoint()) < 0.00000000001;
     }
@@ -137,10 +150,10 @@ public class VisibilityCellsCreator {
     }
 
     private Boolean visibilityCellOnTheLeftFound(final Edge currentEdge) {
-        return visitedManagerLeft.isVisited(new ReflectiveEdge(currentEdge, graph));
+        return visitedManagerLeft.isVisited(new ReflectiveEdge(currentEdge, cellGraph));
     }
 
     private Boolean visibilityCellOnTheRightFound(final Edge currentEdge) {
-        return visitedManagerRight.isVisited(new ReflectiveEdge(currentEdge, graph));
+        return visitedManagerRight.isVisited(new ReflectiveEdge(currentEdge, cellGraph));
     }
 }
