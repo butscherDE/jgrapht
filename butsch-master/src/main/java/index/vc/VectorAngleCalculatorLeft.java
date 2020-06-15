@@ -10,6 +10,7 @@ public class VectorAngleCalculatorLeft extends VectorAngleCalculator {
 
     @Override
     public double getAngleOfVectorsOriented(final Node baseNode, final Node adjNode) {
-        return getAngle(baseNode, adjNode);
+        final double angle = getAngle(baseNode, adjNode);
+        return angle;// != 0 ? angle : Double.MIN_VALUE;
     }
 }

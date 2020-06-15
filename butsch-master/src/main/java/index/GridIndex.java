@@ -43,7 +43,7 @@ public class GridIndex implements Index {
 
     private void initCells() {
         System.out.println("lala1");
-        final VisibilityCellsCreator vcc = new VisibilityCellsCreator(originalGraph, graph);
+        final VisibilityCellsCreator vcc = new VisibilityCellsCreator(graph);
         System.out.println("lala2");
         final List<VisibilityCell> visibilityCells = vcc.create();
         instantiateCellObjects();

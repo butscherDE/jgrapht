@@ -37,7 +37,7 @@ public class VisibilityCellsCreatorTest {
     }
 
     public List<VisibilityCell> createVCs(final RoadGraph graph) {
-        final VisibilityCellsCreator vcc = new VisibilityCellsCreator(originalGraph, graph);
+        final VisibilityCellsCreator vcc = new VisibilityCellsCreator(graph);
         return vcc.create();
     }
 
@@ -186,7 +186,7 @@ public class VisibilityCellsCreatorTest {
         graph.addEdge(nodes[0], nodes[2]);
         graph.addEdge(nodes[2], nodes[3]);
 
-        final VisibilityCellsCreator vcc = new VisibilityCellsCreator(originalGraph, graph);
+        final VisibilityCellsCreator vcc = new VisibilityCellsCreator(graph);
         final List<VisibilityCell> visibilityCells = vcc.create();
 
         assertEquals(2, visibilityCells.size());

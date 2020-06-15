@@ -119,12 +119,21 @@ public class SortedNeighbors {
 
     private int indexIfEdgeWasAdded(final ReflectiveEdge lastEdge) {
         final ComparableEdge lastEdgeComparable = new ComparableEdge(lastEdge);
-        final Iterator<ComparableEdge> allNeighborEdges = sortedEdges.iterator();
 
-        return findIndex(lastEdgeComparable, allNeighborEdges);
+        final int index = Collections.binarySearch(sortedEdges, lastEdgeComparable);
+
+        if (index > 0) {
+            return index - 1;
+        } else if (index == 0) {
+            return sortedEdges.size() - 1;
+        } else {
+            return (index + 1) * (-1) - 1;
+        }
+//        return findIndex(lastEdgeComparable);
     }
 
-    private int findIndex(ComparableEdge lastEdgeComparable, Iterator<ComparableEdge> allNeighborEdges) {
+    private int findIndex(ComparableEdge lastEdgeComparable) {
+        final Iterator<ComparableEdge> allNeighborEdges = sortedEdges.iterator();
         boolean lastEdgeIsGreater = true;
         int i = 0;
         while (allNeighborEdges.hasNext() && lastEdgeIsGreater) {
@@ -138,13 +147,14 @@ public class SortedNeighbors {
 
     public ReflectiveEdge getMostOrientedEdge(final ReflectiveEdge lastEdge) {
         final int addIndex = indexIfEdgeWasAdded(lastEdge);
-        int addIndexPredecessor = addIndex - 1;
-        int indexOfEndOfList = sortedEdges.size() - 1;
-        int indexOfPredecessorOfLastEdge = addIndexPredecessor < 0 ? indexOfEndOfList : addIndexPredecessor;
+//        int addIndexPredecessor = addIndex - 1;
+//        int indexOfEndOfList = sortedEdges.size() - 1;
+//        int indexOfPredecessorOfLastEdge = addIndexPredecessor < 0 ? indexOfEndOfList : addIndexPredecessor;
 
         try {
             if (sortedEdges.size() > 1) {
-                return get(indexOfPredecessorOfLastEdge);
+//                return get(indexOfPredecessorOfLastEdge);
+                return get(addIndex);
             } else {
                 return lastEdge;
             }

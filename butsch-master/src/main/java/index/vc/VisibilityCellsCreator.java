@@ -26,9 +26,9 @@ public class VisibilityCellsCreator {
     private final List<VisibilityCell> allFoundCells = new LinkedList<>();
     private final Set<Edge> allEdges;
 
-    public VisibilityCellsCreator(RoadGraph originalGraph, final RoadGraph cellGraph) {
+    public VisibilityCellsCreator(RoadGraph originalGraph) {
         this.originalGraph = originalGraph;
-        this.cellGraph = getPreprocessedGraph(cellGraph);
+        this.cellGraph = getPreprocessedGraph(originalGraph);
         this.allEdges = this.cellGraph.edgeSet();
 
         final NeighborPreSorter neighborPreSorter = new NeighborPreSorter(this.cellGraph);
@@ -115,13 +115,13 @@ public class VisibilityCellsCreator {
             System.out.println("lala2.2");
 
             if (!visibilityCellOnTheLeftFound(currentEdge)) {
-                addVisibilityCellToResults(new CellRunnerLeft(originalGraph, visitedManagerLeft, currentEdge,
+                addVisibilityCellToResults(new CellRunnerLeft(originalGraph, cellGraph, visitedManagerLeft, currentEdge,
                                                               sortedNeighborListLeft).extractVisibilityCell());
             }
             System.out.println("lala2.3");
 
             if (!visibilityCellOnTheRightFound(currentEdge)) {
-                addVisibilityCellToResults(new CellRunnerRight(originalGraph, visitedManagerRight, currentEdge,
+                addVisibilityCellToResults(new CellRunnerRight(originalGraph, cellGraph, visitedManagerRight, currentEdge,
                                                                sortedNeighborListRight).extractVisibilityCell());
             }
             System.out.println("lala2.4");

@@ -35,7 +35,7 @@ public class CellRunnerTest {
 
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 17, 26);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
@@ -55,7 +55,7 @@ public class CellRunnerTest {
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 26, 17);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
@@ -106,7 +106,7 @@ public class CellRunnerTest {
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 17, 26);
-        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
@@ -126,7 +126,7 @@ public class CellRunnerTest {
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 26, 17);
-        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
@@ -179,7 +179,7 @@ public class CellRunnerTest {
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 14, 106);
-        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
@@ -197,7 +197,7 @@ public class CellRunnerTest {
         final VisibilityCell expectedVc = VisibilityCell.create(expectedPolygon, null);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 106, 110);
-        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
@@ -217,7 +217,7 @@ public class CellRunnerTest {
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 109, 110);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         assertThrows(IllegalArgumentException.class, () -> cr.extractVisibilityCell());
     }
@@ -245,7 +245,7 @@ public class CellRunnerTest {
         final Polygon expectedPolygon = gf.createPolygon(coordinates);
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(GRAPH_MOCKER, 109, 110);
-        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
 
         assertThrows(IllegalArgumentException.class, () -> cr.extractVisibilityCell());
     }
@@ -269,7 +269,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = createCustomTestGraphToTryTrapTheAlgorithmInEndlessLoop();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
         final VisibilityCell vc = cr.extractVisibilityCell();
 
         assertEquals(expectedVc, vc);
@@ -294,7 +294,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = createCustomTestGraphToTryTrapTheAlgorithmInEndlessLoop();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);
-        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
         final VisibilityCell vc = cr.extractVisibilityCell();
 
         assertEquals(expectedVc, vc);
@@ -336,7 +336,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = createSimpleImpasseTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
         final VisibilityCell vc = cr.extractVisibilityCell();
 
         assertEquals(expectedVc, vc);
@@ -372,7 +372,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = createAdvancedImpasseTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 5);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
         final VisibilityCell vc = cr.extractVisibilityCell();
 
         assertEquals(expectedVc, vc);
@@ -416,7 +416,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = twoImpassesInARowGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
         final VisibilityCell vc = cr.extractVisibilityCell();
 
         assertEquals(expectedVc, vc);
@@ -459,7 +459,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = createTwoNodesSameCoordinatesNoEdgeTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
         final VisibilityCell vc = cr.extractVisibilityCell();
 
         assertEquals(expectedVc, vc);
@@ -497,7 +497,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = collinearEdgeWhereNextNodeHintShallNotBeTakenGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 2);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
@@ -521,7 +521,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = collinearEdgeWhereNextNodeHintShallNotBeTakenGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 2);
-        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
         assertEquals(expectedVc, vc);
@@ -562,7 +562,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = collinearEdgeWithNoOtherNeighborsThanBackwardsTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 1, 2);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
 
@@ -585,7 +585,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = collinearEdgeWithNoOtherNeighborsThanBackwardsTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 1, 2);
-        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
 
@@ -633,7 +633,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = issueOnEdgeGermanyTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);
-        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
+        final CellRunner cr = new CellRunnerLeft(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsLeft);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
 
@@ -660,7 +660,7 @@ public class CellRunnerTest {
         final PolygonRoutingTestGraph customTestGraph = issueOnEdgeGermanyTestGraph();
 
         final CellRunnerTestInputs cti = new CellRunnerTestInputs(customTestGraph, 0, 1);
-        final CellRunner cr = new CellRunnerRight(cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
+        final CellRunner cr = new CellRunnerRight(cti.graph, cti.graph, cti.visitedManager, cti.startingEdge, cti.preSortedNeighborsRight);
 
         final VisibilityCell vc = cr.extractVisibilityCell();
 

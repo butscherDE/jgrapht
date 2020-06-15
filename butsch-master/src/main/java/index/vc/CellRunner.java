@@ -17,12 +17,12 @@ abstract class CellRunner {
     private RoadGraph originalGraph;
     private ReflectiveEdge lastNonZeroLengthEdge;
 
-    CellRunner(final RoadGraph originalGraph, final VisitedEdgesHashFunction visitedManager, final Edge startEdge,
+    CellRunner(final RoadGraph originalGraph, final RoadGraph cellGraph, final VisitedEdgesHashFunction visitedManager, final Edge startEdge,
                Map<Node, SortedNeighbors> sortedNeighborsMap) {
         this.originalGraph = originalGraph;
         this.visitedManager = visitedManager;
 
-        this.startEdge = forceEdgeAscendingNodeIDs(new ReflectiveEdge(startEdge, originalGraph));
+        this.startEdge = forceEdgeAscendingNodeIDs(new ReflectiveEdge(startEdge, cellGraph));
         this.sortedNeighborsMap = sortedNeighborsMap;
         this.lastNonZeroLengthEdge = this.startEdge;
     }
@@ -63,7 +63,7 @@ abstract class CellRunner {
     }
 
     private void findRepetition() {
-        if (edgesOnCell.size() > 5) {
+        if (edgesOnCell.size() > 20) {
             LinkedList<Node> window = new LinkedList<>();
             LinkedList<Node> last5 = new LinkedList<>();
 
