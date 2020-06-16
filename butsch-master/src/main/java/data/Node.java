@@ -46,7 +46,7 @@ public class Node implements Comparable<Node> {
 
     @Override
     public String toString() {
-        return id + ", " + longitude + ", " + latitude + ", " + elevation;
+        return "[" + id + "](" + longitude + ", " + latitude + ", " + elevation + ")";
     }
 
     public double euclideanDistance(final Node other) {

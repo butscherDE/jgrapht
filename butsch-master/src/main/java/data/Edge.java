@@ -10,4 +10,9 @@ public class Edge extends DefaultWeightedEdge {
     public Edge() {
         super();
     }
+
+    @Override
+    public String toString() {
+        return "[" + id + "](" + getSource() + " : " + getTarget() + ")";
+    }
 }
