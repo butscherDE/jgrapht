@@ -7,6 +7,7 @@ import data.VisibilityCell;
 import evalutation.Config;
 import geometry.BoundingBox;
 import index.vc.VCNodeTranslator;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
@@ -22,23 +23,22 @@ public class GridIndexTest {
     private final static int INTENSITY = 1000;
     private final static int RND_SEED = 42;
 
-    private final GridIndex gridIndex;
-    private final RoadGraph graph;
+    private static GridIndex gridIndex;
+    private static RoadGraph graph;
 
-    private final double longitudeMinBound;
-    private final double latitudeMinBound;
-    private final double longitudeRange;
-    private final double latitudeRange;
+    private static double longitudeMinBound;
+    private static double longitudeMaxBound;
+    private static double latitudeMinBound;
+    private static double latitudeMaxBound;
+    private static double longitudeRange;
+    private static double latitudeRange;
 
-    public GridIndexTest() {
+    @BeforeAll
+    public static void prepare() {
         try {
             graph = new ImportERPGraph(Config.ERP_PATH).createGraph();
-            this.gridIndex = new GridIndex(graph, 10, 10);
+            gridIndex = new GridIndex(graph, 10, 10);
 
-            double longitudeMinBound = Double.POSITIVE_INFINITY;
-            double longitudeMaxBound = Double.NEGATIVE_INFINITY;
-            double latitudeMinBound = Double.POSITIVE_INFINITY;
-            double latitudeMaxBound = Double.NEGATIVE_INFINITY;
             for (final Node node : graph.vertexSet()) {
                 longitudeMinBound = Math.min(node.longitude, longitudeMinBound);
                 longitudeMaxBound = Math.max(node.longitude, longitudeMaxBound);
@@ -46,16 +46,16 @@ public class GridIndexTest {
                 latitudeMaxBound = Math.max(node.latitude, latitudeMaxBound);
             }
 
-            this.longitudeMinBound = longitudeMinBound;
-            this.latitudeMinBound = latitudeMinBound;
-
-            this.longitudeRange = longitudeMaxBound - longitudeMinBound;
-            this.latitudeRange = latitudeMaxBound - latitudeMinBound;
+            longitudeRange = longitudeMaxBound - longitudeMinBound;
+            latitudeRange = latitudeMaxBound - latitudeMinBound;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             fail();
             throw new IllegalStateException("Could not load graph");
         }
+    }
+
+    public GridIndexTest() {
     }
 
     @Test
