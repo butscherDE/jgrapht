@@ -117,11 +117,15 @@ public class SortedNeighbors {
                 .collect(Collectors.toSet());
     }
 
-    private int indexIfEdgeWasAdded(final ReflectiveEdge lastEdge) {
+    private int getMostOrientedIndex(final ReflectiveEdge lastEdge) {
         final ComparableEdge lastEdgeComparable = new ComparableEdge(lastEdge);
 
         final int index = Collections.binarySearch(sortedEdges, lastEdgeComparable);
 
+        return calcMostOrientedIndex(index);
+    }
+
+    private int calcMostOrientedIndex(int index) {
         if (index > 0) {
             return index - 1;
         } else if (index == 0) {
@@ -136,21 +140,8 @@ public class SortedNeighbors {
         }
     }
 
-    private int findIndex(ComparableEdge lastEdgeComparable) {
-        final Iterator<ComparableEdge> allNeighborEdges = sortedEdges.iterator();
-        boolean lastEdgeIsGreater = true;
-        int i = 0;
-        while (allNeighborEdges.hasNext() && lastEdgeIsGreater) {
-            final ComparableEdge currentEdge = allNeighborEdges.next();
-            lastEdgeIsGreater = lastEdgeComparable.compareTo(currentEdge) > 0;
-
-            i = lastEdgeIsGreater ? i + 1 : i;
-        }
-        return i;
-    }
-
     public ReflectiveEdge getMostOrientedEdge(final ReflectiveEdge lastEdge) {
-        final int addIndex = indexIfEdgeWasAdded(lastEdge);
+        final int addIndex = getMostOrientedIndex(lastEdge);
 
         try {
             if (sortedEdges.size() > 1) {

@@ -8,8 +8,11 @@ import index.GridIndex;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import util.PolygonRoutingTestGraph;
+import visualizations.GeometryVisualizer;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -185,6 +188,11 @@ public class VisibilityCellsCreatorTest {
         graph.addEdge(nodes[2], nodes[0]);
         graph.addEdge(nodes[0], nodes[2]);
         graph.addEdge(nodes[2], nodes[3]);
+
+        GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
+        col.addGraph(Color.BLACK, graph);
+        final GeometryVisualizer geometryVisualizer = new GeometryVisualizer(col);
+//        geometryVisualizer.visualizeGraph(100000);
 
         final VisibilityCellsCreator vcc = new VisibilityCellsCreator(graph);
         final List<VisibilityCell> visibilityCells = vcc.create();
