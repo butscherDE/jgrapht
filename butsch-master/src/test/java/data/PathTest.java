@@ -80,7 +80,7 @@ public class PathTest {
 
     @Test
     public void testToString() {
-        final String expectedString = "(0, 0.0, 25.0, 0.0-2, 16.0, 25.0, 0.0)=[(0, 0.0, 25.0, 0.0 : 1, 8.0, 25.0, 0.0), (1, 8.0, 25.0, 0.0 : 2, 16.0, 25.0, 0.0)]";
+        final String expectedString = "([0](0.0, 25.0, 0.0)-[2](16.0, 25.0, 0.0))=[[459]([0](0.0, 25.0, 0.0) : [1](8.0, 25.0, 0.0)), [465]([1](8.0, 25.0, 0.0) : [2](16.0, 25.0, 0.0))]";
         assertEquals(expectedString, testPath1.toString());
     }
 
