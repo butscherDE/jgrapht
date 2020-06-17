@@ -22,9 +22,10 @@ public class SortedNeighbors {
         this.sortedEdges = sort(baseNode, ignore);
 
         if (sortedEdges.size() == 0 && baseNode.id >= 0) {
-            System.out.println(baseNode);
-            System.out.println(ignore);
-            System.out.println(graph.outgoingEdgesOf(baseNode).size());
+            System.err.println(graph);
+            System.err.println(baseNode);
+            System.err.println(ignore);
+            System.err.println(graph.outgoingEdgesOf(baseNode).size());
             throw new IllegalStateException("Never create Sorted Neighbors on node with no outgoing neighbors.");
         }
     }
@@ -63,7 +64,9 @@ public class SortedNeighbors {
     private void addAllNeighborsMaybeIncludingCompareEdge(final Node ignore, final Set<ReflectiveEdge> incidentEdges,
                                                           final List<ComparableEdge> comparableEdges) {
         for (final ReflectiveEdge incidentEdge : incidentEdges) {
-            if (isNodeToIgnore(ignore, incidentEdge) && isNotImpasseSubNode(incidentEdge)) {
+            final boolean b1 = !isNodeToIgnore(ignore, incidentEdge);
+            final boolean b2 = !isImpasseSubNode(incidentEdge);
+            if (b1 && b2) {
                 if (!hasEdgeEqualCoordinates(incidentEdge)) {
                     comparableEdges.add(new ComparableEdge(incidentEdge));
                 } else {
@@ -74,19 +77,20 @@ public class SortedNeighbors {
     }
 
     private boolean isNodeToIgnore(Node ignore, ReflectiveEdge incidentEdge) {
-        return !incidentEdge.target.equals(ignore);
+        return incidentEdge.target.equals(ignore);
     }
 
-    private boolean isNotImpasseSubNode(final ReflectiveEdge edge) {
+    private boolean isImpasseSubNode(final ReflectiveEdge edge) {
         boolean isImpasse;
 
         if (hasEdgeEqualCoordinates(edge)) {
-            isImpasse = !hasANeighborNonZeroLengthEdge(edge);
+//            isImpasse = !hasANeighborNonZeroLengthEdge(edge);
+            return false;
         } else {
             isImpasse = false;
         }
 
-        return !isImpasse;
+        return isImpasse;
     }
 
     private boolean hasANeighborNonZeroLengthEdge(ReflectiveEdge edge) {
@@ -111,7 +115,7 @@ public class SortedNeighbors {
         final boolean hasEqualCoordinates = hasEdgeEqualCoordinates(neighbor);
 
         if (hasEqualCoordinates && !areEdgesEqual(neighborPredecessor, neighbor)) {
-            return isNotImpasseSubNode(neighbor);
+            return isImpasseSubNode(neighbor);
         } else {
             return !hasEqualCoordinates;
         }

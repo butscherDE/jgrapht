@@ -51,6 +51,7 @@ public abstract class PolygonSimplifierTest {
 
     @Test
     public void luxembourgROIsProduceEqualRoutesOnSimplifiedPolygons() {
+//        fail();
         final ImportPBF importPBF = new ImportPBF(Config.PBF_ANDORRA);
         RoadGraph graph = null;
         try {
