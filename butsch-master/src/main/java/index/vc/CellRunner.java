@@ -4,6 +4,7 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
+import org.jgrapht.Graph;
 import visualizations.SubGraphVisualizer;
 
 import java.util.*;
@@ -17,7 +18,7 @@ abstract class CellRunner {
     private RoadGraph originalGraph;
     private ReflectiveEdge lastNonZeroLengthEdge;
 
-    CellRunner(final RoadGraph originalGraph, final RoadGraph cellGraph, final VisitedEdgesHashFunction visitedManager, final Edge startEdge,
+    CellRunner(final RoadGraph originalGraph, final Graph<Node, Edge> cellGraph, final VisitedEdgesHashFunction visitedManager, final Edge startEdge,
                Map<Node, SortedNeighbors> sortedNeighborsMap) {
         this.originalGraph = originalGraph;
         this.visitedManager = visitedManager;
@@ -106,6 +107,7 @@ abstract class CellRunner {
         final Set<Node> nodes1 = new LinkedHashSet<>(nodes);
         final LinkedList<Node> nodes2 = new LinkedList<>(nodes1);
 
+        System.out.println(this.getClass().getSimpleName());
         nodes.forEach(a -> System.out.println(a));
 
         final SubGraphVisualizer subGraphVisualizer = new SubGraphVisualizer(originalGraph, nodes2);
@@ -146,7 +148,6 @@ abstract class CellRunner {
         final ReflectiveEdge mostOrientedEdge = getMostOrientedEdgeFromSortedNeighbors(lastEdge);
 
         updateLastNonZeroLengthEdge(mostOrientedEdge);
-
         return mostOrientedEdge;
     }
 
@@ -154,7 +155,8 @@ abstract class CellRunner {
         final Node lastEdgeAdjNode = lastEdge.target;
         final SortedNeighbors sortedNeighbors = sortedNeighborsMap.get(lastEdgeAdjNode);
         final ReflectiveEdge reversed = lastNonZeroLengthEdge.getReversed();
-        return sortedNeighbors.getMostOrientedEdge(reversed);
+        final ReflectiveEdge mostOrientedEdge = sortedNeighbors.getMostOrientedEdge(reversed);
+        return mostOrientedEdge;
     }
 
     private void updateLastNonZeroLengthEdge(ReflectiveEdge mostOrientedEdge) {

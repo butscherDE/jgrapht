@@ -1,9 +1,6 @@
 package index.vc;
 
-import data.Edge;
-import data.Node;
-import data.RoadGraph;
-import data.VisibilityCell;
+import data.*;
 import evalutation.StopWatchVerbose;
 
 import java.util.*;
@@ -17,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class VisibilityCellsCreator {
     private final RoadGraph originalGraph;
-    private final RoadGraph cellGraph;
+    private final CellGraph cellGraph;
     private final VisitedEdgesHashFunction visitedManagerLeft = new VisitedEdgesHashFunction();
     private final VisitedEdgesHashFunction visitedManagerRight = new VisitedEdgesHashFunction();
     private final Map<Node, SortedNeighbors> sortedNeighborListLeft;
@@ -36,10 +33,12 @@ public class VisibilityCellsCreator {
         this.sortedNeighborListRight = neighborPreSorter.getAllSortedNeighborsRight();
     }
 
-    public RoadGraph getPreprocessedGraph(final RoadGraph graph) {
-        final RoadGraph cleanedGraph = graph.deepCopy();
-        getGraphWithBidirectionalEdges(cleanedGraph);
+    public CellGraph getPreprocessedGraph(final RoadGraph graph) {
+//        final RoadGraph cleanedGraph = graph.deepCopy();
+//        getGraphWithBidirectionalEdges(cleanedGraph);
+        final CellGraph cleanedGraph = CellGraph.create(graph);
         getGraphWithOutgoingEdgesOnEachVertex(cleanedGraph);
+
 
         return cleanedGraph;
     }
@@ -57,7 +56,7 @@ public class VisibilityCellsCreator {
     }
 
 
-    private RoadGraph getGraphWithOutgoingEdgesOnEachVertex(final RoadGraph cleanedGraph) {
+    private CellGraph getGraphWithOutgoingEdgesOnEachVertex(final CellGraph cleanedGraph) {
         List<Node> checkNodes = getAllInitiallyDegreeZeroNodes(cleanedGraph);
         while (checkNodes.size() > 0) {
             final List<Node> neighbors = getAllNeighborsOfAllDegreeZeroNodes(cleanedGraph, checkNodes);
@@ -68,7 +67,7 @@ public class VisibilityCellsCreator {
         return cleanedGraph;
     }
 
-    private List<Node> getAllInitiallyDegreeZeroNodes(final RoadGraph cleanedGraph) {
+    private List<Node> getAllInitiallyDegreeZeroNodes(final CellGraph cleanedGraph) {
         return cleanedGraph
                     .vertexSet()
                     .stream()
@@ -76,7 +75,7 @@ public class VisibilityCellsCreator {
                     .collect(Collectors.toList());
     }
 
-    private List<Node> getAllNeighborsOfAllDegreeZeroNodes(final RoadGraph cleanedGraph, final List<Node> checkNodes) {
+    private List<Node> getAllNeighborsOfAllDegreeZeroNodes(final CellGraph cleanedGraph, final List<Node> checkNodes) {
         return checkNodes
                         .stream()
                         .map(a -> cleanedGraph.incomingEdgesOf(a))
@@ -85,11 +84,11 @@ public class VisibilityCellsCreator {
                         .collect(Collectors.toList());
     }
 
-    private void removeAllCurrentDegreeZeroNodes(final RoadGraph cleanedGraph, final List<Node> checkNodes) {
+    private void removeAllCurrentDegreeZeroNodes(final CellGraph cleanedGraph, final List<Node> checkNodes) {
         checkNodes.forEach(a -> cleanedGraph.removeVertex(a));
     }
 
-    private List<Node> getAllNeighborsThatDegreeIsNowZero(final RoadGraph cleanedGraph, final List<Node> neighbors) {
+    private List<Node> getAllNeighborsThatDegreeIsNowZero(final CellGraph cleanedGraph, final List<Node> neighbors) {
         final List<Node> checkNodes;
         checkNodes = neighbors
                 .stream()

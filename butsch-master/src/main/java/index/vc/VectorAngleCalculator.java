@@ -3,15 +3,16 @@ package index.vc;
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import org.jgrapht.Graph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.math.Vector2D;
 
 public abstract class VectorAngleCalculator {
     final static double ANGLE_WHEN_COORDINATES_ARE_EQUAL = -Double.MAX_VALUE;
 
-    private final RoadGraph graph;
+    private final Graph<Node, Edge> graph;
 
-    public VectorAngleCalculator(final RoadGraph graph) {
+    public VectorAngleCalculator(final Graph<Node, Edge> graph) {
         this.graph = graph;
     }
 

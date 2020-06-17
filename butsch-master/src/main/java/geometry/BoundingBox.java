@@ -1,5 +1,6 @@
 package geometry;
 
+import data.CellGraph;
 import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
@@ -43,6 +44,18 @@ public class BoundingBox extends Polygon {
 
     public static BoundingBox createFrom(final RoadGraph roadGraph) {
         final List<Node> vertices = new LinkedList<>(roadGraph.vertexSet());
+        vertices.remove(RoadGraph.INVALID_NODE);
+
+        final Node minLongitude = Collections.min(vertices, Comparator.comparingDouble(a -> a.longitude));
+        final Node maxLongitude = Collections.max(vertices, Comparator.comparingDouble(a -> a.longitude));
+        final Node minLatitude = Collections.min(vertices, Comparator.comparingDouble(a -> a.latitude));
+        final Node maxLatitude = Collections.max(vertices, Comparator.comparingDouble(a -> a.latitude));
+
+        return new BoundingBox(minLongitude.longitude, maxLongitude.longitude, minLatitude.latitude, maxLatitude.latitude);
+    }
+
+    public static BoundingBox createFrom(final CellGraph cellGraph) {
+        final List<Node> vertices = new LinkedList<>(cellGraph.vertexSet());
         vertices.remove(RoadGraph.INVALID_NODE);
 
         final Node minLongitude = Collections.min(vertices, Comparator.comparingDouble(a -> a.longitude));

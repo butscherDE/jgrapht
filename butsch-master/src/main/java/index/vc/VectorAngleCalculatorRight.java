@@ -1,10 +1,12 @@
 package index.vc;
 
+import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import org.jgrapht.Graph;
 
 public class VectorAngleCalculatorRight extends VectorAngleCalculator {
-    public VectorAngleCalculatorRight(final RoadGraph graph) {
+    public VectorAngleCalculatorRight(final Graph<Node, Edge> graph) {
         super(graph);
     }
 

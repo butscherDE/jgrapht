@@ -1,19 +1,21 @@
 package index.vc;
 
+import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import org.jgrapht.Graph;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class SortedNeighbors {
     public final static Node DO_NOT_IGNORE_NODE = RoadGraph.INVALID_NODE;
-    private final RoadGraph graph;
+    private final Graph<Node, Edge> graph;
     private final VectorAngleCalculator vectorAngleCalculator;
 
     private final List<ComparableEdge> sortedEdges;
 
-    public SortedNeighbors(final RoadGraph graph, final Node baseNode, final Node ignore, final VectorAngleCalculator vectorAngleCalculator) {
+    public SortedNeighbors(final Graph<Node, Edge> graph, final Node baseNode, final Node ignore, final VectorAngleCalculator vectorAngleCalculator) {
         this.graph = graph;
         this.vectorAngleCalculator = vectorAngleCalculator;
 
@@ -36,12 +38,26 @@ public class SortedNeighbors {
     }
 
     private List<ComparableEdge> getAllNeighbors(Node baseNode, final Node ignore) {
-        final Set<ReflectiveEdge> incidentEdges = getNeighbors(baseNode);
+        final Set<ReflectiveEdge> incidentEdgesRightOrientation = getNeighborsRightOriented(baseNode);
         final List<ComparableEdge> comparableEdges = new ArrayList<>();
 
-        addAllNeighborsMaybeIncludingCompareEdge(ignore, incidentEdges, comparableEdges);
+        addAllNeighborsMaybeIncludingCompareEdge(ignore, incidentEdgesRightOrientation, comparableEdges);
 
         return comparableEdges;
+    }
+
+    private Set<ReflectiveEdge> getNeighborsRightOriented(final Node baseNode) {
+        final Set<ReflectiveEdge> incidentEdges = getNeighbors(baseNode);
+        return incidentEdges
+                .stream()
+                .map(edge -> {
+                    if (edge.source.id != baseNode.id) {
+                        return edge.getReversed();
+                    } else {
+                        return edge;
+                    }
+                })
+                .collect(Collectors.toSet());
     }
 
     private void addAllNeighborsMaybeIncludingCompareEdge(final Node ignore, final Set<ReflectiveEdge> incidentEdges,
@@ -83,6 +99,14 @@ public class SortedNeighbors {
         return hasAnyNeighborNonZeroEdge;
     }
 
+    private Set<ReflectiveEdge> getNeighbors(final Node node) {
+        return graph
+                .outgoingEdgesOf(node)
+                .stream()
+                .map(a -> new ReflectiveEdge(a, graph))
+                .collect(Collectors.toSet());
+    }
+
     private boolean hasNeighborNonZeroLengthEdge(final ReflectiveEdge neighborPredecessor, final ReflectiveEdge neighbor) {
         final boolean hasEqualCoordinates = hasEdgeEqualCoordinates(neighbor);
 
@@ -107,14 +131,6 @@ public class SortedNeighbors {
         final Node adjNode = edge.target;
 
         return baseNode.getPoint().distance(adjNode.getPoint()) < 0.0000000001;
-    }
-
-    private Set<ReflectiveEdge> getNeighbors(final Node node) {
-        return graph
-                .outgoingEdgesOf(node)
-                .stream()
-                .map(a -> new ReflectiveEdge(a, graph))
-                .collect(Collectors.toSet());
     }
 
     private int getMostOrientedIndex(final ReflectiveEdge lastEdge) {
@@ -160,7 +176,7 @@ public class SortedNeighbors {
     public ReflectiveEdge get(final int index) {
         final ComparableEdge comparableEdge = sortedEdges.get(index);
 
-        return new ReflectiveEdge(graph.getEdge(comparableEdge.baseNode, comparableEdge.adjNode), graph);
+        return new ReflectiveEdge(comparableEdge.id, comparableEdge.source, comparableEdge.target, graph);
     }
 
     public int size() {
@@ -174,19 +190,19 @@ public class SortedNeighbors {
 
     private class ComparableEdge implements Comparable<ComparableEdge> {
         private final long id;
-        private final Node baseNode;
-        private final Node adjNode;
+        private final Node source;
+        private final Node target;
 
         ComparableEdge(ReflectiveEdge edge) {
             this.id = edge.id;
-            this.baseNode = edge.source;
-            this.adjNode = edge.target;
+            this.source = edge.source;
+            this.target = edge.target;
         }
 
         @Override
         public int compareTo(ComparableEdge o) {
-            final double angleThis = vectorAngleCalculator.getAngleOfVectorsOriented(baseNode, adjNode);
-            final double angleOther = vectorAngleCalculator.getAngleOfVectorsOriented(o.baseNode, o.adjNode);
+            final double angleThis = vectorAngleCalculator.getAngleOfVectorsOriented(source, target);
+            final double angleOther = vectorAngleCalculator.getAngleOfVectorsOriented(o.source, o.target);
             final double angleDifference = angleThis - angleOther;
             final int angleResult = angleDifference > 0 ? 1 : angleDifference == 0 ? 0 : -1;
             final long actualIdDif = id - o.id;
@@ -200,7 +216,7 @@ public class SortedNeighbors {
         public boolean equals(final Object o) {
             if (o instanceof ComparableEdge) {
                 final ComparableEdge ce = (ComparableEdge) o;
-                return baseNode.id == ce.baseNode.id && adjNode.id == ce.adjNode.id;
+                return source.id == ce.source.id && target.id == ce.target.id;
             } else {
                 return false;
             }
@@ -208,7 +224,7 @@ public class SortedNeighbors {
 
         @Override
         public String toString() {
-            return "ComparableEdge{" + "id=" + id + ", baseNode=" + baseNode + ", adjNode=" + adjNode + '}';
+            return "ComparableEdge{" + "id=" + id + ", baseNode=" + source + ", adjNode=" + target + '}';
         }
     }
 }

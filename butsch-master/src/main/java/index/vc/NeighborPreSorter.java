@@ -1,8 +1,10 @@
 package index.vc;
 
+import data.CellGraph;
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import org.jgrapht.Graph;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -10,12 +12,12 @@ import java.util.Map;
 import java.util.Set;
 
 public class NeighborPreSorter {
-    private final RoadGraph graph;
+    private final Graph<Node, Edge> graph;
 
     private final Map<Node, SortedNeighbors> allSortedNeighborsLeft;
     private final Map<Node, SortedNeighbors> allSortedNeighborsRight;
 
-    public NeighborPreSorter(RoadGraph graph) {
+    public NeighborPreSorter(Graph<Node, Edge> graph) {
         this.graph = graph;
 
         allSortedNeighborsLeft = new HashMap<>(graph.vertexSet().size());

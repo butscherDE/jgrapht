@@ -31,8 +31,6 @@ public class SubGraphVisualizer {
         nodes.stream().forEach(a -> addNode(3, a, collection));
 
         new GeometryVisualizer(collection).visualizeGraph(millis);
-
-
     }
 
     private void addNode(final int recursionDepth, final Node node, final GeometryVisualizer.GeometryDrawCollection collection) {

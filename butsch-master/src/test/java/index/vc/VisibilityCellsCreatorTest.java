@@ -189,16 +189,12 @@ public class VisibilityCellsCreatorTest {
         graph.addEdge(nodes[0], nodes[2]);
         graph.addEdge(nodes[2], nodes[3]);
 
-        GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
-        col.addGraph(Color.BLACK, graph);
-        final GeometryVisualizer geometryVisualizer = new GeometryVisualizer(col);
-//        geometryVisualizer.visualizeGraph(100000);
-
         final VisibilityCellsCreator vcc = new VisibilityCellsCreator(graph);
         final List<VisibilityCell> visibilityCells = vcc.create();
 
-        assertEquals(2, visibilityCells.size());
-        assertEquals(3, visibilityCells.get(0).lineSegments.size());
+        assertEquals(3, visibilityCells.size());
+        assertEquals(5, visibilityCells.get(0).lineSegments.size());
+        assertEquals(3, visibilityCells.get(1).lineSegments.size());
         assertEquals(3, visibilityCells.get(1).lineSegments.size());
     }
 }
