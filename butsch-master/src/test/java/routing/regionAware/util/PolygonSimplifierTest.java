@@ -67,7 +67,6 @@ public abstract class PolygonSimplifierTest {
         final List<NodeRelation> nodeRelations = importPBF.getNodeRelations();
         System.out.println("Num node relations: " + nodeRelations.size());
         final GridIndex gridIndex = new GridIndex(graph, 10, 10);
-        System.out.println("index created");
         final ContractionHierarchyPrecomputation<Node, Edge> chPrecomp = new ContractionHierarchyPrecomputation<>(
                 graph);
         final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = chPrecomp.computeContractionHierarchy();

@@ -3,6 +3,7 @@ package routing;
 import data.*;
 import org.junit.jupiter.api.Test;
 import util.GeneralTestGraph;
+import util.PolygonRoutingTestGraph;
 
 import java.util.*;
 
@@ -37,5 +38,25 @@ public class RPHASTTest {
 
             assertEquals(dijkstraPath.getWeight(), rphastPath.getWeight(), 0);
         }
+    }
+
+    @Test
+    public void unreachableNode() {
+        final Set<Node> sources = new LinkedHashSet<>(Arrays.asList(new Node(0, 0, 0, 0)));
+        final Set<Node> targets = new LinkedHashSet<>(Arrays.asList(new Node(103,0,0,0),
+                                                                    new Node(1,0,0,0),
+                                                                    new Node(2,0,0,0)));
+
+        final RoadGraph graph = new PolygonRoutingTestGraph().graph;
+        graph.removeEdge(graph.getEdge(new Node(104,0,0,0), new Node(103,0,0,0)));
+        final RoadCH roadCH = new CHPreprocessing(graph).createCHGraph();
+
+        final RPHAST rphast = new RPHAST(roadCH, true);
+        final List<Path> rphastPaths = rphast.findPaths(sources, targets);
+
+
+        assertEquals(Double.MAX_VALUE, rphastPaths.get(0).getWeight());
+        assertEquals(8.0, rphastPaths.get(1).getWeight());
+        assertEquals(16.0, rphastPaths.get(2).getWeight());
     }
 }
