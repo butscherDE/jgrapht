@@ -6,6 +6,7 @@ import util.BinaryHashFunction;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class Path {
     final GraphPath<Node, Edge> path;
@@ -29,6 +30,20 @@ public class Path {
 
     public RoadGraph getGraph() {
         return (RoadGraph) path.getGraph();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Path path1 = (Path) o;
+        final List<Edge> pathVertexList = path.getEdgeList();
+        final List<Edge> path1VertexList = path1.path.getEdgeList();
+        return pathVertexList.equals(path1VertexList);
     }
 
     public int getLength() {

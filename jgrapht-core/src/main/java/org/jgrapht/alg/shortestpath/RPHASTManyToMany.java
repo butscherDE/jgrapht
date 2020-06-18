@@ -9,6 +9,7 @@ import org.jgrapht.graph.GraphWalk;
 import org.jgrapht.util.VisitedManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Implementation based on RPhast by Daniel Delling, Andrew V. Goldberg, and Renote F. Werneck (Faster Batched Shortest
@@ -88,6 +89,7 @@ public class RPHASTManyToMany<V, E> {
         final LinkedList<GraphPath<V, E>> paths = new LinkedList<>();
 
         for (final V source : sources) {
+            resetCosts();
             findUpwardsEdges(source);
             cost.put(ch.getContractionMapping().get(source), 0d);
 
@@ -96,11 +98,17 @@ public class RPHASTManyToMany<V, E> {
 
             paths.addAll(backtrackPathForEachTarget(getChVertex(source)));
 
-            cost.clear();
             predecessors.clear();
         }
 
         return paths;
+    }
+
+    public void resetCosts() {
+        cost.clear();
+        targets.forEach(target -> {
+            cost.put(getChVertex(target), Double.POSITIVE_INFINITY);
+        });
     }
 
     private void findUpwardsEdges(final V source) {
@@ -152,12 +160,16 @@ public class RPHASTManyToMany<V, E> {
                 paths.add(backtrackPath(source, target));
             }
         } else {
-            System.out.println(targets);
-            System.out.println(cost.values());
+//            System.out.println("targets2: " + targets);
+//            System.out.println("cost keys: " + cost.keySet().stream().map(a -> a.vertex).collect(Collectors.toList()));
+//            System.out.println("cost values: " + cost.values());
             for (final V target : targets) {
+//                System.out.println("source: " + source.vertex);
+//                System.out.println("target: " + target);
                 final V sourceVertex = source.vertex;
                 final List<E> emptyEdgeList = Collections.emptyList();
                 final Double preCalculatedCost = cost.get(getChVertex(target));
+//                System.out.println(preCalculatedCost);
                 paths.add(new GraphWalk<V, E>(graph, sourceVertex, target, emptyEdgeList, preCalculatedCost));
             }
         }

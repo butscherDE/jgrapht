@@ -59,7 +59,6 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
                     }
                 }
 
-                System.out.println(routeCandidates.getMaxGainCandidate());
                 routeCandidates.sortByTimeInROIDescending();
                 routeCandidates.pruneDominatedCandidateRoutes();
                 routeCandidates.pruneLowerQuantileInROI();

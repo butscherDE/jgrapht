@@ -120,9 +120,9 @@ public class ImportPBF implements GraphImporter {
             isRoad.put("secondary_link", true);
             isRoad.put("tertiary_link", true);
             isRoad.put("living_street", true);
-            isRoad.put("service", true);
+            isRoad.put("service", false);
             isRoad.put("pedestrian", false);
-            isRoad.put("track", true);
+            isRoad.put("track", false);
             isRoad.put("bus_guideway", false);
             isRoad.put("escape", false);
             isRoad.put("raceway", false);
@@ -133,7 +133,7 @@ public class ImportPBF implements GraphImporter {
             isRoad.put("corridor", false);
             isRoad.put("path", false);
             isRoad.put("cycleway", false);
-            isRoad.put("construction", true); //?
+            isRoad.put("construction", false); //?
             isRoad.put("bus_stop", false);
             isRoad.put("crossing", false);
             isRoad.put("elevator", false);
