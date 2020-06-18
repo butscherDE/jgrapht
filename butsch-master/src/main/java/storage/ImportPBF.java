@@ -100,9 +100,61 @@ public class ImportPBF implements GraphImporter {
     }
 
     private class RoadGraphEdgeAdder implements Consumer<Way> {
+        private final Map<String, Boolean> isRoad = new HashMap<>();
+
         private final ReentrantLock lock = new ReentrantLock();
         private final List<Pair<Long, Long>> edges = Collections.synchronizedList(new LinkedList<>());
         private final Map<Long, Way> ways = Collections.synchronizedMap(new HashMap<>());
+
+        public RoadGraphEdgeAdder() {
+            isRoad.put("motorway", true);
+            isRoad.put("trunk", true);
+            isRoad.put("primary", true);
+            isRoad.put("secondary", true);
+            isRoad.put("tertiary", true);
+            isRoad.put("unclassified", true);
+            isRoad.put("residential", true);
+            isRoad.put("motorway_link", true);
+            isRoad.put("trunk_link", true);
+            isRoad.put("primary_link", true);
+            isRoad.put("secondary_link", true);
+            isRoad.put("tertiary_link", true);
+            isRoad.put("living_street", true);
+            isRoad.put("service", true);
+            isRoad.put("pedestrian", false);
+            isRoad.put("track", true);
+            isRoad.put("bus_guideway", false);
+            isRoad.put("escape", false);
+            isRoad.put("raceway", false);
+            isRoad.put("road", false);
+            isRoad.put("footway", false);
+            isRoad.put("bridleway", false);
+            isRoad.put("steps", false);
+            isRoad.put("corridor", false);
+            isRoad.put("path", false);
+            isRoad.put("cycleway", false);
+            isRoad.put("construction", true); //?
+            isRoad.put("bus_stop", false);
+            isRoad.put("crossing", false);
+            isRoad.put("elevator", false);
+            isRoad.put("emergency_access_point", false);
+            isRoad.put("give_way", false);
+            isRoad.put("milestone", false);
+            isRoad.put("mini_roundabout", true);
+            isRoad.put("passing_place", false);
+            isRoad.put("platform", false);
+            isRoad.put("rest_area", false);
+            isRoad.put("speed_camera", false);
+            isRoad.put("street_lamp", false);
+            isRoad.put("services", false);
+            isRoad.put("stop", false);
+            isRoad.put("traffic_mirror", false);
+            isRoad.put("traffic_signals", false);
+            isRoad.put("trailhead", false);
+            isRoad.put("turning_circle", true);
+            isRoad.put("turning_loop", true);
+            isRoad.put("toll_gantry", true);
+        }
 
         @Override
         public void accept(final Way way) {
@@ -116,7 +168,9 @@ public class ImportPBF implements GraphImporter {
         }
 
         public boolean isRoad(final Way way) {
-            return way.getTags().get("highway") != null;
+            final String tag = way.getTags().get("highway");
+            return tag != null && isRoad.get(tag);
+//            return way.getTags().get("highway") != null;
         }
 
         private void addRoadData(Way way, List<Long> nodeIds) {

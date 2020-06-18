@@ -4,6 +4,7 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import data.VisibilityCell;
+import evalutation.StopWatchVerbose;
 import org.jgrapht.Graph;
 import visualizations.SubGraphVisualizer;
 
@@ -58,7 +59,7 @@ abstract class CellRunner {
         boolean endNotReached;
         do {
             endNotReached = processNextNeighborOnCell();
-            findRepetition();
+//            findRepetition();
         }
         while (endNotReached);
     }
@@ -122,10 +123,10 @@ abstract class CellRunner {
     private boolean processNextNeighborOnCell() {
         final ReflectiveEdge leftOrRightMostNeighbor = getMostLeftOrRightOrientedEdge();
 
-        return settleAllFoundEdgesAndSetWhenRunHasStopped(leftOrRightMostNeighbor);
+        return settleFoundEdge(leftOrRightMostNeighbor);
     }
 
-    private boolean settleAllFoundEdgesAndSetWhenRunHasStopped(ReflectiveEdge edge) {
+    private boolean settleFoundEdge(ReflectiveEdge edge) {
         if (lastEdgeNotReached(edge)) {
             settleEdge(edge);
             return true;
