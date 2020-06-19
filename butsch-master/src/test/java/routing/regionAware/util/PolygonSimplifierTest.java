@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -66,7 +67,8 @@ public abstract class PolygonSimplifierTest {
             e.printStackTrace();
             fail();
         }
-        final List<NodeRelation> nodeRelations = importPBF.getNodeRelations();
+        final List<NodeRelation> nodeRelations = importPBF.getNodeRelations().stream().filter(a -> a.nodes.size() <= 50).collect(Collectors.toList());
+        System.out.println("Relations.size(): " + nodeRelations.stream().map(a -> a.nodes.size()).collect(Collectors.toList()));
         System.out.println("Num node relations: " + nodeRelations.size());
         final GridIndex gridIndex = new GridIndex(graph, 10, 10);
         final ContractionHierarchyPrecomputation<Node, Edge> chPrecomp = new ContractionHierarchyPrecomputation<>(
@@ -79,36 +81,43 @@ public abstract class PolygonSimplifierTest {
         final int size = nodes.size();
         final Random random = new Random();
         int i = 0;
+        int skipped = 0;
         for (final NodeRelation nodeRelation : nodeRelations) {
             System.out.println(i++ + ", id: " + nodeRelation.id + ", size: " + nodeRelation.nodes.size());
             final RegionOfInterest roi = new RegionOfInterest(nodeRelation.nodes);
             final Node source = nodes.get(random.nextInt(size));
             final Node target = nodes.get(random.nextInt(size));
 
-            System.out.println("lala1");
             final StopWatchVerbose sw = new StopWatchVerbose("Polygon Simplification");
             final Polygon simplifiedPolygon = getSimplifiedPolygon(roi.getPolygon(), gridIndex);
             sw.printTimingIfVerbose();
-            System.out.println("lala2");
             final RegionOfInterest simpleRoi = new RegionOfInterest(simplifiedPolygon);
-            System.out.println("lala3");
 
-            final RegionThrough rt = new RegionThrough(graph, roadCH, gridIndex, roi);
-            System.out.println("lala4");
-            final RegionThrough rtSimple = new RegionThrough(graph, roadCH, gridIndex, simpleRoi);
-            System.out.println("lala5");
+            try {
+                final RegionThrough rt = new RegionThrough(graph, roadCH, gridIndex, roi);
+                final RegionThrough rtSimple = new RegionThrough(graph, roadCH, gridIndex, simpleRoi);
 //            final RegionAlong ra = new RegionAlong(graph, roadCH, gridIndex, roi);
 //            final RegionAlong raSimple = new RegionAlong(graph, roadCH, gridIndex, simpleRoi);
 
-            System.out.println("checka");
-            final Path path = rt.findPath(source, target);
-            final Path path1 = rtSimple.findPath(source, target);
-            System.out.println(path);
-            System.out.println(path1);
-            assertEquals(path, path1);
+                final Path path = rt.findPath(source, target);
+                final Path path1 = rtSimple.findPath(source, target);
+                System.out.println(path);
+                System.out.println(path1);
+                assertEquals(path, path1);
 //            assertEquals(ra.findPath(source, target), raSimple.findPath(source, target));
+            } catch (IllegalArgumentException e) {
+                if (e.getMessage().equals("Empty region")) {
+                    System.out.println("skipped due to empty region");
+                    skipped++;
+                } else {
+                    e.printStackTrace();
+                    fail();
+                }
+            }
         }
         System.out.println("Checked for " + i + " Polygons.");
+
+        assertTrue(skipped < i);
     }
 
     public void assertEquals(Path expected, Path actual) {

@@ -49,4 +49,9 @@ public class RegionThroughTest extends AbstractRegionTest {
 
         return nodeIds;
     }
+
+    @Override
+    AbstractRegion getInstance(RoadGraph globalGraph, RoadCH globalCh, GridIndex index, RegionOfInterest roi) {
+        return new RegionThrough(globalGraph, globalCh, index, roi);
+    }
 }

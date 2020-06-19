@@ -29,8 +29,18 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
         this.region = region;
 
         this.entryExitNodes = new EntryExitPointExtractor(region, globalIndex).extract();
-        this.regionCH = getRegionCH();
+        this.regionCH = getValidatedRegionCH();
         this.allPathsNonBacktracked.putAll(getRegionInternalPaths(entryExitNodes, entryExitNodes, regionCH));
+    }
+
+    public RoadCH getValidatedRegionCH() {
+        final RoadCH regionCH = getRegionCH();
+
+        if (regionCH.getGraph().vertexSet().size() <= 1) {
+            throw new IllegalArgumentException("Empty region");
+        }
+
+        return regionCH;
     }
 
     @Override
