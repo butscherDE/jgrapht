@@ -7,6 +7,7 @@ import geometry.PolygonContainsChecker;
 import index.GridIndex;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
@@ -26,6 +27,48 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PolygonSimplifierTest {
     final static PolygonRoutingTestGraph GRAPH_MOCKER = PolygonRoutingTestGraph.DEFAULT_INSTANCE;
+
+    private static RoadGraph graph;
+    private static List<NodeRelation> nodeRelations;
+    private static GridIndex gridIndex;
+    private static RoadCH roadCH;
+
+    @BeforeAll
+    public static void initPbfTest() {
+        final ImportPBF importPBF = new ImportPBF(Config.PBF_ANDORRA);
+        createGraph(importPBF);
+        calcRelations(importPBF);
+        createIndex();
+        calcRoadCh();
+    }
+
+    private static void createGraph(ImportPBF importPBF) {
+        graph = null;
+        try {
+            graph = importPBF.createGraph();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
+    private static void calcRelations(ImportPBF importPBF) {
+        nodeRelations = importPBF.getNodeRelations().stream().filter(a -> a.nodes.size() <= 100).collect(Collectors.toList());
+        System.out.println("Relations.size(): " + nodeRelations.stream().map(a -> a.nodes.size()).collect(Collectors.toList()));
+        System.out.println("Num node relations: " + nodeRelations.size());
+    }
+
+    private static void createIndex() {
+        gridIndex = new GridIndex(graph, 10, 10);
+    }
+
+    private static void calcRoadCh() {
+        final ContractionHierarchyPrecomputation<Node, Edge> chPrecomp = new ContractionHierarchyPrecomputation<>(
+                graph);
+        final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = chPrecomp.computeContractionHierarchy();
+        roadCH = new RoadCH(ch);
+        System.out.println("ch created");
+    }
 
 
     public PolygonSimplifierTest() {
@@ -56,71 +99,66 @@ public abstract class PolygonSimplifierTest {
 
     @Test
     public void luxembourgROIsProduceEqualRoutesOnSimplifiedPolygons() {
-//        fail();
-        final ImportPBF importPBF = new ImportPBF(Config.PBF_ANDORRA);
-        RoadGraph graph = null;
-        try {
-            graph = importPBF.createGraph();
-            System.out.println("stats:");
-            System.out.println("nodes: " + graph.vertexSet().size());
-            System.out.println("edges: " + graph.edgeSet().size());
-            System.out.println("polygon: " + importPBF.getNodeRelations().size());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            fail();
-        }
-        final List<NodeRelation> nodeRelations = importPBF.getNodeRelations().stream().filter(a -> a.nodes.size() <= 100).collect(Collectors.toList());
-        System.out.println("Relations.size(): " + nodeRelations.stream().map(a -> a.nodes.size()).collect(Collectors.toList()));
-        System.out.println("Num node relations: " + nodeRelations.size());
-        final GridIndex gridIndex = new GridIndex(graph, 10, 10);
-        final ContractionHierarchyPrecomputation<Node, Edge> chPrecomp = new ContractionHierarchyPrecomputation<>(
-                graph);
-        final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = chPrecomp.computeContractionHierarchy();
-        final RoadCH roadCH = new RoadCH(ch);
-        System.out.println("ch created");
-
         final List<Node> nodes = new ArrayList<>(graph.vertexSet());
-        final int size = nodes.size();
         final Random random = new Random();
         int i = 0;
         int skipped = 0;
         for (final NodeRelation nodeRelation : nodeRelations) {
             System.out.println(i++ + ", id: " + nodeRelation.id + ", size: " + nodeRelation.nodes.size());
             final RegionOfInterest roi = new RegionOfInterest(nodeRelation.nodes);
-            final Node source = nodes.get(random.nextInt(size));
-            final Node target = nodes.get(random.nextInt(size));
-
-            final StopWatchVerbose sw = new StopWatchVerbose("Polygon Simplification");
-            final Polygon simplifiedPolygon = getSimplifiedPolygon(roi.getPolygon(), gridIndex);
-            sw.printTimingIfVerbose();
-            final RegionOfInterest simpleRoi = new RegionOfInterest(simplifiedPolygon);
+            final Node source = nodes.get(random.nextInt(nodes.size()));
+            final Node target = nodes.get(random.nextInt(nodes.size()));
+            final RegionOfInterest simpleRoi = buildSimplifiedRoi(roi);
 
             try {
-                final RegionThrough rt = new RegionThrough(graph, roadCH, gridIndex, roi);
-                final RegionThrough rtSimple = new RegionThrough(graph, roadCH, gridIndex, simpleRoi);
-//            final RegionAlong ra = new RegionAlong(graph, roadCH, gridIndex, roi);
-//            final RegionAlong raSimple = new RegionAlong(graph, roadCH, gridIndex, simpleRoi);
-
-                final Path expectedPath = rt.findPath(source, target);
-                final Path simplePath = rtSimple.findPath(source, target);
-                System.out.println("Path weights: " + expectedPath.getWeight() + ", " + simplePath.getWeight());
-                assertEquals(expectedPath, simplePath);
-//            assertEquals(ra.findPath(source, target), raSimple.findPath(source, target));
+                buildPathsAndAssertTheyDoNotChangeBySimplification(roi, source, target, simpleRoi);
             } catch (IllegalArgumentException e) {
-                if (e.getMessage().equals("Empty region")) {
-//                    System.out.println("skipped due to empty region");
-                    RoadGraph finalGraph = graph;
-                    assertThrows(IllegalArgumentException.class, () -> new RegionThrough(finalGraph, roadCH, gridIndex, roi));
-                    assertThrows(IllegalArgumentException.class, () -> new RegionThrough(finalGraph, roadCH, gridIndex, simpleRoi));
-                    skipped++;
-                } else {
-                    e.printStackTrace();
-                    fail();
-                }
+                skipped = checkEmptyRegion(skipped, roi, simpleRoi, e);
             }
         }
 
         assertAndPrintStatistics(i, skipped);
+    }
+
+    private RegionOfInterest buildSimplifiedRoi(RegionOfInterest roi) {
+        final StopWatchVerbose sw = new StopWatchVerbose("Polygon Simplification");
+        final Polygon simplifiedPolygon = getSimplifiedPolygon(roi.getPolygon(), gridIndex);
+        sw.printTimingIfVerbose();
+        return new RegionOfInterest(simplifiedPolygon);
+    }
+
+    private void buildPathsAndAssertTheyDoNotChangeBySimplification(RegionOfInterest roi, Node source, Node target, RegionOfInterest simpleRoi) {
+        final RegionThrough rt = new RegionThrough(graph, roadCH, gridIndex, roi);
+        final RegionThrough rtSimple = new RegionThrough(graph, roadCH, gridIndex, simpleRoi);
+//            final RegionAlong ra = new RegionAlong(graph, roadCH, gridIndex, roi);
+//            final RegionAlong raSimple = new RegionAlong(graph, roadCH, gridIndex, simpleRoi);
+
+        final Path expectedPath = rt.findPath(source, target);
+        final Path simplePath = rtSimple.findPath(source, target);
+        System.out.println("Path weights: " + expectedPath.getWeight() + ", " + simplePath.getWeight());
+        assertEquals(expectedPath, simplePath);
+//            assertEquals(ra.findPath(source, target), raSimple.findPath(source, target));
+    }
+
+    private int checkEmptyRegion(int skipped, RegionOfInterest roi, RegionOfInterest simpleRoi, IllegalArgumentException e) {
+        if (e.getMessage().equals("Empty region")) {
+            assertAndSkippEmptyRegion(roi, simpleRoi);
+            skipped++;
+        } else {
+            failOnRegionEmptyAfterSimplification(e);
+        }
+        return skipped;
+    }
+
+    private void assertAndSkippEmptyRegion(RegionOfInterest roi, RegionOfInterest simpleRoi) {
+        RoadGraph finalGraph = graph;
+        assertThrows(IllegalArgumentException.class, () -> new RegionThrough(finalGraph, roadCH, gridIndex, roi));
+        assertThrows(IllegalArgumentException.class, () -> new RegionThrough(finalGraph, roadCH, gridIndex, simpleRoi));
+    }
+
+    private void failOnRegionEmptyAfterSimplification(IllegalArgumentException e) {
+        e.printStackTrace();
+        fail();
     }
 
     public void assertEquals(Path expected, Path actual) {
