@@ -6,6 +6,7 @@ import evalutation.StopWatchVerbose;
 import geometry.PolygonContainsChecker;
 import index.GridIndex;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class PolygonSimplifierTest {
     final static PolygonRoutingTestGraph GRAPH_MOCKER = PolygonRoutingTestGraph.DEFAULT_INSTANCE;
+
 
     public PolygonSimplifierTest() {
 
@@ -67,7 +69,7 @@ public abstract class PolygonSimplifierTest {
             e.printStackTrace();
             fail();
         }
-        final List<NodeRelation> nodeRelations = importPBF.getNodeRelations().stream().filter(a -> a.nodes.size() <= 50).collect(Collectors.toList());
+        final List<NodeRelation> nodeRelations = importPBF.getNodeRelations().stream().filter(a -> a.nodes.size() <= 100).collect(Collectors.toList());
         System.out.println("Relations.size(): " + nodeRelations.stream().map(a -> a.nodes.size()).collect(Collectors.toList()));
         System.out.println("Num node relations: " + nodeRelations.size());
         final GridIndex gridIndex = new GridIndex(graph, 10, 10);
@@ -99,15 +101,17 @@ public abstract class PolygonSimplifierTest {
 //            final RegionAlong ra = new RegionAlong(graph, roadCH, gridIndex, roi);
 //            final RegionAlong raSimple = new RegionAlong(graph, roadCH, gridIndex, simpleRoi);
 
-                final Path path = rt.findPath(source, target);
-                final Path path1 = rtSimple.findPath(source, target);
-                System.out.println(path);
-                System.out.println(path1);
-                assertEquals(path, path1);
+                final Path expectedPath = rt.findPath(source, target);
+                final Path simplePath = rtSimple.findPath(source, target);
+                System.out.println("Path weights: " + expectedPath.getWeight() + ", " + simplePath.getWeight());
+                assertEquals(expectedPath, simplePath);
 //            assertEquals(ra.findPath(source, target), raSimple.findPath(source, target));
             } catch (IllegalArgumentException e) {
                 if (e.getMessage().equals("Empty region")) {
-                    System.out.println("skipped due to empty region");
+//                    System.out.println("skipped due to empty region");
+                    RoadGraph finalGraph = graph;
+                    assertThrows(IllegalArgumentException.class, () -> new RegionThrough(finalGraph, roadCH, gridIndex, roi));
+                    assertThrows(IllegalArgumentException.class, () -> new RegionThrough(finalGraph, roadCH, gridIndex, simpleRoi));
                     skipped++;
                 } else {
                     e.printStackTrace();
@@ -115,13 +119,20 @@ public abstract class PolygonSimplifierTest {
                 }
             }
         }
-        System.out.println("Checked for " + i + " Polygons.");
 
-        assertTrue(skipped < i);
+        assertAndPrintStatistics(i, skipped);
     }
 
     public void assertEquals(Path expected, Path actual) {
-        System.out.println("tkkg");
+        if (expected.isFound()) {
+            Assertions.assertEquals(expected.getWeight(), actual.getWeight(), 0);
+            assetEdges(expected, actual);
+        } else {
+            assertFalse(actual.isFound());
+        }
+    }
+
+    private void assetEdges(Path expected, Path actual) {
         final Iterator<Edge> expectedIt = expected.getEdgeList().iterator();
         final Iterator<Edge> actualIt = actual.getEdgeList().iterator();
 
@@ -138,4 +149,9 @@ public abstract class PolygonSimplifierTest {
     }
 
     abstract Polygon getSimplifiedPolygon(final Polygon polygon, final GridIndex gridIndex);
+
+    private void assertAndPrintStatistics(int i, int skipped) {
+        System.out.println("Checked for " + i + " Polygons, where " + skipped + " were skipped due to empty subgraphs");
+        assertTrue(skipped < i);
+    }
 }

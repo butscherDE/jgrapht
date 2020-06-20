@@ -2,7 +2,7 @@ package evalutation;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class Config {
-    public final static boolean VERBOSE = true;
+    public final static boolean VERBOSE = false;
     // ERP style data
 //    public final static String ERP_PATH = "C:\\Users\\Daniel\\Documents\\ger.txt";
     public final static String ERP_PATH = "C:\\Users\\Daniel\\Dropbox\\uni\\Sem11\\ERP\\100k_j_d.txt";

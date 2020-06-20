@@ -131,7 +131,6 @@ public class RouteCandidateList<T extends RouteCandidate> {
         // Assumes that routeCandidates was already sorted descending to roi distance after pruning dominated route candidates
         final int endIndex = (int) (size() * 0.75) + 1;
 
-        System.out.println(candidates.size());
         candidates = candidates.subList(0, endIndex);
     }
 }

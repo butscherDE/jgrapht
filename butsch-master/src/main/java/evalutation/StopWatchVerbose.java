@@ -11,6 +11,9 @@ public class StopWatchVerbose {
 
 
     public void printTimingIfVerbose() {
-        System.out.println(sw.stop().toString());
+        if (Config.VERBOSE) {
+            System.out.println(sw.stop()
+                    .toString());
+        }
     }
 }
