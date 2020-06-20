@@ -128,16 +128,20 @@ public abstract class PolygonSimplifierTest {
     }
 
     private void buildPathsAndAssertTheyDoNotChangeBySimplification(RegionOfInterest roi, Node source, Node target, RegionOfInterest simpleRoi) {
+        assertThrowPathUnchanged(roi, source, target, simpleRoi);
+        assertAlongPathUnchanged(roi, source, target, simpleRoi);
+    }
+
+    private void assertThrowPathUnchanged(RegionOfInterest roi, Node source, Node target, RegionOfInterest simpleRoi) {
         final RegionThrough rt = new RegionThrough(graph, roadCH, gridIndex, roi);
         final RegionThrough rtSimple = new RegionThrough(graph, roadCH, gridIndex, simpleRoi);
-//            final RegionAlong ra = new RegionAlong(graph, roadCH, gridIndex, roi);
-//            final RegionAlong raSimple = new RegionAlong(graph, roadCH, gridIndex, simpleRoi);
+        assertEquals(rt.findPath(source, target), rtSimple.findPath(source, target));
+    }
 
-        final Path expectedPath = rt.findPath(source, target);
-        final Path simplePath = rtSimple.findPath(source, target);
-        System.out.println("Path weights: " + expectedPath.getWeight() + ", " + simplePath.getWeight());
-        assertEquals(expectedPath, simplePath);
-//            assertEquals(ra.findPath(source, target), raSimple.findPath(source, target));
+    private void assertAlongPathUnchanged(RegionOfInterest roi, Node source, Node target, RegionOfInterest simpleRoi) {
+        final RegionAlong ra = new RegionAlong(graph, roadCH, gridIndex, roi);
+        final RegionAlong raSimple = new RegionAlong(graph, roadCH, gridIndex, simpleRoi);
+        assertEquals(ra.findPath(source, target), raSimple.findPath(source, target));
     }
 
     private int checkEmptyRegion(int skipped, RegionOfInterest roi, RegionOfInterest simpleRoi, IllegalArgumentException e) {
