@@ -158,32 +158,15 @@ public class RPHASTManyToMany<V, E> {
     private List<GraphPath<V, E>> backtrackPathForEachTarget(final ContractionVertex<V> source) {
         final List<GraphPath<V, E>> paths = new LinkedList<>();
 
-        System.out.println(targets);
-        System.out.println(cost.keySet().stream().map(n -> n.vertex).collect(Collectors.toList()));
-
-        targets.forEach(t -> {
-            if (cost.get(getChVertex(t)) == null) {
-                System.out.println(t);
-                System.exit(-1);
-            }
-
-        });
-
         if (enableBacktrack) {
             for (final V target : targets) {
                 paths.add(backtrackPath(source, target));
             }
         } else {
-//            System.out.println("targets2: " + targets);
-//            System.out.println("cost keys: " + cost.keySet().stream().map(a -> a.vertex).collect(Collectors.toList()));
-//            System.out.println("cost values: " + cost.values());
             for (final V target : targets) {
-//                System.out.println("source: " + source.vertex);
-//                System.out.println("target: " + target);
                 final V sourceVertex = source.vertex;
                 final List<E> emptyEdgeList = Collections.emptyList();
                 final Double preCalculatedCost = cost.get(getChVertex(target));
-//                System.out.println(preCalculatedCost);
                 paths.add(new GraphWalk<V, E>(graph, sourceVertex, target, emptyEdgeList, preCalculatedCost));
             }
         }
