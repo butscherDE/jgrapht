@@ -86,7 +86,7 @@ public class RegionAlong extends AbstractRegion {
                     .stream()
                     .filter(e -> internalNodesMap.get(globalGraph.getEdgeTarget(e)) != null)
                     .forEach(e -> addEdge(e, regionGraph));
-            globalGraph.outgoingEdgesOf(eeNode)
+            globalGraph.incomingEdgesOf(eeNode)
                     .stream()
                     .filter(e -> internalNodesMap.get(globalGraph.getEdgeSource(e)) != null)
                     .forEach(e -> addEdge(e, regionGraph));
