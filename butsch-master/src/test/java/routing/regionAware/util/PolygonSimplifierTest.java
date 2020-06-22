@@ -105,7 +105,7 @@ public abstract class PolygonSimplifierTest {
         int i = 0;
         int skipped = 0;
         for (final NodeRelation nodeRelation : nodeRelations) {
-            System.out.println(i++ + ", id: " + nodeRelation.id + ", size: " + nodeRelation.nodes.size());
+//            System.out.println(i++ + ", id: " + nodeRelation.id + ", size: " + nodeRelation.nodes.size());
             final RegionOfInterest roi = new RegionOfInterest(nodeRelation.nodes);
             final Node source = nodes.get(random.nextInt(nodes.size()));
             final Node target = nodes.get(random.nextInt(nodes.size()));
@@ -169,7 +169,7 @@ public abstract class PolygonSimplifierTest {
     public void assertEquals(Path expected, Path actual) {
         if (expected.isFound()) {
             Assertions.assertEquals(expected.getWeight(), actual.getWeight(), 0);
-            assetEdges(expected, actual);
+//            assetEdges(expected, actual);
         } else {
             assertFalse(actual.isFound());
         }

@@ -59,60 +59,8 @@ abstract class CellRunner {
         boolean endNotReached;
         do {
             endNotReached = processNextNeighborOnCell();
-//            findRepetition();
         }
         while (endNotReached);
-    }
-
-    private void findRepetition() {
-        if (edgesOnCell.size() > 20) {
-            LinkedList<Node> window = new LinkedList<>();
-            LinkedList<Node> last5 = new LinkedList<>();
-
-            final Iterator<ReflectiveEdge> iterator = edgesOnCell.iterator();
-            window.add(iterator.next().target);
-            window.add(iterator.next().target);
-            window.add(iterator.next().target);
-            window.add(iterator.next().target);
-            window.add(iterator.next().target);
-
-            last5.add(edgesOnCell.get(edgesOnCell.size() - 5).target);
-            last5.add(edgesOnCell.get(edgesOnCell.size() - 4).target);
-            last5.add(edgesOnCell.get(edgesOnCell.size() - 3).target);
-            last5.add(edgesOnCell.get(edgesOnCell.size() - 2).target);
-            last5.add(edgesOnCell.get(edgesOnCell.size() - 1).target);
-
-            int lastRep = -1;
-            int c = 5;
-            while (iterator.hasNext()) {
-                c++;
-                if (window.equals(last5)) {
-                    if (lastRep >= 0) {
-                        foundRepetition(lastRep);
-                    }
-                    lastRep = c;
-                }
-
-                window.removeFirst();
-                window.addLast(iterator.next().target);
-            }
-        }
-    }
-
-    private void foundRepetition(int from) {
-        final List<Node> collect = edgesOnCell.stream()
-                .map(a -> a.source)
-                .collect(Collectors.toList());
-        collect.add(edgesOnCell.getLast().target);
-        final List<Node> nodes = collect.subList(from - 10, collect.size());
-        final Set<Node> nodes1 = new LinkedHashSet<>(nodes);
-        final LinkedList<Node> nodes2 = new LinkedList<>(nodes1);
-
-        System.out.println(this.getClass().getSimpleName());
-        nodes.forEach(a -> System.out.println(a));
-
-        final SubGraphVisualizer subGraphVisualizer = new SubGraphVisualizer(originalGraph, nodes2);
-        subGraphVisualizer.visualize(1_000_000);
     }
 
     private void addStartAndEndNodeOfCell() {
