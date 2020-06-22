@@ -57,8 +57,11 @@ public class RPHASTManyToMany<V, E> {
         verticesToExplore.addAll(startSet);
         visitedManager.visited(startSet);
 
+        System.out.println(verticesToExplore);
+        System.out.println(chGraph.vertexSet().stream().map(chv -> chv.vertex).collect(Collectors.toList()));
         while (!verticesToExplore.empty()) {
             V vertex = verticesToExplore.pop();
+            System.out.println(vertex);
             ContractionVertex<V> chVertex = getChVertex(vertex);
             for (final ContractionEdge<E> chEdge : comparator.getIncidentEdges(chVertex)) {
                 if (comparator.isEdgeCorrectlyOriented(chEdge)) {
@@ -106,9 +109,9 @@ public class RPHASTManyToMany<V, E> {
 
     public void resetCosts() {
         cost.clear();
-        targets.forEach(target -> {
-            cost.put(getChVertex(target), Double.POSITIVE_INFINITY);
-        });
+//        targets.forEach(target -> {
+//            cost.put(getChVertex(target), Double.POSITIVE_INFINITY);
+//        });
     }
 
     private void findUpwardsEdges(final V source) {

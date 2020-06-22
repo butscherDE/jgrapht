@@ -1,11 +1,20 @@
 package routing.regionAware;
 
-import data.CHPreprocessing;
-import data.RegionOfInterest;
-import data.RoadCH;
-import data.RoadGraph;
+import data.*;
+import geometry.BoundingBox;
+import geometry.RedBlueSegmentIntersectionCrossProductFactory;
+import geometry.SegmentIntersectionAlgorithm;
 import index.GridIndex;
+import index.vc.ReflectiveEdge;
+import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
+import org.locationtech.jts.geom.LineSegment;
 import routing.regionAware.util.RegionSubGraphBuilder;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RegionThrough extends AbstractRegion {
     public RegionThrough(final RoadGraph globalGraph, final RoadCH globalCH, final GridIndex globalIndex,

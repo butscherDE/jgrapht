@@ -29,7 +29,7 @@ public class RegionAlongTest extends AbstractRegionTest{
         final Node startNode = index.getClosestNode(startLongitude, startLatitude);
         final Node endNode = index.getClosestNode(endLongitude, endLatitude);
 
-        final RegionThrough regionThrough = new RegionThrough(graph, ch, index, roi);
+        final RegionAlong regionThrough = new RegionAlong(graph, ch, index, roi);
         return regionThrough.findPath(startNode, endNode);
     }
 

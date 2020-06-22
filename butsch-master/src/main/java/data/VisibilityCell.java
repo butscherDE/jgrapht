@@ -13,7 +13,7 @@ public class VisibilityCell implements PolygonSegmentCollection {
     private static final GeometryFactory gf = new GeometryFactory();
     public final List<LineSegment> lineSegments;
     private final Coordinate[] coordinates;
-    private final List<ReflectiveEdge> edges;
+    public final List<ReflectiveEdge> edges;
 
     private VisibilityCell(final List<LineSegment> lineSegments, final Coordinate[] coordinates, final List<ReflectiveEdge> edges) {
         this.lineSegments = lineSegments;

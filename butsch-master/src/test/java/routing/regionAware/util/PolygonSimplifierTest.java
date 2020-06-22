@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class PolygonSimplifierTest {
     final static PolygonRoutingTestGraph GRAPH_MOCKER = PolygonRoutingTestGraph.DEFAULT_INSTANCE;
 
+    private static int MAX_POLYGON_SIZE = 100;
     private static RoadGraph graph;
     private static List<NodeRelation> nodeRelations;
     private static GridIndex gridIndex;
@@ -53,7 +54,7 @@ public abstract class PolygonSimplifierTest {
     }
 
     private static void calcRelations(ImportPBF importPBF) {
-        nodeRelations = importPBF.getNodeRelations().stream().filter(a -> a.nodes.size() <= 100).collect(Collectors.toList());
+        nodeRelations = importPBF.getNodeRelations().stream().filter(a -> a.nodes.size() <= MAX_POLYGON_SIZE).collect(Collectors.toList());
         System.out.println("Relations.size(): " + nodeRelations.stream().map(a -> a.nodes.size()).collect(Collectors.toList()));
         System.out.println("Num node relations: " + nodeRelations.size());
     }
@@ -128,11 +129,11 @@ public abstract class PolygonSimplifierTest {
     }
 
     private void buildPathsAndAssertTheyDoNotChangeBySimplification(RegionOfInterest roi, Node source, Node target, RegionOfInterest simpleRoi) {
-        assertThrowPathUnchanged(roi, source, target, simpleRoi);
+        assertThroughPathUnchanged(roi, source, target, simpleRoi);
         assertAlongPathUnchanged(roi, source, target, simpleRoi);
     }
 
-    private void assertThrowPathUnchanged(RegionOfInterest roi, Node source, Node target, RegionOfInterest simpleRoi) {
+    private void assertThroughPathUnchanged(RegionOfInterest roi, Node source, Node target, RegionOfInterest simpleRoi) {
         final RegionThrough rt = new RegionThrough(graph, roadCH, gridIndex, roi);
         final RegionThrough rtSimple = new RegionThrough(graph, roadCH, gridIndex, simpleRoi);
         assertEquals(rt.findPath(source, target), rtSimple.findPath(source, target));

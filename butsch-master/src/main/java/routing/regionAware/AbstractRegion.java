@@ -16,6 +16,7 @@ import java.util.*;
 public abstract class AbstractRegion implements RoutingAlgorithm {
     final RoadGraph globalGraph;
     private final RoadCH globalCH;
+    final GridIndex index;
     final RegionOfInterest region;
     private final RoadCH regionCH;
     private final Map<Pair<Node, Node>, Path> allPathsNonBacktracked = new HashMap<>();
@@ -26,6 +27,7 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
                           final RegionOfInterest region) {
         this.globalGraph = globalGraph;
         this.globalCH = globalCH;
+        this.index = globalIndex;
         this.region = region;
 
         this.entryExitNodes = new EntryExitPointExtractor(region, globalIndex).extract();
