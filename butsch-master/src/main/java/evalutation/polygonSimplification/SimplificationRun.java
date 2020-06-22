@@ -12,6 +12,8 @@ import storage.CsvColumnDumper;
 import storage.CsvDumper;
 import storage.ImportPBF;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class SimplificationRun {
     private final static String[] DUMP_HEADER = new String[] {"id", "algo", "relationId", "time", "before", "after"};
-    private final static String RESULT_PATH = Config.ERP_PATH + "results\\simplify\\" + LocalDateTime.now() + ".csv";
+    private final static String RESULT_PATH = Config.POLY_SIMPLIFICATION + LocalDateTime.now().toString().replaceAll(":", "_") + ".csv";
     private final static char DELIMITER = ',';
     private final PolygonSimplifier simple;
     private final PolygonSimplifier extended;
@@ -29,6 +31,8 @@ public class SimplificationRun {
     private List<List<Object>> results;
 
     public SimplificationRun(String dataPath, int maxPolySize) {
+        failOnNonExistingPath();
+
         final DataInstance instance = DataInstance.createFromImporter(new ImportPBF(dataPath));
 
         simple = new PolygonSimplifierSimpleGreedy(instance.index);
@@ -38,6 +42,15 @@ public class SimplificationRun {
         relations = instance.relations.stream()
                 .filter(r -> r.nodes.size() <= maxPolySize)
                 .collect(Collectors.toList());
+    }
+
+    private void failOnNonExistingPath() {
+        final String parent = new File(RESULT_PATH).getParent();
+        File directory = new File(parent);
+        if (!directory.exists()) {
+            new FileNotFoundException(directory.toString()).printStackTrace();
+            System.exit(-1);
+        }
     }
 
     public void run() {
@@ -53,6 +66,12 @@ public class SimplificationRun {
     }
 
     private List<List<Object>> measure() {
+        prepareResults();
+        execute();
+        return results;
+    }
+
+    private void prepareResults() {
         results = new ArrayList<>(6);
         results.add(new ArrayList<>(relations.size() * 3));
         results.add(new ArrayList<>(relations.size() * 3));
@@ -60,9 +79,12 @@ public class SimplificationRun {
         results.add(new ArrayList<>(relations.size() * 3));
         results.add(new ArrayList<>(relations.size() * 3));
         results.add(new ArrayList<>(relations.size() * 3));
+    }
 
+    private void execute() {
         int id = 0;
         for (NodeRelation relation : relations) {
+            System.out.println("Run# " + id / 3 + "/" + relations.size() + ", relation-id: " + relation.id);
             final Polygon polygon = relation.toPolygon();
 
             final Result[] result = new Result[3];
@@ -77,7 +99,6 @@ public class SimplificationRun {
             addPolygonSizeBeforeSimplificiation(polygon);
             addPolygonSizeAfterSimplification(result);
         }
-        return results;
     }
 
     private int addId(int id) {
