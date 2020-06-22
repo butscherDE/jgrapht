@@ -32,6 +32,7 @@ public class RegionSubGraphBuilder {
         addNodesWhite();
         addEdges();
 
+        isNodeInRegion.clear();
         return subGraph;
     }
 
@@ -46,6 +47,7 @@ public class RegionSubGraphBuilder {
         addNodesWhiteBlack();
         addEdges();
 
+        isNodeInRegion.clear();
         return subGraph;
     }
 

@@ -1,13 +1,13 @@
 package evalutation.polygonSimplification;
 
+import data.Node;
 import data.NodeRelation;
+import data.RegionOfInterest;
+import data.RoadGraph;
 import evalutation.Config;
 import evalutation.DataInstance;
 import org.locationtech.jts.geom.Polygon;
-import routing.regionAware.util.PolygonSimplifier;
-import routing.regionAware.util.PolygonSimplifierExtendedGreedy;
-import routing.regionAware.util.PolygonSimplifierFullGreedy;
-import routing.regionAware.util.PolygonSimplifierSimpleGreedy;
+import routing.regionAware.util.*;
 import storage.CsvColumnDumper;
 import storage.CsvDumper;
 import storage.ImportPBF;
@@ -16,8 +16,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SimplificationRun {
@@ -39,8 +38,15 @@ public class SimplificationRun {
         extended = new PolygonSimplifierExtendedGreedy(instance.index);
         full = new PolygonSimplifierFullGreedy(instance.index);
 
+        final RegionSubGraphBuilder regionSubGraphBuilder = new RegionSubGraphBuilder();
         relations = instance.relations.stream()
                 .filter(r -> r.nodes.size() <= maxPolySize)
+                .filter(r -> {
+                    final RegionOfInterest roi = new RegionOfInterest(r.toPolygon());
+                    final Set<Node> entryExitNodes = new EntryExitPointExtractor(roi, instance.index).extract();
+                    final RoadGraph subGraph = regionSubGraphBuilder.getSubGraph(instance.graph, roi, entryExitNodes);
+                    return subGraph.vertexSet().size() > 1;
+                })
                 .collect(Collectors.toList());
     }
 

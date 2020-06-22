@@ -14,4 +14,8 @@ public class BinaryHashFunction<T> {
 
         return value == null ? false : value;
     }
+
+    public void clear() {
+        hashMap.clear();
+    }
 }
