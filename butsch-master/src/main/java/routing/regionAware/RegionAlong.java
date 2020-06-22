@@ -71,9 +71,11 @@ public class RegionAlong extends AbstractRegion {
     private void addInternalNodesEdges(List<ReflectiveEdge> edges, Set<Node> nodes, RoadGraph regionGraph) {
         nodes.forEach(node -> regionGraph.addVertex(node));
         edges.forEach(edge -> {
-            final Edge regionEdge = regionGraph.addEdge(edge.source, edge.target);
-            final double edgeWeight = globalGraph.getEdgeWeight(globalGraph.getEdge(edge.source, edge.target));
-            regionGraph.setEdgeWeight(regionEdge, edgeWeight);
+            if (!regionGraph.containsEdge(edge.source, edge.target)) {
+                final Edge regionEdge = regionGraph.addEdge(edge.source, edge.target);
+                final double edgeWeight = globalGraph.getEdgeWeight(globalGraph.getEdge(edge.source, edge.target));
+                regionGraph.setEdgeWeight(regionEdge, edgeWeight);
+            }
         });
     }
 
