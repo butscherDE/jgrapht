@@ -105,7 +105,7 @@ public abstract class PolygonSimplifierTest {
         int i = 0;
         int skipped = 0;
         for (final NodeRelation nodeRelation : nodeRelations) {
-//            System.out.println(i++ + ", id: " + nodeRelation.id + ", size: " + nodeRelation.nodes.size());
+            System.out.println(i++ + ", id: " + nodeRelation.id + ", size: " + nodeRelation.nodes.size());
             final RegionOfInterest roi = new RegionOfInterest(nodeRelation.nodes);
             final Node source = nodes.get(random.nextInt(nodes.size()));
             final Node target = nodes.get(random.nextInt(nodes.size()));
@@ -136,13 +136,17 @@ public abstract class PolygonSimplifierTest {
     private void assertThroughPathUnchanged(RegionOfInterest roi, Node source, Node target, RegionOfInterest simpleRoi) {
         final RegionThrough rt = new RegionThrough(graph, roadCH, gridIndex, roi);
         final RegionThrough rtSimple = new RegionThrough(graph, roadCH, gridIndex, simpleRoi);
-        assertEquals(rt.findPath(source, target), rtSimple.findPath(source, target));
+        final Path greaterPath = rt.findPath(source, target);
+        final Path smallerPath = rtSimple.findPath(source, target);
+        assertEquals(greaterPath, smallerPath);
     }
 
     private void assertAlongPathUnchanged(RegionOfInterest roi, Node source, Node target, RegionOfInterest simpleRoi) {
         final RegionAlong ra = new RegionAlong(graph, roadCH, gridIndex, roi);
         final RegionAlong raSimple = new RegionAlong(graph, roadCH, gridIndex, simpleRoi);
-        assertEquals(ra.findPath(source, target), raSimple.findPath(source, target));
+        final Path greaterPath = ra.findPath(source, target);
+        final Path smallerPath = raSimple.findPath(source, target);
+        assertEquals(greaterPath, smallerPath);
     }
 
     private int checkEmptyRegion(int skipped, RegionOfInterest roi, RegionOfInterest simpleRoi, IllegalArgumentException e) {
