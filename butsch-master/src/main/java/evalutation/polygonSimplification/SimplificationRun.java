@@ -90,7 +90,7 @@ public class SimplificationRun {
     private void execute() {
         int id = 0;
         for (NodeRelation relation : relations) {
-            System.out.println(LocalDateTime.now() + ": Run# " + (id / 3 + 1) + "/" + relations.size() + ", relation-id: " + relation.id);
+            System.out.println(LocalDateTime.now() + ": Run# " + (id / 3 + 1) + "/" + relations.size() + ", relation-id: " + relation.id + ", size: " + relation.nodes.size());
             final Polygon polygon = relation.toPolygon();
 
             final Result[] result = new Result[3];
