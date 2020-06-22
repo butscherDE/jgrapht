@@ -109,9 +109,9 @@ public class RPHASTManyToMany<V, E> {
 
     public void resetCosts() {
         cost.clear();
-//        targets.forEach(target -> {
-//            cost.put(getChVertex(target), Double.POSITIVE_INFINITY);
-//        });
+        targets.forEach(target -> {
+            cost.put(getChVertex(target), Double.POSITIVE_INFINITY);
+        });
     }
 
     private void findUpwardsEdges(final V source) {
@@ -157,6 +157,17 @@ public class RPHASTManyToMany<V, E> {
 
     private List<GraphPath<V, E>> backtrackPathForEachTarget(final ContractionVertex<V> source) {
         final List<GraphPath<V, E>> paths = new LinkedList<>();
+
+        System.out.println(targets);
+        System.out.println(cost.keySet().stream().map(n -> n.vertex).collect(Collectors.toList()));
+
+        targets.forEach(t -> {
+            if (cost.get(getChVertex(t)) == null) {
+                System.out.println(t);
+                System.exit(-1);
+            }
+
+        });
 
         if (enableBacktrack) {
             for (final V target : targets) {
