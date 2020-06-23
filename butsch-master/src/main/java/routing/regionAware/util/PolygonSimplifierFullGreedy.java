@@ -5,7 +5,7 @@ import org.locationtech.jts.geom.Polygon;
 
 import java.util.Arrays;
 
-public class PolygonSimplifierFullGreedy implements PolygonSimplifier {
+public class PolygonSimplifierFullGreedy extends PolygonSimplifier {
     private final GridIndex gridIndex;
 
     public PolygonSimplifierFullGreedy(GridIndex gridIndex) {
@@ -33,6 +33,7 @@ public class PolygonSimplifierFullGreedy implements PolygonSimplifier {
             simplified = maxSetSize[0] + maxSetSize[1] > 0;
             if (simplified) {
                 polygon = new PolygonLineContractor(polygon, maxSetIndex).getPolygon(maxSetSize[0], maxSetSize[1]);
+                contractions++;
             }
         }
 

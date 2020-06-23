@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SimplificationRun {
-    private final static String[] DUMP_HEADER = new String[] {"id", "algo", "relationId", "time", "before", "after"};
+    private final static String[] DUMP_HEADER = new String[] {"id", "algo", "relationId", "time", "contractions", "before", "after"};
     private final static String RESULT_PATH = Config.POLY_SIMPLIFICATION + LocalDateTime.now().toString().replaceAll(":", "_") + ".csv";
     private final static char DELIMITER = ',';
     private final PolygonSimplifier simple;
@@ -78,7 +78,8 @@ public class SimplificationRun {
     }
 
     private void prepareResults() {
-        results = new ArrayList<>(6);
+        results = new ArrayList<>(7);
+        results.add(new ArrayList<>(relations.size() * 3));
         results.add(new ArrayList<>(relations.size() * 3));
         results.add(new ArrayList<>(relations.size() * 3));
         results.add(new ArrayList<>(relations.size() * 3));
@@ -102,6 +103,7 @@ public class SimplificationRun {
             addAlgorithmName();
             addRelationId(relation);
             addSimplificationtime(result);
+            addNumContractions(result);
             addPolygonSizeBeforeSimplificiation(polygon);
             addPolygonSizeAfterSimplification(result);
         }
@@ -132,16 +134,22 @@ public class SimplificationRun {
         }
     }
 
+    private void addNumContractions(Result[] result) {
+        for (Result res : result) {
+            results.get(4).add(res.contractions);
+        }
+    }
+
     private void addPolygonSizeBeforeSimplificiation(Polygon polygon) {
         final int polygonSizeBefore = getPolygonSize(polygon);
-        results.get(4).add(polygonSizeBefore);
-        results.get(4).add(polygonSizeBefore);
-        results.get(4).add(polygonSizeBefore);
+        results.get(5).add(polygonSizeBefore);
+        results.get(5).add(polygonSizeBefore);
+        results.get(5).add(polygonSizeBefore);
     }
 
     private void addPolygonSizeAfterSimplification(Result[] result) {
         for (Result res : result) {
-            results.get(5).add(getPolygonSize(res.polygon));
+            results.get(6).add(getPolygonSize(res.polygon));
         }
     }
 
@@ -153,18 +161,21 @@ public class SimplificationRun {
         final long start = System.nanoTime();
         final Polygon simplePolygon = simplifier.simplify(polygon);
         final long end = System.nanoTime();
+        final int contractions = simplifier.getContractions();
 
-        return new Result(end - start, simplePolygon);
+        return new Result(end - start, simplePolygon, contractions);
     }
 
 
     private class Result {
         public final long nanos;
         public final Polygon polygon;
+        public final int contractions;
 
-        public Result(long nanos, Polygon polygon) {
+        public Result(long nanos, Polygon polygon, final int contractions) {
             this.nanos = nanos;
             this.polygon = polygon;
+            this.contractions = contractions;
         }
     }
 

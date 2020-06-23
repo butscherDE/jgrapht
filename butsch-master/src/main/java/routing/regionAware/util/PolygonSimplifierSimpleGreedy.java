@@ -5,7 +5,7 @@ import org.locationtech.jts.geom.Polygon;
 
 import java.util.Random;
 
-public class PolygonSimplifierSimpleGreedy implements PolygonSimplifier {
+public class PolygonSimplifierSimpleGreedy extends PolygonSimplifier {
     private final GridIndex gridIndex;
     private final Random random = new Random();
 
@@ -27,6 +27,7 @@ public class PolygonSimplifierSimpleGreedy implements PolygonSimplifier {
             simplified = contractionSetSize[0] + contractionSetSize[1] > 0;
             if (simplified) {
                 polygon = new PolygonLineContractor(polygon, index).getPolygon(contractionSetSize[0], contractionSetSize[1]);
+                contractions++;
             }
         }
 
