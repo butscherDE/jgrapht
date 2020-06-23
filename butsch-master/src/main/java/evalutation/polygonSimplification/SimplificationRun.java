@@ -130,8 +130,12 @@ public class SimplificationRun {
 
     private void addSimplificationtime(Result[] result) {
         for (Result res : result) {
-            results.get(3).add(res.nanos / 1e9);
+            results.get(3).add(getNanosAsSeconds(res));
         }
+    }
+
+    private double getNanosAsSeconds(final Result res) {
+        return res.nanos / 1e9;
     }
 
     private void addNumContractions(Result[] result) {
