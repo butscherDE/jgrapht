@@ -164,6 +164,12 @@ public class ImportPBF implements GraphImporter {
             isRoad.put("emergency_bay", false);
             isRoad.put("stairs", false);
             isRoad.put("razed", false);
+            isRoad.put("dismantled", false);
+            isRoad.put("no", false);
+            isRoad.put("traffic_island", false);
+            isRoad.put("via_ferrata", false);
+            isRoad.put("ramp", false);
+            isRoad.put("access_ramp", false);
         }
 
         @Override
