@@ -86,18 +86,12 @@ public class ImportPBF implements GraphImporter {
         private final ReentrantLock lock = new ReentrantLock();
         final Map<Long, Node> nodes = Collections.synchronizedMap(new HashMap<>());
 
-        int c = 0;
         @Override
         public void accept(final com.wolt.osm.parallelpbf.entity.Node node) {
             lock.lock();
-            c++;
             final data.Node internalNodeFormat = new Node(node.getId(), node.getLon(), node.getLat(), 0);
 
             nodes.put(internalNodeFormat.id, internalNodeFormat);
-            c--;
-            if (c != 0) {
-                System.err.println("node not zero: " + c);
-            }
             lock.unlock();
         }
     }
@@ -305,12 +299,16 @@ public class ImportPBF implements GraphImporter {
             final Map<String, String> tags = relation.getTags();
             final String type = tags.get("type");
             final String landuse = tags.get("landuse");
-            if ((type != null && type.equals("boundary")) ||
-                (landuse != null) && landuse.equals("forest") ||
-                (type != null) && type.equals("multipolygon")) {
+            if (isNodeDescription(type, landuse)) {
                 relations.put(relation.getId(), relation);
             }
             lock.unlock();
+        }
+
+        public boolean isNodeDescription(final String type, final String landuse) {
+            return (type != null && type.equals("boundary")) ||
+                (landuse != null) && landuse.equals("forest") ||
+                (type != null) && type.equals("multipolygon");
         }
 
         public List<NodeRelation> getNodeRelations() {
