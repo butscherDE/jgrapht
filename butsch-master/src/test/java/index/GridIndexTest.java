@@ -16,6 +16,7 @@ import util.PolygonRoutingTestGraph;
 
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -262,6 +263,47 @@ public class GridIndexTest {
         gridIndex.queryVisibilityCells(limiter, visitor);
 
         visitor.getVisibilityCells().stream().forEach(a -> System.out.println(VCNodeTranslator.getNodeIDs(a, gridIndex)));
+    }
+
+    @Test
+    public void testDump() {
+        final GridIndex index = getDumpIndex();
+
+        final String expectedDump = "0.0\n" +
+                                    "1.0\n" +
+                                    "0.0\n" +
+                                    "1.0\n" +
+                                    "3\n" +
+                                    "3\n" +
+                                    "0|319572,319574|12408,12409\n" +
+                                    "0|319572,319574|12408,12409\n" +
+                                    "0|319572,319574|12408,12409\n" +
+                                    "|319572|\n" +
+                                    "|319572|\n" +
+                                    "|319572|\n" +
+                                    "-1,1|319571,319572,319573|\n" +
+                                    "-1,1|319571,319572,319573|\n" +
+                                    "-1,1|319571,319572,319573|";
+        final String dump = index.dump().collect(Collectors.joining("\n"));
+
+        assertEquals(expectedDump, dump);
+    }
+
+    public GridIndex getDumpIndex() {
+        final RoadGraph graph = new RoadGraph(Edge.class);
+
+        final Node[] nodes = new Node[] {
+                new Node(0,0,0,0),
+                new Node(1,1,1,0),
+                new Node(2,0,1,0)
+        };
+        graph.addVertex(nodes[0]);
+        graph.addVertex(nodes[1]);
+        graph.addVertex(nodes[2]);
+        graph.addEdge(nodes[0], nodes[1]);
+        graph.addEdge(nodes[1], nodes[2]);
+        graph.addEdge(nodes[2], nodes[0]);
+        return new GridIndex(graph,3,3);
     }
 
     private class OddIdVisitor implements Index.IndexVisitor<Node> {

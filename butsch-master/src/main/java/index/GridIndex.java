@@ -414,6 +414,17 @@ public class GridIndex implements Index {
         public int hashCode() {
             return Objects.hash(nodes, edges);
         }
+
+        public String dump() {
+            final String nodesDump = nodes.stream().map(n -> String.valueOf(n.id)).collect(Collectors.joining(","));
+            final String edgesDump = edges.stream().map(e -> String.valueOf(e.id)).collect(Collectors.joining(","));
+            final String vcDump = visibilityCells
+                    .stream()
+                    .map(vc -> String.valueOf(vc.id))
+                    .collect(Collectors.joining(","));
+
+            return nodesDump + "|" + edgesDump + "|" + vcDump;
+        }
     }
 
     private class CellHullCreator {
@@ -668,7 +679,26 @@ public class GridIndex implements Index {
         }
     }
 
-    public Stream<String> gridIndexDump() {
-        return null;
+    public Stream<String> dump() {
+        final Stream.Builder<String> sb = Stream.builder();
+
+        sb.add(String.valueOf(indexBounds.minLongitude));
+        sb.add(String.valueOf(indexBounds.maxLongitude));
+        sb.add(String.valueOf(indexBounds.minLatitude));
+        sb.add(String.valueOf(indexBounds.maxLatitude));
+        sb.add(String.valueOf(cells.length));
+        sb.add(String.valueOf(cells[0].length));
+
+        for (int i = 0; i < cells.length; i++) {
+            final GridCell[] column = cells[i];
+
+            for (int j = 0; j < column.length; j++) {
+                final GridCell cell = column[i];
+
+                sb.add(cell.dump());
+            }
+        }
+
+        return sb.build();
     }
 }
