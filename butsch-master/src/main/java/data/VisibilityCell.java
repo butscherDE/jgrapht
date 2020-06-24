@@ -8,16 +8,21 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.locationtech.jts.geom.*;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class VisibilityCell implements PolygonSegmentCollection {
+    private static AtomicLong AUTO_ID = new AtomicLong(0);
     private static final GeometryFactory gf = new GeometryFactory();
+
+    public final long id;
     public final List<LineSegment> lineSegments;
     private final Coordinate[] coordinates;
     public final List<ReflectiveEdge> edges;
 
-    private VisibilityCell(final List<LineSegment> lineSegments, final Coordinate[] coordinates,
+    private VisibilityCell(final long id, final List<LineSegment> lineSegments, final Coordinate[] coordinates,
                            final List<ReflectiveEdge> edges) {
+        this.id = id;
         this.lineSegments = lineSegments;
         this.coordinates = coordinates;
         this.edges = edges;
@@ -35,6 +40,22 @@ public class VisibilityCell implements PolygonSegmentCollection {
             throw new IllegalArgumentException("Coordinates do not form a closed LineString");
         }
 
+        final List<LineSegment> lineSegments = getLineSegments(coordinates);
+
+        return new VisibilityCell(AUTO_ID.getAndIncrement(), lineSegments, coordinates, edges);
+    }
+
+    public static VisibilityCell create(final long id, final Coordinate[] coordinates, final List<ReflectiveEdge> edges) {
+        if (!coordinates[0].equals(coordinates[coordinates.length - 1])) {
+            throw new IllegalArgumentException("Coordinates do not form a closed LineString");
+        }
+
+        final List<LineSegment> lineSegments = getLineSegments(coordinates);
+
+        return new VisibilityCell(id, lineSegments, coordinates, edges);
+    }
+
+    public static List<LineSegment> getLineSegments(final Coordinate[] coordinates) {
         final List<LineSegment> lineSegments = new ArrayList<>(coordinates.length - 1);
 
         for (int i = 0; i < coordinates.length - 1; i++) {
@@ -47,8 +68,7 @@ public class VisibilityCell implements PolygonSegmentCollection {
                 lineSegments.add(new LineSegment(endCoordinate, startCoordinate));
             }
         }
-
-        return new VisibilityCell(lineSegments, coordinates, edges);
+        return lineSegments;
     }
 
     public static VisibilityCell create(final List<Node> nodes, final List<ReflectiveEdge> edges) {
@@ -66,8 +86,9 @@ public class VisibilityCell implements PolygonSegmentCollection {
     public static VisibilityCell create(final String dump, final RoadGraph graph) {
         final String[] split = dump.split("\\|");
 
-        final String coordinateDump = split[0];
-        final String edgeDump = split[1];
+        final String id = split[0];
+        final String coordinateDump = split[1];
+        final String edgeDump = split[2];
 
         final String[] coordinatesDumps = coordinateDump.split(";");
         final String[] edgesDumps = edgeDump.split(";");
@@ -75,7 +96,7 @@ public class VisibilityCell implements PolygonSegmentCollection {
         final Coordinate[] coordinates = getCoordinatesFromDumps(coordinatesDumps);
         final List<ReflectiveEdge> edges = getEdgeListFromDumps(graph, edgesDumps);
 
-        return create(coordinates, edges);
+        return create(Long.valueOf(id), coordinates, edges);
     }
 
     public static Coordinate[] getCoordinatesFromDumps(final String[] coordinatesDumps) {
@@ -176,7 +197,7 @@ public class VisibilityCell implements PolygonSegmentCollection {
         final String coordinateDump = Arrays.stream(coordinates).map(c -> toDump(c)).collect(Collectors.joining(";"));
         final String edgeDump = edges.stream().map(edge -> toDump(edge)).collect(Collectors.joining(";"));
 
-        return coordinateDump + "|" + edgeDump;
+        return id + "|" + coordinateDump + "|" + edgeDump;
     }
 
     private static String toDump(final Coordinate coordinate) {

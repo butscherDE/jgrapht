@@ -218,6 +218,6 @@ public class VisibilityCellTest {
     }
 
     public String getExpectedDump() {
-        return "0.0,25.0;8.0,25.0;3.0,20.0;0.0,25.0|1,0,1;9,1,7;4,7,0";
+        return "138|0.0,25.0;8.0,25.0;3.0,20.0;0.0,25.0|1,0,1;9,1,7;4,7,0";
     }
 }
