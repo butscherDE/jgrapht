@@ -41,7 +41,6 @@ public class NodeRelationTest {
 
     @Test
     public void relationIdNodes() {
-        System.out.println(nodeRelationFromNodes);
         assertEquals(0, nodeRelationFromNodes.id);
     }
 
