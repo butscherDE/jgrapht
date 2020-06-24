@@ -164,12 +164,35 @@ public class ImportPBF implements GraphImporter {
             isRoad.put("emergency_bay", false);
             isRoad.put("stairs", false);
             isRoad.put("razed", false);
-            isRoad.put("dismantled", false);
-            isRoad.put("no", false);
-            isRoad.put("traffic_island", false);
-            isRoad.put("via_ferrata", false);
-            isRoad.put("ramp", false);
-            isRoad.put("access_ramp", false);
+//            isRoad.put("dismantled", false);
+//            isRoad.put("no", false);
+//            isRoad.put("traffic_island", false);
+//            isRoad.put("via_ferrata", false);
+//            isRoad.put("ramp", false);
+//            isRoad.put("access_ramp", false);
+//            isRoad.put("disused", false);
+//            isRoad.put("alley", false);
+//            isRoad.put("bridge", false);
+//            isRoad.put("informal_path", false);
+//            isRoad.put("virtual", false);
+//            isRoad.put("none", false);
+//            isRoad.put("trail", false);
+//            isRoad.put("yes", false);
+//            isRoad.put("private_footway", false);
+//            isRoad.put("historic", false);
+//            isRoad.put("service;yes", false);
+//            isRoad.put("layby", false);
+//            isRoad.put("planned", false);
+//            isRoad.put("pa", false);
+//            isRoad.put("place", false);
+//            isRoad.put("demolished", false);
+//            isRoad.put("abandoned:highway", false);
+//            isRoad.put("footway;service", false);
+//            isRoad.put("schoolyard", false);
+//            isRoad.put("never_built", false);
+//            isRoad.put("tidal_path", false);
+//            isRoad.put("er", false);
+//            isRoad.put("access", false);
         }
 
         @Override
@@ -195,10 +218,10 @@ public class ImportPBF implements GraphImporter {
         public boolean isRoadByTag(final String tag) {
             final Boolean isRoad = this.isRoad.get(tag);
             if (isRoad == null) {
-                return handleTagNotFound(tag);
+                handleTagNotFound(tag);
             }
 
-            return tag != null && isRoad;
+            return tag != null && isRoad != null && isRoad;
         }
 
         public boolean handleTagNotFound(final String tag) {
