@@ -197,6 +197,16 @@ public class VisibilityCellTest {
         assertEquals(expected, dump);
     }
 
+    @Test
+    public void reimportTest() {
+        final VisibilityCell dumpVc = getDumpVc();
+        final String dump = dumpVc.dump();
+
+        final VisibilityCell reimportedVc = VisibilityCell.create(dump, graphMocker.graph);
+
+        assertEquals(dumpVc, reimportedVc);
+    }
+
     public VisibilityCell getDumpVc() {
         final RoadGraph graph = graphMocker.graph;
         final List<Node> nodes = Arrays.asList(graph.getVertex(0), graph.getVertex(1), graph.getVertex(7));
@@ -208,10 +218,6 @@ public class VisibilityCellTest {
     }
 
     public String getExpectedDump() {
-        return "{0.0,25.0,3.0,20.0}{0.0,25.0,8.0,25.0}{3.0,20.0,8.0,25.0}" +
-                                    "|" +
-                                    "{0.0,25.0}{8.0,25.0}{3.0,20.0}{0.0,25.0}" +
-                                    "|" +
-                                    "{1,0,1}{9,1,7}{4,7,0}";
+        return "0.0,25.0;8.0,25.0;3.0,20.0;0.0,25.0|1,0,1;9,1,7;4,7,0";
     }
 }

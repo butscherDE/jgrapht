@@ -8,6 +8,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.locationtech.jts.geom.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class VisibilityCell implements PolygonSegmentCollection {
     private static final GeometryFactory gf = new GeometryFactory();
@@ -15,7 +16,8 @@ public class VisibilityCell implements PolygonSegmentCollection {
     private final Coordinate[] coordinates;
     public final List<ReflectiveEdge> edges;
 
-    private VisibilityCell(final List<LineSegment> lineSegments, final Coordinate[] coordinates, final List<ReflectiveEdge> edges) {
+    private VisibilityCell(final List<LineSegment> lineSegments, final Coordinate[] coordinates,
+                           final List<ReflectiveEdge> edges) {
         this.lineSegments = lineSegments;
         this.coordinates = coordinates;
         this.edges = edges;
@@ -59,6 +61,43 @@ public class VisibilityCell implements PolygonSegmentCollection {
         coordinates[coordinates.length - 1] = nodes.get(0).getPoint().getCoordinate();
 
         return create(coordinates, edges);
+    }
+
+    public static VisibilityCell create(final String dump, final RoadGraph graph) {
+        final String[] split = dump.split("\\|");
+
+        final String coordinateDump = split[0];
+        final String edgeDump = split[1];
+
+        final String[] coordinatesDumps = coordinateDump.split(";");
+        final String[] edgesDumps = edgeDump.split(";");
+
+        final Coordinate[] coordinates = getCoordinatesFromDumps(coordinatesDumps);
+        final List<ReflectiveEdge> edges = getEdgeListFromDumps(graph, edgesDumps);
+
+        return create(coordinates, edges);
+    }
+
+    public static Coordinate[] getCoordinatesFromDumps(final String[] coordinatesDumps) {
+        System.out.println(coordinatesDumps.length);
+        return Arrays.stream(coordinatesDumps).map(cs -> {
+                final String[] elements = cs.split(",");
+                final Double x = Double.valueOf(elements[0]);
+                final Double y = Double.valueOf(elements[1]);
+                final Coordinate coordinate = new Coordinate(x, y);
+                return coordinate;
+            }).toArray(size -> new Coordinate[coordinatesDumps.length]);
+    }
+
+    public static List<ReflectiveEdge> getEdgeListFromDumps(final RoadGraph graph, final String[] edgesDumps) {
+        return Arrays.stream(edgesDumps).map(es -> {
+                final String[] elements = es.split(",");
+                final Long edgeId = Long.valueOf(elements[0]);
+                final Node sourceNode = graph.getVertex(Long.valueOf(elements[1]));
+                final Node targetNode = graph.getVertex(Long.valueOf(elements[2]));
+                final ReflectiveEdge edge = new ReflectiveEdge(edgeId, sourceNode, targetNode, graph);
+                return edge;
+            }).collect(Collectors.toList());
     }
 
     @Override
@@ -134,26 +173,17 @@ public class VisibilityCell implements PolygonSegmentCollection {
     }
 
     public String dump() {
-        final StringBuilder sb = new StringBuilder();
+        final String coordinateDump = Arrays.stream(coordinates).map(c -> toDump(c)).collect(Collectors.joining(";"));
+        final String edgeDump = edges.stream().map(edge -> toDump(edge)).collect(Collectors.joining(";"));
 
-        lineSegments.forEach(ls -> sb.append(toDump(ls)));
-        sb.append("|");
-        Arrays.stream(coordinates).forEach(coordinate -> sb.append(toDump(coordinate)));
-        sb.append("|");
-        edges.forEach(edge -> sb.append(toDump(edge)));
-
-        return sb.toString();
-    }
-
-    private static String toDump(final LineSegment ls) {
-        return "{" + ls.p0.getX() + "," + ls.p0.getY() + "," + ls.p1.getX() + "," + ls.p1.getY() + "}";
+        return coordinateDump + "|" + edgeDump;
     }
 
     private static String toDump(final Coordinate coordinate) {
-        return "{" + coordinate.getX() + "," + coordinate.getY() + "}";
+        return coordinate.getX() + "," + coordinate.getY();
     }
 
     private static String toDump(final ReflectiveEdge edge) {
-        return "{" + edge.id + "," + edge.source.id + "," + edge.target.id + "}";
+        return edge.id + "," + edge.source.id + "," + edge.target.id;
     }
 }
