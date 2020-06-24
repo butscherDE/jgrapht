@@ -216,10 +216,9 @@ public class ImportPBF implements GraphImporter {
             return tag != null && isRoad != null && isRoad;
         }
 
-        public boolean handleTagNotFound(final String tag) {
+        public void handleTagNotFound(final String tag) {
             final String errStr = "Tag " + tag + " is unknown";
             System.err.println(errStr);
-            throw new IllegalStateException(errStr);
         }
 
         private void addRoadData(Way way, List<Long> nodeIds) {
