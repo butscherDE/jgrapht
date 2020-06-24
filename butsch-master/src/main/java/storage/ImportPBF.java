@@ -185,6 +185,11 @@ public class ImportPBF implements GraphImporter {
             isRoad.put("tidal_path", false);
             isRoad.put("er", false);
             isRoad.put("access", false);
+            isRoad.put("FIXME", false);
+            isRoad.put("razed:service", false);
+            isRoad.put("loading_place", false);
+            isRoad.put("Esri World; estimate; survey", false);
+            isRoad.put("ladder", false);
         }
 
         @Override
