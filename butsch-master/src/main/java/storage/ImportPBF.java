@@ -12,12 +12,9 @@ import org.jgrapht.alg.util.Pair;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
@@ -183,17 +180,25 @@ public class ImportPBF implements GraphImporter {
         public boolean isRoad(final Way way) {
             final String tag = way.getTags().get("highway");
             if (tag != null) {
-                final Boolean isRoad = this.isRoad.get(tag);
-                if (isRoad == null) {
-                    final String errStr = "Tag " + tag + " is unknown";
-                    System.err.println(errStr);
-                    throw new IllegalStateException(errStr);
-                }
+                return isRoadByTag(tag);
+            } else {
+                return false;
+            }
+        }
 
-                return tag != null && isRoad;
+        public boolean isRoadByTag(final String tag) {
+            final Boolean isRoad = this.isRoad.get(tag);
+            if (isRoad == null) {
+                return handleTagNotFound(tag);
             }
 
-            return false;
+            return tag != null && isRoad;
+        }
+
+        public boolean handleTagNotFound(final String tag) {
+            final String errStr = "Tag " + tag + " is unknown";
+            System.err.println(errStr);
+            throw new IllegalStateException(errStr);
         }
 
         private void addRoadData(Way way, List<Long> nodeIds) {
