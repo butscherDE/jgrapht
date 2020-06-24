@@ -41,6 +41,87 @@ public class GridIndex implements Index {
         sw.printTimingIfVerbose();
     }
 
+    public GridIndex(final RoadGraph graph, final Iterator<String> dump, Map<Long, VisibilityCell> visibilityCellMap) {
+        this.graph = graph;
+        this.indexBounds = setIndexBounds(dump);
+        this.cells = setCells(dump);
+        final double longitudeRange = (indexBounds.maxLongitude + LONGITUDE_RANGE) - (indexBounds.minLongitude + LONGITUDE_RANGE);
+        final double latitudeRange = (indexBounds.maxLatitude + LATITUDE_RANGE) - (indexBounds.minLatitude + LATITUDE_RANGE);
+        this.longitudeCellSize = longitudeRange / cells.length;
+        this.latitudeCellSize = latitudeRange / cells[0].length;
+
+        for (int i = 0; i < cells.length; i++) {
+            for (int j = 0; j < cells[0].length; j++) {
+                final GridCell newCell = new GridCell();
+                cells[i][j] = newCell;
+                final String cellDump = dump.next();
+
+                final String[] elements = cellDump.split("\\|", -1);
+                final String nodeDump = elements[0];
+                final String edgeDump = elements[1];
+                final String vcDump = elements[2];
+
+                if (nodeDump.length() > 0) {
+                    addNodes(newCell, nodeDump);
+                }
+                if (edgeDump.length() > 0) {
+                    addEdges(newCell, edgeDump);
+                }
+                if (vcDump.length() > 0) {
+                    addVisibilityCells(visibilityCellMap, newCell, vcDump);
+                }
+            }
+        }
+    }
+
+    public void addNodes(final GridCell newCell, final String nodeDump) {
+        final String[] nodesStr = nodeDump.split(",");
+        final List<Node> nodes = Arrays
+                .stream(nodesStr)
+                .map(ns -> this.graph.getVertex(Long.valueOf(ns)))
+                .collect(Collectors.toList());
+        newCell.nodes.addAll(nodes);
+    }
+
+    public void addEdges(final GridCell newCell, final String edgeDump) {
+        final String[] edgeStr = edgeDump.split(";");
+        final List<Edge> edges = Arrays.stream(edgeStr).map(es -> {
+            final String[] sourceTarget = es.split(",");
+            final Node source = this.graph.getVertex(Long.valueOf(sourceTarget[0]));
+            final Node target = this.graph.getVertex(Long.valueOf(sourceTarget[1]));
+
+            final Edge edge = this.graph.getEdge(source, target);
+            return edge;
+        }).collect(Collectors.toList());
+        newCell.edges.addAll(edges);
+    }
+
+    public void addVisibilityCells(final Map<Long, VisibilityCell> visibilityCellMap, final GridCell newCell,
+                                   final String vcDump) {
+        final String[] vc = vcDump.split(",");
+        final List<VisibilityCell> visibilityCells = Arrays
+                .stream(vc)
+                .map(vcs -> visibilityCellMap.get(Long.valueOf(vcs)))
+                .collect(Collectors.toList());
+        newCell.visibilityCells.addAll(visibilityCells);
+    }
+
+    public BoundingBox setIndexBounds(final Iterator<String> dump) {
+        final double minLongitude = Double.valueOf(dump.next());
+        final double maxLongitude = Double.valueOf(dump.next());
+        final double minLatitude = Double.valueOf(dump.next());
+        final double maxLatitude = Double.valueOf(dump.next());
+
+        return new BoundingBox(minLongitude, maxLongitude, minLatitude, maxLatitude);
+    }
+
+    public GridCell[][] setCells(final Iterator<String> dump) {
+        final int longGranularity = Integer.valueOf(dump.next());
+        final int latGranularity = Integer.valueOf(dump.next());
+
+        return new GridCell[longGranularity][latGranularity];
+    }
+
     private void initCells() {
         final VisibilityCellsCreator vcc = new VisibilityCellsCreator(graph);
         final List<VisibilityCell> visibilityCells = vcc.create();
@@ -171,7 +252,8 @@ public class GridIndex implements Index {
         }
     }
 
-    private boolean isEdgeCompletelyContainedInOneCell(final Coordinate startCoordinate, final Coordinate endCoordinate) {
+    private boolean isEdgeCompletelyContainedInOneCell(final Coordinate startCoordinate,
+                                                       final Coordinate endCoordinate) {
         final int startCoordinateLongitudeIndex = getLongitudeIndex(startCoordinate.getX());
         final int endCoordinateLongitudeIndex = getLongitudeIndex(endCoordinate.getX());
         final int startCoordinateLatitudeIndex = getLatitudeIndex(startCoordinate.getY());
@@ -215,7 +297,8 @@ public class GridIndex implements Index {
         return intersectingCells;
     }
 
-    private LineSegment[] getBoundingBoxLineSegments(final int gridCellLongitudeIndex, final int gridCellLatitudeIndex) {
+    private LineSegment[] getBoundingBoxLineSegments(final int gridCellLongitudeIndex,
+                                                     final int gridCellLatitudeIndex) {
         final LineSegment[] boundingBoxLineSegments = new LineSegment[4];
 
         double cellLowerLeftLongitude = getCellLongitudeStart(gridCellLongitudeIndex);
@@ -230,10 +313,14 @@ public class GridIndex implements Index {
         @SuppressWarnings("UnnecessaryLocalVariable") double cellUpperRightLongitude = cellLowerRightLongitude;
         double cellUpperRightLatitude = cellUpperLeftLatitude;
 
-        boundingBoxLineSegments[0] = new LineSegment(cellLowerLeftLongitude, cellLowerLeftLatitude, cellUpperLeftLongitude, cellUpperLeftLatitude);
-        boundingBoxLineSegments[1] = new LineSegment(cellUpperLeftLongitude, cellUpperLeftLatitude, cellUpperRightLongitude, cellUpperRightLatitude);
-        boundingBoxLineSegments[2] = new LineSegment(cellUpperRightLongitude, cellUpperRightLatitude, cellLowerRightLongitude, cellLowerRightLatitude);
-        boundingBoxLineSegments[3] = new LineSegment(cellLowerRightLongitude, cellLowerRightLatitude, cellLowerLeftLongitude, cellLowerLeftLatitude);
+        boundingBoxLineSegments[0] = new LineSegment(cellLowerLeftLongitude, cellLowerLeftLatitude,
+                                                     cellUpperLeftLongitude, cellUpperLeftLatitude);
+        boundingBoxLineSegments[1] = new LineSegment(cellUpperLeftLongitude, cellUpperLeftLatitude,
+                                                     cellUpperRightLongitude, cellUpperRightLatitude);
+        boundingBoxLineSegments[2] = new LineSegment(cellUpperRightLongitude, cellUpperRightLatitude,
+                                                     cellLowerRightLongitude, cellLowerRightLatitude);
+        boundingBoxLineSegments[3] = new LineSegment(cellLowerRightLongitude, cellLowerRightLatitude,
+                                                     cellLowerLeftLongitude, cellLowerLeftLatitude);
 
         return boundingBoxLineSegments;
     }
@@ -251,7 +338,7 @@ public class GridIndex implements Index {
     }
 
     private void addVisibilityCellToGridCells(final VisibilityCell visibilityCell) {
-        final BoundingBox vcBoundingBox  = BoundingBox.createFrom(visibilityCell);
+        final BoundingBox vcBoundingBox = BoundingBox.createFrom(visibilityCell);
 
         final int minLongIndex = getLongitudeIndex(vcBoundingBox.minLongitude);
         final int maxLongIndex = getLongitudeIndex(vcBoundingBox.maxLongitude);
@@ -314,15 +401,15 @@ public class GridIndex implements Index {
         final CellHullCreator hullCreator = new CellHullCreator(coordinate);
 
         Edge minEdge = null;
-        while (minEdge == null)
-        {
+        while (minEdge == null) {
             final List<GridCell> cellBlock = hullCreator.getSurroundingCells();
 
             final List<Edge> minDistanceEdgesPerCell = cellBlock
                     .stream()
                     .map(a -> saveMinEdge(a.edges, Comparator.comparingDouble(b -> getDistance(coordinate, b))))
                     .collect(Collectors.toList());
-            minEdge = Collections.min(minDistanceEdgesPerCell, Comparator.comparingDouble(a -> getDistance(coordinate, a)));
+            minEdge = Collections.min(minDistanceEdgesPerCell,
+                                      Comparator.comparingDouble(a -> getDistance(coordinate, a)));
         }
 
         return minEdge;
@@ -387,7 +474,7 @@ public class GridIndex implements Index {
         return lineSegment2.intersection(lineSegment) != null;
     }
 
-    private static class GridCell {
+    private class GridCell {
         // Initial size = 0 because in various szenarios most cells are empty.
         final List<Node> nodes = new ArrayList<>(0);
         final List<Edge> edges = new ArrayList<>(0);
@@ -417,7 +504,10 @@ public class GridIndex implements Index {
 
         public String dump() {
             final String nodesDump = nodes.stream().map(n -> String.valueOf(n.id)).collect(Collectors.joining(","));
-            final String edgesDump = edges.stream().map(e -> String.valueOf(e.id)).collect(Collectors.joining(","));
+            final String edgesDump = edges
+                    .stream()
+                    .map(e -> graph.getEdgeSource(e).id + "," + graph.getEdgeTarget(e).id)
+                    .collect(Collectors.joining(";"));
             final String vcDump = visibilityCells
                     .stream()
                     .map(vc -> String.valueOf(vc.id))
@@ -522,10 +612,12 @@ public class GridIndex implements Index {
     }
 
     public <T> void queryGraphEntity(final BoundingBox limiter, final IndexVisitor visitor,
-                                 final Function<GridCell, Stream<? extends T>> gridCellStreamFunction) {
+                                     final Function<GridCell, Stream<? extends T>> gridCellStreamFunction) {
         final Set<GridCell> cellsOverlappingLimiter = getCellsInLimiter(limiter);
-        final Set<T> allEntitiesInCells = cellsOverlappingLimiter.stream().flatMap(gridCellStreamFunction).collect(
-                Collectors.toSet());
+        final Set<T> allEntitiesInCells = cellsOverlappingLimiter
+                .stream()
+                .flatMap(gridCellStreamFunction)
+                .collect(Collectors.toSet());
 
         if (visitor instanceof GridIndexVisitor) {
             final GridIndexVisitor gridIndexVisitor = (GridIndexVisitor) visitor;
@@ -546,11 +638,11 @@ public class GridIndex implements Index {
             final Node node = (Node) graphEntity;
 
             return getBoundingBox(node);
-        } else if (graphEntity instanceof  Edge){
+        } else if (graphEntity instanceof Edge) {
             final Edge edge = (Edge) graphEntity;
 
             return getBoundingBox(edge);
-        } else if (graphEntity instanceof  VisibilityCell) {
+        } else if (graphEntity instanceof VisibilityCell) {
             final VisibilityCell vc = (VisibilityCell) graphEntity;
 
             return getBoundingBox(vc);
@@ -601,7 +693,8 @@ public class GridIndex implements Index {
         final Set<GridCell> gridCellsOverlappingLimiter = new LinkedHashSet<>();
         addBorderCellNodes(limiter, minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex,
                            gridCellsOverlappingLimiter);
-        addInnerCellNodes(minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex, gridCellsOverlappingLimiter);
+        addInnerCellNodes(minLongitudeIndex, maxLongitudeIndex, minLatitudeIndex, maxLatitudeIndex,
+                          gridCellsOverlappingLimiter);
         return gridCellsOverlappingLimiter;
     }
 

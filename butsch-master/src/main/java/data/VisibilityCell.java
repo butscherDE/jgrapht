@@ -84,7 +84,7 @@ public class VisibilityCell implements PolygonSegmentCollection {
     }
 
     public static VisibilityCell create(final String dump, final RoadGraph graph) {
-        final String[] split = dump.split("\\|");
+        final String[] split = dump.split("\\|", -1);
 
         final String id = split[0];
         final String coordinateDump = split[1];

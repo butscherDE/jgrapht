@@ -17,6 +17,7 @@ import util.PolygonRoutingTestGraph;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -275,18 +276,35 @@ public class GridIndexTest {
                                     "1.0\n" +
                                     "3\n" +
                                     "3\n" +
-                                    "0|319572,319574|12408,12409\n" +
-                                    "0|319572,319574|12408,12409\n" +
-                                    "0|319572,319574|12408,12409\n" +
-                                    "|319572|\n" +
-                                    "|319572|\n" +
-                                    "|319572|\n" +
-                                    "-1,1|319571,319572,319573|\n" +
-                                    "-1,1|319571,319572,319573|\n" +
-                                    "-1,1|319571,319572,319573|";
+                                    "0|0,1;2,0|12408,12409\n" +
+                                    "0|0,1;2,0|12408,12409\n" +
+                                    "0|0,1;2,0|12408,12409\n" +
+                                    "|0,1|\n" +
+                                    "|0,1|\n" +
+                                    "|0,1|\n" +
+                                    "-1,1|-1,-1;0,1;1,2|\n" +
+                                    "-1,1|-1,-1;0,1;1,2|\n" +
+                                    "-1,1|-1,-1;0,1;1,2|";
         final String dump = index.dump().collect(Collectors.joining("\n"));
 
         assertEquals(expectedDump, dump);
+    }
+
+    @Test
+    public void reimport() {
+        final GridIndex dumpIndex = getDumpIndex();
+        final Stream<String> firstDump = dumpIndex.dump();
+
+        final Map<Long, VisibilityCell> vcMap = new HashMap<>();
+        final AllVCsLogger logger = new AllVCsLogger();
+        dumpIndex.queryVisibilityCells(new BoundingBox(-1, 2, -1, 2), logger);
+        logger.vcs.forEach(vc -> vcMap.put(vc.id, vc));
+
+        final List<String> dumpAsList = firstDump.collect(Collectors.toList());
+        final GridIndex reimportedIndex = new GridIndex(dumpIndex.graph, dumpAsList.iterator(),
+                                                        vcMap);
+
+        assertEquals(dumpAsList, reimportedIndex.dump().collect(Collectors.toList()));
     }
 
     public GridIndex getDumpIndex() {
