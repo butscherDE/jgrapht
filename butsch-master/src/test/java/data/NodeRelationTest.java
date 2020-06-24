@@ -5,11 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
+import util.PolygonRoutingTestGraph;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -125,5 +123,35 @@ public class NodeRelationTest {
         final String actualString = nodeRelation.toString();
 
         assertEquals(expectedString, actualString);
+    }
+
+    @Test
+    public void dump() {
+        final RoadGraph graph = PolygonRoutingTestGraph.DEFAULT_INSTANCE.graph;
+        final NodeRelation nodeRelation = getDumpRelation(graph);
+
+        final String dump = nodeRelation.dump();
+        assertEquals("1|desc|highway=primary,oneway=yes|0,1,2", dump);
+    }
+
+    @Test
+    public void reimport() {
+        final RoadGraph graph = PolygonRoutingTestGraph.DEFAULT_INSTANCE.graph;
+
+        final String dump = getDumpRelation(graph).dump();
+        final NodeRelation reimportedRelation = NodeRelation.createFromDump(dump, graph);
+
+        assertEquals(25, reimportedRelation.nodes.get(0).latitude);
+        assertEquals(dump, reimportedRelation.dump());
+    }
+
+    public NodeRelation getDumpRelation(final RoadGraph graph) {
+        final List<Node> list = Arrays.asList(graph.getVertex(0),
+                                              graph.getVertex(1),
+                                              graph.getVertex(2));
+        final Map<String, String> tags = new HashMap<>();
+        tags.put("highway", "primary");
+        tags.put("oneway", "yes");
+        return new NodeRelation(1, "desc", tags, list);
     }
 }

@@ -5,6 +5,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class NodeRelation {
     public final long id;
@@ -53,6 +54,27 @@ public class NodeRelation {
         return new NodeRelation(id, description, tags, nodes);
     }
 
+    public static NodeRelation createFromDump(final String dump, final RoadGraph graph) {
+        final String[] elements = dump.split("\\|");
+        final long id = Long.valueOf(elements[0]);
+        final String description = elements[1];
+        final Map<String, String> tags = getTags(elements[2]);
+        final List<Long> nodes = Arrays
+                .stream(elements[3].split(","))
+                .map(n -> Long.valueOf(n))
+                .collect(Collectors.toList());
+
+        return createFromNodeIds(id, description, tags, nodes, graph);
+    }
+
+    private static Map<String, String> getTags(final String tagsRaw) {
+        final Map<String, String> tags = Arrays
+                .stream(tagsRaw.split(","))
+                .map(rawTag -> rawTag.split("="))
+                .collect(Collectors.toMap(p -> p[0], p -> p[1]));
+        return tags;
+    }
+
     public Polygon toPolygon() {
         final Coordinate[] coordinates = new Coordinate[nodes.size() + 1];
 
@@ -86,5 +108,12 @@ public class NodeRelation {
     @Override
     public String toString() {
         return "NodeRelation(" + id + "): " + nodes.toString();
+    }
+
+    public String dump() {
+        final String tagsRaw = this.tags.toString();
+        final String tags = tagsRaw.substring(1, tagsRaw.length() - 1).replaceAll(", ", ",");
+        final String nodeDump = nodes.stream().map(n -> String.valueOf(n.id)).collect(Collectors.joining(","));
+        return id + "|" + description + "|" + tags + "|" + nodeDump;
     }
 }
