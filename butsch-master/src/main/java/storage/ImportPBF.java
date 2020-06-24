@@ -166,29 +166,16 @@ public class ImportPBF implements GraphImporter {
             isRoad.put("abandoned", false);
             isRoad.put("emergency_bay", false);
             isRoad.put("stairs", false);
-//            isRoad.put("razed", false);
+            isRoad.put("razed", false);
         }
-AtomicInteger c = new AtomicInteger(0);
-        final Map<Long, String> activeWays = Collections.synchronizedMap(new HashMap<>());
 
         @Override
         public void accept(final Way way) {
             lock.lock();
-            if (way.getId() == 122071860L) {
-                int i = 0;
-            }
-            c.incrementAndGet();
-            activeWays.put(way.getId(), way.getTags().get("highway"));
             ways.put(way.getId(), way);
             final List<Long> nodeIds = way.getNodes();
             if (isRoad(way)) {
                 addRoadData(way, nodeIds);
-            }
-            activeWays.remove(way.getId());
-            if (c.decrementAndGet() != 0) {
-//                System.err.println(" edge not zero: " + c);
-//                System.err.println(activeWays);
-                System.exit(-1);
             }
             lock.unlock();
         }
@@ -198,7 +185,9 @@ AtomicInteger c = new AtomicInteger(0);
             if (tag != null) {
                 final Boolean isRoad = this.isRoad.get(tag);
                 if (isRoad == null) {
-                    throw new IllegalStateException("Tag " + tag + " is unknown");
+                    final String errStr = "Tag " + tag + " is unknown";
+                    System.err.println(errStr);
+                    throw new IllegalStateException(errStr);
                 }
 
                 return tag != null && isRoad;
