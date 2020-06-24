@@ -12,7 +12,12 @@ import org.jgrapht.alg.util.Pair;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
@@ -56,9 +61,6 @@ public class ImportPBF implements GraphImporter {
                 .onChangeset(new DummyChangeSet())
                 .onComplete(new Completer())
                 .parse();
-
-        // TODO This is super dirty, but necessary as .parse() doesn't wait for thread termination in executor pool.
-        try {Thread.sleep(5000);} catch (Exception e) {}
     }
 
     private void addGraphData() {
@@ -89,12 +91,18 @@ public class ImportPBF implements GraphImporter {
         private final ReentrantLock lock = new ReentrantLock();
         final Map<Long, Node> nodes = Collections.synchronizedMap(new HashMap<>());
 
+        int c = 0;
         @Override
         public void accept(final com.wolt.osm.parallelpbf.entity.Node node) {
             lock.lock();
+            c++;
             final data.Node internalNodeFormat = new Node(node.getId(), node.getLon(), node.getLat(), 0);
 
             nodes.put(internalNodeFormat.id, internalNodeFormat);
+            c--;
+            if (c != 0) {
+                System.err.println("node not zero: " + c);
+            }
             lock.unlock();
         }
     }
@@ -154,23 +162,49 @@ public class ImportPBF implements GraphImporter {
             isRoad.put("turning_circle", true);
             isRoad.put("turning_loop", true);
             isRoad.put("toll_gantry", true);
+            isRoad.put("proposed", false);
+            isRoad.put("abandoned", false);
+            isRoad.put("emergency_bay", false);
+            isRoad.put("stairs", false);
+//            isRoad.put("razed", false);
         }
+AtomicInteger c = new AtomicInteger(0);
+        final Map<Long, String> activeWays = Collections.synchronizedMap(new HashMap<>());
 
         @Override
         public void accept(final Way way) {
             lock.lock();
+            if (way.getId() == 122071860L) {
+                int i = 0;
+            }
+            c.incrementAndGet();
+            activeWays.put(way.getId(), way.getTags().get("highway"));
             ways.put(way.getId(), way);
             final List<Long> nodeIds = way.getNodes();
             if (isRoad(way)) {
                 addRoadData(way, nodeIds);
+            }
+            activeWays.remove(way.getId());
+            if (c.decrementAndGet() != 0) {
+//                System.err.println(" edge not zero: " + c);
+//                System.err.println(activeWays);
+                System.exit(-1);
             }
             lock.unlock();
         }
 
         public boolean isRoad(final Way way) {
             final String tag = way.getTags().get("highway");
-            return tag != null && isRoad.get(tag);
-//            return way.getTags().get("highway") != null;
+            if (tag != null) {
+                final Boolean isRoad = this.isRoad.get(tag);
+                if (isRoad == null) {
+                    throw new IllegalStateException("Tag " + tag + " is unknown");
+                }
+
+                return tag != null && isRoad;
+            }
+
+            return false;
         }
 
         private void addRoadData(Way way, List<Long> nodeIds) {
@@ -244,9 +278,17 @@ public class ImportPBF implements GraphImporter {
         final Map<Long, Relation> relations = Collections.synchronizedMap(new HashMap<>());
         private List<Long> invalidRelations;
 
+        AtomicInteger c = new AtomicInteger(0);
+        Semaphore s = new Semaphore(1);
         @Override
         public void accept(final Relation relation) {
             lock.lock();
+            try {
+                s.acquire();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            c.incrementAndGet();
             final Map<String, String> tags = relation.getTags();
             final String type = tags.get("type");
             final String landuse = tags.get("landuse");
@@ -255,6 +297,11 @@ public class ImportPBF implements GraphImporter {
                 (type != null) && type.equals("multipolygon")) {
                 relations.put(relation.getId(), relation);
             }
+            if (
+            c.decrementAndGet() != 0) {
+                System.err.println("relation not zero: " + c);
+            }
+            s.release();
             lock.unlock();
         }
 
