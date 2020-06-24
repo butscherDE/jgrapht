@@ -132,4 +132,28 @@ public class VisibilityCell implements PolygonSegmentCollection {
     public List<LineSegment> getSortedLineSegments() {
         return lineSegments;
     }
+
+    public String dump() {
+        final StringBuilder sb = new StringBuilder();
+
+        lineSegments.forEach(ls -> sb.append(toDump(ls)));
+        sb.append("|");
+        Arrays.stream(coordinates).forEach(coordinate -> sb.append(toDump(coordinate)));
+        sb.append("|");
+        edges.forEach(edge -> sb.append(toDump(edge)));
+
+        return sb.toString();
+    }
+
+    private static String toDump(final LineSegment ls) {
+        return "{" + ls.p0.getX() + "," + ls.p0.getY() + "," + ls.p1.getX() + "," + ls.p1.getY() + "}";
+    }
+
+    private static String toDump(final Coordinate coordinate) {
+        return "{" + coordinate.getX() + "," + coordinate.getY() + "}";
+    }
+
+    private static String toDump(final ReflectiveEdge edge) {
+        return "{" + edge.id + "," + edge.source.id + "," + edge.target.id + "}";
+    }
 }

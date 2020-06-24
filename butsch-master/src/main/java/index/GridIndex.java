@@ -667,4 +667,8 @@ public class GridIndex implements Index {
             return this;
         }
     }
+
+    public Stream<String> gridIndexDump() {
+        return null;
+    }
 }
