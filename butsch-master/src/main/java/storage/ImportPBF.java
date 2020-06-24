@@ -13,8 +13,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 
@@ -301,17 +299,9 @@ public class ImportPBF implements GraphImporter {
         final Map<Long, Relation> relations = Collections.synchronizedMap(new HashMap<>());
         private List<Long> invalidRelations;
 
-        AtomicInteger c = new AtomicInteger(0);
-        Semaphore s = new Semaphore(1);
         @Override
         public void accept(final Relation relation) {
             lock.lock();
-            try {
-                s.acquire();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            c.incrementAndGet();
             final Map<String, String> tags = relation.getTags();
             final String type = tags.get("type");
             final String landuse = tags.get("landuse");
@@ -320,11 +310,6 @@ public class ImportPBF implements GraphImporter {
                 (type != null) && type.equals("multipolygon")) {
                 relations.put(relation.getId(), relation);
             }
-            if (
-            c.decrementAndGet() != 0) {
-                System.err.println("relation not zero: " + c);
-            }
-            s.release();
             lock.unlock();
         }
 
