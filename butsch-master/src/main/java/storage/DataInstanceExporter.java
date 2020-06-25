@@ -33,7 +33,7 @@ public class DataInstanceExporter {
         final VCLogger vcLogger = new VCLogger();
         index.queryVisibilityCells(new BoundingBox(-180, 180, -90, 90), vcLogger);
 
-        vcLogger.cells
+//        vcLogger.cells
     }
 
     private class VCLogger implements GridIndex.GridIndexVisitor<VisibilityCell> {
