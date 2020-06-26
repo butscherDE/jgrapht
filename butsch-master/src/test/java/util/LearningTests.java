@@ -5,7 +5,9 @@ import data.RoadGraph;
 import evalutation.Config;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.Polygon;
 import storage.ImportERPGraph;
 import visualizations.GeometryVisualizer;
 
@@ -38,5 +40,29 @@ public class LearningTests {
         assertEquals(4, iterator.next());
         assertEquals(5, iterator.next());
         assertFalse(iterator.hasNext());
+    }
+
+    @Test
+    public void translatePolygon() {
+        final Coordinate[] inCoords = new Coordinate[] {
+                new Coordinate(0,0),
+                new Coordinate(1,0),
+                new Coordinate(1,1),
+                new Coordinate(0,0)
+        };
+
+        final Polygon polygon = new GeometryFactory().createPolygon(inCoords);
+        final Coordinate[] coordinates = polygon.getCoordinates();
+        for (Coordinate coordinate : coordinates) {
+            coordinate.x += 1;
+        }
+
+        final Coordinate[] expectedCoords = {
+                new Coordinate(1, 0),
+                new Coordinate(2, 0),
+                new Coordinate(2, 1),
+                new Coordinate(1, 0)
+        };
+        assertArrayEquals(expectedCoords, polygon.getCoordinates());
     }
 }

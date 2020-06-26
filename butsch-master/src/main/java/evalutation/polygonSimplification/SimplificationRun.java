@@ -1,15 +1,13 @@
 package evalutation.polygonSimplification;
 
 import data.Node;
-import data.NodeRelation;
 import data.RegionOfInterest;
 import data.RoadGraph;
 import evalutation.Config;
 import evalutation.DataInstance;
-import geometry.CLPolygonGeneratorFactory;
-import geometry.PolygonGenerator;
-import geometry.StarPolygonGeneratorFactory;
-import geometry.TwoOptPolygonGenerator;
+import geometry.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
 import routing.regionAware.util.*;
 import storage.*;
@@ -20,13 +18,12 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class SimplificationRun {
+    private final static GeometryFactory gf = new GeometryFactory();
     private final static String[] DUMP_HEADER = new String[]{"id", "algo", "relationId", "time", "contractions", "before", "after"};
     private final static String RESULT_PATH = Config.POLY_SIMPLIFICATION + LocalDateTime.now()
             .toString()
@@ -48,27 +45,47 @@ public class SimplificationRun {
         full = new PolygonSimplifierFullGreedy(instance.index);
 
         final RegionSubGraphBuilder regionSubGraphBuilder = new RegionSubGraphBuilder();
-        relations = getRelations(maxPolySize, instance, regionSubGraphBuilder);
+        relations = getTestEntities(maxPolySize, instance, regionSubGraphBuilder);
     }
 
-    private List<TestEntity> getRelations(int maxPolySize, DataInstance instance, RegionSubGraphBuilder regionSubGraphBuilder) {
-        final Stream<TestEntity> realEntities = getRealDataStream(instance, regionSubGraphBuilder);
+    private List<TestEntity> getTestEntities(int maxPolySize, DataInstance instance, RegionSubGraphBuilder regionSubGraphBuilder) {
+        final List<TestEntity> entities = getRealDataStream(instance, regionSubGraphBuilder);
 
         try {
-            final Stream<TestEntity> starEntities = getStarStream();
-            final Stream<TestEntity> clEntities = getClStream();
-            final Stream<TestEntity> twoOptEntities = getTwoOptStream();
+            addArtificialEntities(instance, entities);
 
-            final List<TestEntity> testEntities = concatenateAndCollect(maxPolySize, realEntities, starEntities, clEntities, twoOptEntities);
-
-            return testEntities;
+            return filterEntities(maxPolySize, entities);
         } catch (IOException e) {
             e.printStackTrace();
             throw new IllegalStateException("Could not import data");
         }
     }
 
-    private Stream<TestEntity> getRealDataStream(DataInstance instance, RegionSubGraphBuilder regionSubGraphBuilder) {
+    private void addArtificialEntities(DataInstance instance, List<TestEntity> entities) throws IOException {
+        final Stream<Polygon> starEntities = getStarStream();
+        final Stream<Polygon> clEntities = getClStream();
+        final Stream<Polygon> twoOptEntities = getTwoOptStream();
+
+        final BoundingBox graphBounds = BoundingBox.createFrom(instance.graph);
+        addTransformedEntities(entities, starEntities, graphBounds);
+        addTransformedEntities(entities, clEntities, graphBounds);
+        addTransformedEntities(entities, twoOptEntities, graphBounds);
+    }
+
+    private List<TestEntity> filterEntities(int maxPolySize, List<TestEntity> entities) {
+        final List<TestEntity> sizeFilteredEntities = entities.stream()
+                .filter(e -> e.polygon.getCoordinates().length - 1 <= maxPolySize)
+                .collect(Collectors.toList());
+        return sizeFilteredEntities;
+    }
+
+    private List<TestEntity> addTransformedEntities(List<TestEntity> entities, Stream<Polygon> polygonStream, BoundingBox graphBounds) {
+        return polygonStream.map(p -> scaleAndTranslate(p, graphBounds))
+                .map(p -> new TestEntity(-1, p))
+                .collect(Collectors.toCollection(() -> entities));
+    }
+
+    private List<TestEntity> getRealDataStream(DataInstance instance, RegionSubGraphBuilder regionSubGraphBuilder) {
         return instance.relations.stream()
                     .filter(r -> {
                         final RegionOfInterest roi = new RegionOfInterest(r.toPolygon());
@@ -77,34 +94,45 @@ public class SimplificationRun {
                         return subGraph.vertexSet()
                                 .size() > 1;
                     })
-                    .map(r -> new TestEntity(r.id, r.toPolygon()));
+                    .map(r -> new TestEntity(r.id, r.toPolygon()))
+                    .collect(Collectors.toList());
     }
 
-    private Stream<TestEntity> getStarStream() throws IOException {
+    private Stream<Polygon> getStarStream() throws IOException {
         final CircularPolygonImporter starImporter = new CircularPolygonImporter(Config.POLYGON_PATH + "300_200_StarPolygonGeneratorFactory.txt");
         return starImporter.importPolygons()
-                .stream()
-                .map(p -> new TestEntity(-1, p));
+                .stream();
     }
 
-    private Stream<TestEntity> getClStream() throws IOException {
+    private Stream<Polygon> getClStream() throws IOException {
         final CircularPolygonImporter clImporter = new CircularPolygonImporter(Config.POLYGON_PATH + "300_200_CLPolygonGeneratorFactory.txt");
         return clImporter.importPolygons()
-                .stream()
-                .map(p -> new TestEntity(-2, p));
+                .stream();
     }
 
-    private Stream<TestEntity> getTwoOptStream() throws IOException {
+    private Stream<Polygon> getTwoOptStream() throws IOException {
         final CircularPolygonImporter twoOptImporter = new CircularPolygonImporter(Config.POLYGON_PATH + "300_200_TwoOptPolygonGeneratorFactory.txt");
         return twoOptImporter.importPolygons()
-                .stream()
-                .map(p -> new TestEntity(-3, p));
+                .stream();
     }
 
-    private List<TestEntity> concatenateAndCollect(int maxPolySize, Stream<TestEntity> realEntities, Stream<TestEntity> starEntities, Stream<TestEntity> clEntities, Stream<TestEntity> twoOptEntities) {
-        final Stream<TestEntity> concat = Stream.concat(Stream.concat(Stream.concat(realEntities, starEntities), clEntities), twoOptEntities);
-        return concat.filter(e -> e.polygon.getCoordinates().length - 1 <= maxPolySize)
-                .collect(Collectors.toList());
+    private Polygon scaleAndTranslate(Polygon p, BoundingBox graphBounds) {
+        final Coordinate[] coordinates = p.getCoordinates();
+        final double width = graphBounds.maxLongitude - graphBounds.minLongitude;
+        final double height = graphBounds.maxLatitude - graphBounds.minLatitude;
+
+        final double polygonWidth = Math.random() * width;
+        final double polygonHeight = Math.random() * height;
+
+        final double polygonLongitudeTranslation = Math.random() * (width - polygonWidth) + graphBounds.minLongitude;
+        final double polygonLatitudeTranslation = Math.random() * (height - polygonHeight) + graphBounds.minLatitude;
+
+        for (Coordinate coordinate : coordinates) {
+            coordinate.x = coordinate.x * polygonWidth + polygonLongitudeTranslation;
+            coordinate.y = coordinate.y * polygonHeight + polygonLatitudeTranslation;
+        }
+
+        return p;
     }
 
     private void failOnNonExistingPath() {
