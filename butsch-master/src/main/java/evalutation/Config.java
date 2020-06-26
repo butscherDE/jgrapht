@@ -13,7 +13,6 @@ public class Config {
 
     // Polygons
     public final static String IMG_PATH = "C:\\Users\\Daniel\\Documents\\jpanelimg\\";
-    public final static String POLYGON_PATH = "C:\\Users\\Daniel\\Documents\\masterpolygons\\";
 
     // PBF files
     public static final String PBF_FREIBURG = PBF_FILES + "freiburg-regbez-latest.osm.pbf";
@@ -26,5 +25,6 @@ public class Config {
 
     // Results
     public static final String RESULTS = PBF_FILES + "results\\";
+    public final static String POLYGON_PATH = RESULTS + "preprocessedPolygons\\";
     public static final String POLY_SIMPLIFICATION = RESULTS + "simplify\\";
 }
