@@ -23,6 +23,15 @@ public class Config {
     public static final String PBF_BAWU = PBF_FILES + "baden-wuerttemberg-latest.osm.pbf";
     public static final String PBF_GERMANY = PBF_FILES + "germany-latest.osm.pbf";
 
+    // Preproc files
+    public static final String PREPROC = PBF_FILES + "preproc\\";
+    public static final String[] PRE_TUEBINGEN = new String[] {
+            PREPROC + "tuebingen_graph.txt",
+            PREPROC + "tuebingen_vcs.txt",
+            PREPROC + "tuebingen_index.txt",
+            PREPROC + "tuebingen_polygons.txt"
+    };
+
     // Results
     public static final String RESULTS = PBF_FILES + "results\\";
     public final static String POLYGON_PATH = RESULTS + "preprocessedPolygons\\";
