@@ -54,8 +54,8 @@ public abstract class PolygonSimplifierTest {
     }
 
     private static void calcRelations(ImportPBF importPBF) {
-        nodeRelations = importPBF.getNodeRelations().stream().filter(a -> a.nodes.size() <= MAX_POLYGON_SIZE).collect(Collectors.toList());
-        System.out.println("Relations.size(): " + nodeRelations.stream().map(a -> a.nodes.size()).collect(Collectors.toList()));
+        nodeRelations = importPBF.getNodeRelations().stream().filter(a -> a.coordinates.length - 1 <= MAX_POLYGON_SIZE).collect(Collectors.toList());
+        System.out.println("Relations.size(): " + nodeRelations.stream().map(a -> a.coordinates.length - 1).collect(Collectors.toList()));
         System.out.println("Num node relations: " + nodeRelations.size());
     }
 
@@ -105,8 +105,8 @@ public abstract class PolygonSimplifierTest {
         int i = 0;
         int skipped = 0;
         for (final NodeRelation nodeRelation : nodeRelations) {
-            System.out.println(i++ + ", id: " + nodeRelation.id + ", size: " + nodeRelation.nodes.size());
-            final RegionOfInterest roi = new RegionOfInterest(nodeRelation.nodes);
+            System.out.println(i++ + ", id: " + nodeRelation.id + ", size: " + (nodeRelation.coordinates.length - 1));
+            final RegionOfInterest roi = new RegionOfInterest(nodeRelation.toPolygon());
             final Node source = nodes.get(random.nextInt(nodes.size()));
             final Node target = nodes.get(random.nextInt(nodes.size()));
             final RegionOfInterest simpleRoi = buildSimplifiedRoi(roi);

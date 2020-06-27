@@ -1,7 +1,6 @@
 package evalutation.polygonSimplification;
 
 import data.NodeRelation;
-import data.RoadGraph;
 import evalutation.Config;
 import storage.CsvColumnDumper;
 import storage.ImportPBF;
@@ -31,7 +30,7 @@ public class PolygonSizeDistribution {
 
         nodeRelations.forEach(r -> {
             elements.get(0).add(r.id);
-            elements.get(1).add(r.nodes.size());
+            elements.get(1).add(r.coordinates.length - 1);
         });
 
         try {

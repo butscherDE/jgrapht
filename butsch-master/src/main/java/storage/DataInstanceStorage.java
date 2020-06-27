@@ -57,7 +57,7 @@ public class DataInstanceStorage {
             final FileWriter fileWriter = new FileWriter(path);
             outputStream.forEach(o -> {
                 try {
-                    fileWriter.write(o);
+                    fileWriter.write(o + "\n");
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.exit(-1);
@@ -170,6 +170,7 @@ public class DataInstanceStorage {
             final BufferedReader bufferedReader = new BufferedReader(fileReader);
             List<String> lines = new LinkedList<>();
             String line = "";
+
             while ((line = bufferedReader.readLine()) != null) {
                 lines.add(line);
             }
