@@ -74,13 +74,9 @@ public class NodeRelation {
     }
 
     private static Map<String, String> getTags(final String tagsRaw) {
-        System.out.println(tagsRaw);
         final Map<String, String> tags = Arrays
                 .stream(tagsRaw.split(";"))
-                .map(rawTag -> {
-                    System.out.println(rawTag);
-                    return rawTag.split("=");
-                })
+                .map(rawTag -> rawTag.split("="))
                 .collect(Collectors.toMap(p -> p[0], p -> p[1]));
         return tags;
     }

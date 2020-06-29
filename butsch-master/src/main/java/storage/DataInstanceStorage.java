@@ -185,52 +185,6 @@ public class DataInstanceStorage {
             System.exit(-1);
             return null;
         }
-
-        /*try {
-            final FileReader fileReader = new FileReader(path);
-            final BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-            final BoundingBox graphBoundingBox = new BoundingBox(
-                    Double.valueOf(bufferedReader.readLine()),
-                    Double.valueOf(bufferedReader.readLine()),
-                    Double.valueOf(bufferedReader.readLine()),
-                    Double.valueOf(bufferedReader.read())
-            );
-            final double longitudeGranularity = Double.valueOf(bufferedReader.readLine());
-            final double latitudeGranularity = Double.valueOf(bufferedReader.readLine());
-
-            String line = "";
-            while ((line = bufferedReader.readLine()) != null) {
-                final String[] cellRaw = line.split("\\|");
-                final String nodesRaw = cellRaw[0];
-                final String edgesRaw = cellRaw[1];
-                final String vcsRaw = cellRaw[2];
-
-                final List<Node> nodes = Arrays.stream(nodesRaw.split(","))
-                        .map(nr -> Long.valueOf(nr))
-                        .map(nid -> graph.getVertex(nid))
-                        .collect(Collectors.toList());
-
-                final List<Edge> edges = Arrays.stream(edgesRaw.split(";"))
-                        .map(er -> er.split(","))
-                        .map(esplit -> new Node[] {
-                                graph.getVertex(Long.valueOf(esplit[0])),
-                                graph.getVertex(Long.valueOf(esplit[1]))})
-                        .map(stNodes -> graph.getEdge(stNodes[0], stNodes[1]))
-                        .collect(Collectors.toList());
-
-                final List<VisibilityCell> visibilityCells = Arrays.stream(vcsRaw.split(","))
-                        .map(vcr -> Long.valueOf(vcr))
-                        .map(vcid -> vcs.get(vcid))
-                        .collect(Collectors.toList());
-            }
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
     }
 
     private static List<NodeRelation> importRelations(final String path, final RoadGraph graph) {

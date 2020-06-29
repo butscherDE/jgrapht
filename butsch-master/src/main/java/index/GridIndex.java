@@ -475,7 +475,7 @@ public class GridIndex implements Index {
     }
 
     private class GridCell {
-        // Initial size = 0 because in various szenarios most cells are empty.
+        // Initial size = 0 because in various scenarios most cells are empty.
         final List<Node> nodes = new ArrayList<>(0);
         final List<Edge> edges = new ArrayList<>(0);
         final List<VisibilityCell> visibilityCells = new ArrayList<>(0);
@@ -510,6 +510,7 @@ public class GridIndex implements Index {
                     .collect(Collectors.joining(";"));
             final String vcDump = visibilityCells
                     .stream()
+                    .filter(vc -> vc != null) //TODO Find out why there are null vcs and why vc count differs?
                     .map(vc -> String.valueOf(vc.id))
                     .collect(Collectors.joining(","));
 
@@ -786,7 +787,7 @@ public class GridIndex implements Index {
             final GridCell[] column = cells[i];
 
             for (int j = 0; j < column.length; j++) {
-                final GridCell cell = column[i];
+                final GridCell cell = column[j];
 
                 sb.add(cell.dump());
             }
