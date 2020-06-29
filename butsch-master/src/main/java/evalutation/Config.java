@@ -13,6 +13,7 @@ public class Config {
 
     // Polygons
     public final static String IMG_PATH = "C:\\Users\\Daniel\\Documents\\jpanelimg\\";
+    public final static String IMG_PATH2 = PBF_FILES + "polygonImages\\";
 
     // PBF files
     public static final String PBF_FREIBURG = PBF_FILES + "freiburg-regbez-latest.osm.pbf";

@@ -6,10 +6,13 @@ import data.RoadGraph;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +27,7 @@ public class GeometryVisualizer {
     private Graphics2D g2d;
     private ScaledCoordinates scaledCoordinates;
     private double[] minMax;
+    private JFrame frame;
 
     public GeometryVisualizer(final GeometryDrawCollection geometryDrawCollection) {
         this.geometryDrawCollection = geometryDrawCollection;
@@ -42,7 +46,7 @@ public class GeometryVisualizer {
         final double originalRatio = spreadX / spreadY;
 
         // create window
-        final JFrame frame = new JFrame(GeometryVisualizer.class.getSimpleName());
+        frame = new JFrame(GeometryVisualizer.class.getSimpleName());
 
         // panel which contains the actual graph
         final JPanel main = new JPanel() {
@@ -157,6 +161,20 @@ public class GeometryVisualizer {
         minMax[1] = Math.max(minMax[1], coordinate.getX());
         minMax[2] = Math.min(minMax[2], coordinate.getY());
         minMax[3] = Math.max(minMax[3], coordinate.getY());
+    }
+
+    public void save(final String path) {
+        try
+        {
+            BufferedImage image = new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics2D = image.createGraphics();
+            frame.paint(graphics2D);
+            ImageIO.write(image,"jpeg", new File(path));
+        }
+        catch(Exception exception)
+        {
+            //code
+        }
     }
 
     private static class ScaledCoordinates {
