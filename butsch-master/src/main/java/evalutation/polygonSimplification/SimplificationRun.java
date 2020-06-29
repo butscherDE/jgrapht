@@ -126,7 +126,7 @@ public class SimplificationRun {
                 .stream();
     }
 
-    private Polygon scaleAndTranslate(Polygon p, BoundingBox graphBounds) {
+    public static Polygon scaleAndTranslate(Polygon p, BoundingBox graphBounds) {
         final Coordinate[] coordinates = p.getCoordinates();
         final double width = graphBounds.maxLongitude - graphBounds.minLongitude;
         final double height = graphBounds.maxLatitude - graphBounds.minLatitude;
