@@ -78,10 +78,7 @@ public class SimplificationRun {
     private List<TestEntity> filterEntities(int maxPolySize, List<TestEntity> entities) {
         final List<TestEntity> sizeFilteredEntities = entities.stream()
                 .filter(e -> e.polygon.getCoordinates().length - 1 <= maxPolySize)
-                .filter(e -> e.id < 0)
-//                .filter(e -> e.id != -1)
-//                .filter(e -> e.id != -2)
-                .filter(e -> e.polygon.getCoordinates().length < 20)
+                .filter(e -> e.polygon.getCoordinates().length < 50)
                 .collect(Collectors.toList());
         return sizeFilteredEntities;
     }
