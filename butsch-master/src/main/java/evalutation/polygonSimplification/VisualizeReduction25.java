@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class VisualizeReduction25 {
-    private final static int POLY_SIZE = 10;
-    private final static int NUM_POLY = 1;
+    private final static int POLY_SIZE = 25;
+    private final static int NUM_POLY = 100;
     private final static String PBF_PATH = Config.PBF_ANDORRA;
 
     public static void main(String[] args) {
@@ -29,24 +29,19 @@ public class VisualizeReduction25 {
         final List<Polygon> starPolygons = scaleAndTranslate(PolyognGeneratorHelpers.generateStar(NUM_POLY, POLY_SIZE), graphBounds);
         final List<Polygon> clPolygons = scaleAndTranslate(PolyognGeneratorHelpers.generateCL(NUM_POLY, POLY_SIZE), graphBounds);
         final List<Polygon> pbfPolygons = PolyognGeneratorHelpers.read(PBF_PATH, NUM_POLY, POLY_SIZE);
-        System.out.println(twoOptPolygons.size());
-        System.out.println("lala1");
+
         final List<Polygon> twoOptSimplified = twoOptPolygons.stream()
                 .map(p -> simplify(p, polygonSimplifier))
                 .collect(Collectors.toList());
-        System.out.println("lala1.1");
         final List<Polygon> starSimplified = starPolygons.stream()
                 .map(p -> simplify(p, polygonSimplifier))
                 .collect(Collectors.toList());
-        System.out.println("lala1.2");
         final List<Polygon> clSimplified = clPolygons.stream()
                 .map(p -> simplify(p, polygonSimplifier))
                 .collect(Collectors.toList());
-        System.out.println("lala1.3");
         final List<Polygon> pbfSimplified = pbfPolygons.stream()
                 .map(p -> simplify(p, polygonSimplifier))
                 .collect(Collectors.toList());
-        System.out.println("lala2");
 
         savePolygons(twoOptPolygons, "twoOpt", "imported");
         savePolygons(starPolygons, "star", "imported");
@@ -83,7 +78,9 @@ public class VisualizeReduction25 {
                 .collect(Collectors.toList());
     }
 
+    static int i = 0;
     public static Polygon simplify(final Polygon polygon, final PolygonSimplifierFullGreedy polygonSimplifier) {
+        System.out.println(++i);
         return polygonSimplifier.simplify(polygon);
     }
 
