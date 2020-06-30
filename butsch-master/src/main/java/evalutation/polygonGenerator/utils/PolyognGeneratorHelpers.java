@@ -33,7 +33,7 @@ public class PolyognGeneratorHelpers {
         return polygons;
     }
 
-    public static List<Polygon> read(String pbfPath, int polySize, long numPoly) {
+    public static List<Polygon> read(String pbfPath, long numPoly, int polySize) {
         final List<NodeRelation> relations = getNodeRelations(pbfPath);
         final List<Polygon> closestPolygons = getNPolygonsClosestToDesiredSize(relations, polySize, numPoly);
         return closestPolygons;
@@ -54,8 +54,8 @@ public class PolyognGeneratorHelpers {
         return relations.stream()
                 .map(r -> r.toPolygon())
                 .sorted((p, q) -> {
-                    final int pDistanceToDesiredSize = Math.abs(Integer.compare(p.getNumPoints(), polySize));
-                    final int qDistanceToDesiredSize = Math.abs(Integer.compare(q.getNumPoints(), polySize));
+                    final int pDistanceToDesiredSize = Math.abs(p.getNumPoints() - polySize);
+                    final int qDistanceToDesiredSize = Math.abs(q.getNumPoints() - polySize);
 
                     return Integer.compare(pDistanceToDesiredSize, qDistanceToDesiredSize);
                 })
