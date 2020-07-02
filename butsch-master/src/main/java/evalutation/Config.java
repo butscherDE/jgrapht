@@ -38,4 +38,5 @@ public class Config {
     public static final String RESULTS = PBF_FILES + "results\\";
     public final static String POLYGON_PATH = RESULTS + "preprocessedPolygons\\";
     public static final String POLY_SIMPLIFICATION = RESULTS + "simplify\\";
+    public final static String HEAPMAX = RESULTS + "heapmax\\";
 }

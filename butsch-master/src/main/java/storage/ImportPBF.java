@@ -12,7 +12,6 @@ import org.jgrapht.alg.util.Pair;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
@@ -43,6 +42,20 @@ public class ImportPBF implements GraphImporter {
 
         swImport.printTimingIfVerbose();
         return graph;
+    }
+
+    public List<NodeRelation> importRelationsOnly() throws FileNotFoundException {
+        final StopWatchVerbose swImport = new StopWatchVerbose("Import PBF");
+
+        onNodes = new RoadGraphNodeAdder();
+        onWays = new RoadGraphEdgeAdder();
+        onRelations = new NodeRelationAdder();
+
+        runParser();
+        createNodeRelations();
+
+        swImport.printTimingIfVerbose();
+        return nodeRelations;
     }
 
     private void runParser() throws FileNotFoundException {
