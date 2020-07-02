@@ -23,10 +23,13 @@ public class EvaluateHeapSize {
     public static void main(String[] args) throws IOException {
         final ImportPBF importPBF = new ImportPBF(PBF);
         final List<NodeRelation> nodeRelations = importPBF.importRelationsOnly();
+        System.out.println("imported");
 
         final List<List<Object>> elements = getResults(nodeRelations);
+        System.out.println("results gathered");
 
         new CsvColumnDumper(RESULT_PATH, DUMP_HEADER, elements, SEPARATOR).dump();
+        System.out.println("results written");
 
         System.out.println("Processed " + elements.size() + " relations.");
     }
