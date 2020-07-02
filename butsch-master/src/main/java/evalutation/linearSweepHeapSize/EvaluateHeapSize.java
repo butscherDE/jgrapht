@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class EvaluateHeapSize {
-    private final static String PBF = Config.PBF_BAWU;
+    private final static String PBF = Config.PBF_GERMANY;
     private final static char SEPARATOR = ',';
     private final static String[] DUMP_HEADER = new String[]{"regionid", "regionsize", "max"};
     private final static String RESULT_PATH = Config.HEAPMAX + LocalDateTime

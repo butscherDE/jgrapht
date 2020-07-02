@@ -204,6 +204,13 @@ public class ImportPBF implements GraphImporter {
             isRoad.put("loading_place", false);
             isRoad.put("Esri World; estimate; survey", false);
             isRoad.put("ladder", false);
+            isRoad.put("virtual_rail", false);
+            isRoad.put("busway", false);
+            isRoad.put("area:residential", false);
+            isRoad.put("unused", false);
+            isRoad.put("centre_line", false);
+            isRoad.put("path/cycleway", false);
+            isRoad.put("fuel", false);
         }
 
         @Override

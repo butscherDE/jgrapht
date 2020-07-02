@@ -59,6 +59,7 @@ public class PolyognGeneratorHelpers {
 
                     return Integer.compare(pDistanceToDesiredSize, qDistanceToDesiredSize);
                 })
+                .filter(p -> p.getNumPoints() < 2 * polySize)
                 .limit(numPoly)
                 .collect(Collectors.toList());
     }
