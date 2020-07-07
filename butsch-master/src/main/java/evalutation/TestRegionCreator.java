@@ -45,7 +45,7 @@ public class TestRegionCreator {
                           .collect(Collectors.toCollection(() -> realRegions));
 
         Collections.shuffle(realRegions);
-        return realRegions.subList(0, numRelationsPerType);
+        return realRegions.subList(0, Math.min(realRegions.size(), numRelationsPerType));
     }
 
     private void addArtificialEntities(List<TestRegion> entities) throws IOException {
