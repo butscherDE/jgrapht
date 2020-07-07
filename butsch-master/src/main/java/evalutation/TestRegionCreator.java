@@ -6,6 +6,8 @@ import org.locationtech.jts.geom.Polygon;
 import storage.CircularPolygonImporter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -13,14 +15,12 @@ import java.util.stream.Stream;
 
 public class TestRegionCreator {
     private final DataInstance instance;
-    private final String pbf;
     private final int numRelationsPerType;
     private final Function<Polygon, Boolean> relationFilter;
 
-    public TestRegionCreator(final DataInstance instance, final String pbf, final int numRelationsPerType,
+    public TestRegionCreator(final DataInstance instance, final int numRelationsPerType,
                              final Function<Polygon, Boolean> relationFilter) {
         this.instance = instance;
-        this.pbf = pbf;
         this.numRelationsPerType = numRelationsPerType;
         this.relationFilter = relationFilter;
     }
@@ -30,7 +30,6 @@ public class TestRegionCreator {
 
         try {
             addArtificialEntities(entities);
-
             return entities;
         } catch (IOException e) {
             e.printStackTrace();
@@ -39,10 +38,14 @@ public class TestRegionCreator {
     }
 
     private List<TestRegion> getRealDataStream() {
-        return instance.relations.stream()
-                                 .filter(r -> relationFilter.apply(r.toPolygon()))
-                                 .map(r -> new TestRegion(r.id, r.toPolygon()))
-                                 .collect(Collectors.toList());
+        final List<TestRegion> realRegions = new ArrayList<>();
+        instance.relations.stream()
+                          .filter(r -> relationFilter.apply(r.toPolygon()))
+                          .map(r -> new TestRegion(r.id, r.toPolygon()))
+                          .collect(Collectors.toCollection(() -> realRegions));
+
+        Collections.shuffle(realRegions);
+        return realRegions.subList(0, numRelationsPerType);
     }
 
     private void addArtificialEntities(List<TestRegion> entities) throws IOException {
@@ -77,6 +80,7 @@ public class TestRegionCreator {
     private List<TestRegion> addTransformedEntities(final int id, List<TestRegion> entities, Stream<Polygon> polygonStream, BoundingBox graphBounds) {
         return polygonStream.map(p -> scaleAndTranslate(p, graphBounds))
                             .filter(p -> relationFilter.apply(p))
+                            .limit(numRelationsPerType)
                             .map(p -> new TestRegion(id, p))
                             .collect(Collectors.toCollection(() -> entities));
     }
