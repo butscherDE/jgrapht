@@ -2,6 +2,7 @@ package evalutation.polygonSimplification;
 
 import data.RoadGraph;
 import evalutation.Config;
+import evalutation.TestRegionCreator;
 import evalutation.polygonGenerator.utils.PolyognGeneratorHelpers;
 import geometry.BoundingBox;
 import geometry.ShapeDrawer;
@@ -80,7 +81,7 @@ public class VisualizeReduction25 {
 
     private static List<Polygon> scaleAndTranslate(final List<Polygon> polygons, final BoundingBox graphBounds) {
         return polygons.stream()
-                .map(p -> SimplificationRun.scaleAndTranslate(p, graphBounds))
+                .map(p -> TestRegionCreator.scaleAndTranslate(p, graphBounds))
                 .collect(Collectors.toList());
     }
 
