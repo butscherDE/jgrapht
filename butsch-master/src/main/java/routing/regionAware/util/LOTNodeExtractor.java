@@ -45,16 +45,6 @@ public class LOTNodeExtractor {
         return this.viaPointToLOTNodes.get(viaPoint);
     }
 
-    public List<Node> getAllLotNodes() {
-        final List<Node> lotNodes = new LinkedList<>();
-
-        for (final Map.Entry<Node, List<Node>> nodeListEntry : viaPointToLOTNodes.entrySet()) {
-            lotNodes.addAll(nodeListEntry.getValue());
-        }
-
-        return lotNodes;
-    }
-
     public Path getLotNodePathFor(final Node viaPoint, final Node lotNode) {
         return this.allPaths.get(new Pair<>(viaPoint, lotNode));
     }
