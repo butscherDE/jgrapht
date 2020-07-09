@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Random;
 
 public class TwoOptPolygonsUpTo200 {
-    private final static int NUM_POLYGONS = 300;
+    private final static int NUM_POLYGONS = 1000;
     private final static int MAX_POINTS = 200;
     private final static String PATH = Config.POLYGON_PATH;
 

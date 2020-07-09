@@ -60,19 +60,19 @@ public class TestRegionCreator {
     }
 
     private Stream<Polygon> getStarStream() throws IOException {
-        final CircularPolygonImporter starImporter = new CircularPolygonImporter(Config.POLYGON_PATH + "300_200_StarPolygonGeneratorFactory.txt");
+        final CircularPolygonImporter starImporter = new CircularPolygonImporter(Config.POLYGON_PATH + "1000_200_StarPolygonGeneratorFactory.txt");
         return starImporter.importPolygons()
                            .stream();
     }
 
     private Stream<Polygon> getClStream() throws IOException {
-        final CircularPolygonImporter clImporter = new CircularPolygonImporter(Config.POLYGON_PATH + "300_200_CLPolygonGeneratorFactory.txt");
+        final CircularPolygonImporter clImporter = new CircularPolygonImporter(Config.POLYGON_PATH + "1000_200_CLPolygonGeneratorFactory.txt");
         return clImporter.importPolygons()
                          .stream();
     }
 
     private Stream<Polygon> getTwoOptStream() throws IOException {
-        final CircularPolygonImporter twoOptImporter = new CircularPolygonImporter(Config.POLYGON_PATH + "300_200_TwoOptPolygonGeneratorFactory.txt");
+        final CircularPolygonImporter twoOptImporter = new CircularPolygonImporter(Config.POLYGON_PATH + "1000_200_TwoOptPolygonGeneratorFactory.txt");
         return twoOptImporter.importPolygons()
                              .stream();
     }

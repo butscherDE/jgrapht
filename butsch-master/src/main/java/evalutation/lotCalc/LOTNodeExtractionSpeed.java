@@ -12,6 +12,7 @@ import routing.RPHAST;
 import routing.RPHASTFactory;
 import routing.RoutingAlgorithm;
 import routing.regionAware.util.EntryExitPointExtractor;
+import routing.regionAware.util.RegionSubGraphBuilder;
 import storage.CsvColumnDumper;
 import storage.ImportPBF;
 
@@ -21,12 +22,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class LOTNodeExtractionSpeed {
-    private final static String PBF = Config.PBF_ANDORRA;
+    private final static String PBF = Config.PBF_TUEBINGEN;
     private final static int numSourceTarget = 10;
-    private final static int numPolygonsEachSource = 100;
+    private final static int numPolygonsEachSource = 1000;
     private final static Random random = new Random(1337);
 
-    private final static String[] DUMP_HEADER = new String[]{"relationId", "numEENodes", "naiveTime", "rphastTime"};
+    private final static String[] DUMP_HEADER = new String[]{"relationId", "numEENodes", "numNodes", "naiveTime", "rphastTime"};
     private final static String RESULT_PATH = Config.LOT + LocalDateTime.now().toString().replaceAll(":", "_") + ".csv";
     private final static char DELIMITER = ',';
 
@@ -50,38 +51,51 @@ public class LOTNodeExtractionSpeed {
             System.out.println("Testing " + ++i + "/" + testRegions.size());
             sampleSourceTarget();
             final Set<Node> entryExitPoints = createEntryExitPoints(testRegion);
-            measure(testRegion, entryExitPoints);
+            final int subGraphSize = getSubGraphSize(testRegion, entryExitPoints);
+            measure(testRegion, entryExitPoints, subGraphSize);
         }
 
         dump();
     }
 
-    public static void measure(final TestRegion testRegion, final Set<Node> entryExitPoints) {
-        final long durationNaive = getDurationNaive(entryExitPoints);
-        final long durationRphast = getDurationRphast(entryExitPoints);
-        addResult(testRegion, entryExitPoints, durationNaive, durationRphast);
+    public static int getSubGraphSize(final TestRegion testRegion, final Set<Node> entryExitPoints) {
+        return new RegionSubGraphBuilder()
+                        .getSubGraph(instance.graph, new RegionOfInterest(testRegion.polygon), entryExitPoints)
+                        .vertexSet()
+                        .size();
     }
 
-    public static long getDurationNaive(final Set<Node> entryExitPoints) {
+    public static void measure(final TestRegion testRegion, final Set<Node> entryExitPoints, final int subGraphSize) {
+        final double durationNaive = getDurationNaive(entryExitPoints);
+        final double durationRphast = getDurationRphast(entryExitPoints);
+        addResult(testRegion, entryExitPoints, durationNaive, durationRphast, subGraphSize);
+    }
+
+    public static double getDurationNaive(final Set<Node> entryExitPoints) {
         final long naiveNanos0 = System.nanoTime();
         getAllPathsNaive(entryExitPoints);
         final long naiveNanos1 = System.nanoTime();
-        return naiveNanos1 - naiveNanos0;
+        return toSeconds(naiveNanos1 - naiveNanos0);
     }
 
-    public static long getDurationRphast(final Set<Node> entryExitPoints) {
+    public static double getDurationRphast(final Set<Node> entryExitPoints) {
         final long rphastNanos0 = System.nanoTime();
         getAllPathsRphast(entryExitPoints);
         final long rphastNanos1 = System.nanoTime();
-        return rphastNanos1 - rphastNanos0;
+        return toSeconds(rphastNanos1 - rphastNanos0);
     }
 
-    public static void addResult(final TestRegion testRegion, final Set<Node> entryExitPoints, final long durationNaive,
-                                 final long durationRphast) {
+    public static double toSeconds(final long nano) {
+        return nano / 1e-9;
+    }
+
+    public static void addResult(final TestRegion testRegion, final Set<Node> entryExitPoints, final double durationNaive,
+                                 final double durationRphast, final int subGraphSize) {
         results.get(0).add(testRegion.id);
         results.get(1).add(entryExitPoints.size());
-        results.get(2).add(durationNaive);
-        results.get(3).add(durationRphast);
+        results.get(2).add(subGraphSize);
+        results.get(3).add(durationNaive);
+        results.get(4).add(durationRphast);
     }
 
     private static void dump() {
