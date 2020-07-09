@@ -12,9 +12,11 @@ import routing.RPHAST;
 import routing.RPHASTFactory;
 import routing.RoutingAlgorithm;
 import routing.regionAware.util.EntryExitPointExtractor;
+import storage.CsvColumnDumper;
 import storage.ImportPBF;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -35,19 +37,23 @@ public class LOTNodeExtractionSpeed {
     private static RoadCH roadCh;
     private static List<TestRegion> testRegions;
     private static List<Node> vertices;
-    private static Set<Node> sources;
-    private static Set<Node> targets;
+    private static Set<Node> sources = new LinkedHashSet<>();
+    private static Set<Node> targets = new LinkedHashSet<>();
 
     private static List<List<Object>> results = new ArrayList<>(DUMP_HEADER.length);
 
     public static void main(String[] args) {
         init();
 
+        int i = 0;
         for (final TestRegion testRegion : testRegions) {
+            System.out.println("Testing " + ++i + "/" + testRegions.size());
             sampleSourceTarget();
             final Set<Node> entryExitPoints = createEntryExitPoints(testRegion);
             measure(testRegion, entryExitPoints);
         }
+
+        dump();
     }
 
     public static void measure(final TestRegion testRegion, final Set<Node> entryExitPoints) {
@@ -76,6 +82,16 @@ public class LOTNodeExtractionSpeed {
         results.get(1).add(entryExitPoints.size());
         results.get(2).add(durationNaive);
         results.get(3).add(durationRphast);
+    }
+
+    private static void dump() {
+        final CsvColumnDumper dumper = new CsvColumnDumper(RESULT_PATH, DUMP_HEADER, results, DELIMITER);
+        try {
+            dumper.dump();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
     }
 
     private static void init() {

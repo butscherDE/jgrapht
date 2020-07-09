@@ -48,7 +48,7 @@ public class SimplificationRun {
         extended = new PolygonSimplifierExtendedGreedy(instance.index);
         full = new PolygonSimplifierFullGreedy(instance.index);
 
-        testentitites = new TestRegionCreator(instance, dataPath, Integer.MAX_VALUE, new Function<Polygon, Boolean>() {
+        testentitites = new TestRegionCreator(instance, Integer.MAX_VALUE, new Function<Polygon, Boolean>() {
             @Override
             public Boolean apply(final Polygon polygon) {
                 final boolean relationSize = polygon.getCoordinates().length - 1 <= maxPolySize;
