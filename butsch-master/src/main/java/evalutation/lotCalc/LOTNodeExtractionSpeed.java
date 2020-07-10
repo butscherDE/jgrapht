@@ -48,7 +48,7 @@ public class LOTNodeExtractionSpeed {
 
         int i = 0;
         for (final TestRegion testRegion : testRegions) {
-            System.out.println("Testing " + ++i + "/" + testRegions.size());
+            System.out.println(LocalDateTime.now() + ": Testing " + ++i + "/" + testRegions.size());
             sampleSourceTarget();
             final Set<Node> entryExitPoints = createEntryExitPoints(testRegion);
             final int subGraphSize = getSubGraphSize(testRegion, entryExitPoints);
