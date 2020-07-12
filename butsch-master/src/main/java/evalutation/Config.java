@@ -40,4 +40,5 @@ public class Config {
     public static final String POLY_SIMPLIFICATION = RESULTS + "simplify\\";
     public final static String HEAPMAX = RESULTS + "heapmax\\";
     public final static String LOT = RESULTS + "lot\\";
+    public final static String SIMPLIFICATION_STEPS = RESULTS + "simplificationSteps\\";
 }

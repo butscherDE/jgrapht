@@ -3,7 +3,10 @@ package visualizations;
 import data.Edge;
 import data.Node;
 import data.RoadGraph;
+import geometry.BoundingBox;
+import org.locationtech.jts.awt.ShapeWriter;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 
 import javax.imageio.ImageIO;
@@ -134,11 +137,15 @@ public class GeometryVisualizer {
         final double yi = (startCoordinate.getY() - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
         final double xj = (endCoordinate.getX() - minMax[0]) * scaledCoordinates.scale + scaledCoordinates.padX;
         final double yj = (endCoordinate.getY() - minMax[2]) * scaledCoordinates.scale + scaledCoordinates.padY;
+
         g2d.draw(new Line2D.Double(xi, yi, xj, yj));
     }
 
     private double[] extractMinMax() {
         double[] minMax = {Double.MAX_VALUE, -Double.MAX_VALUE, Double.MAX_VALUE, -Double.MAX_VALUE};
+
+        final BoundingBox boundingBox = new BoundingBox(0d, 51d, -25d,-0d);
+        final GeometryFactory gf = new GeometryFactory();
 
         for (final Collection<Node> nodes : geometryDrawCollection.coordinates.values()) {
             for (Node node : nodes) {
@@ -146,7 +153,9 @@ public class GeometryVisualizer {
             }
         }
 
+        Iterator<Color> colors = geometryDrawCollection.lineSegments.keySet().iterator();
         for (final Collection<LineSegment> lineSegments : geometryDrawCollection.lineSegments.values()) {
+            final Color color = colors.next();
             for (final LineSegment lineSegment : lineSegments) {
                 updateMinMaxWithCoordinate(minMax, lineSegment.p0);
                 updateMinMaxWithCoordinate(minMax, lineSegment.p1);
@@ -166,14 +175,14 @@ public class GeometryVisualizer {
     public void save(final String path) {
         try
         {
-            BufferedImage image = new BufferedImage(800, 800, BufferedImage.TYPE_INT_RGB);
+            BufferedImage image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics2D = image.createGraphics();
             frame.paint(graphics2D);
             ImageIO.write(image,"jpeg", new File(path));
         }
-        catch(Exception exception)
+        catch(Exception e)
         {
-            //code
+            e.printStackTrace();
         }
     }
 
@@ -198,7 +207,7 @@ public class GeometryVisualizer {
         }
 
         public ScaledCoordinates invoke() {
-            if (originalRatio < ratio) {
+            if (originalRatio < ratio) { ;
                 scale = h / spreadY;
                 padX = (w - scale * spreadX) / 2 + MARGIN;
                 padY = MARGIN;
@@ -207,6 +216,7 @@ public class GeometryVisualizer {
                 padX = MARGIN;
                 padY = (h - scale * spreadY) / 2 + MARGIN;
             }
+
             return this;
         }
     }
@@ -219,21 +229,31 @@ public class GeometryVisualizer {
         }
 
         public void inverseY() {
+            final double maxLatitude = coordinates
+                    .values()
+                    .stream()
+                    .map(col -> col.stream().map(c -> c.latitude).collect(Collectors.toList()))
+                    .map(col -> Collections.max(col))
+                    .max(Double::compare)
+                    .get();
+
             coordinates.forEach((a, b) -> {
                 final List<Node> nodesForColor = b.stream().collect(Collectors.toList());
-//                coordinates.remove(a);
                 final ArrayList<Node> newList = new ArrayList<>(nodesForColor.size());
                 coordinates.put(a, newList);
-                nodesForColor.forEach(n -> newList.add(new Node(n.id, n.longitude, n.latitude * (-1), n.elevation)));
+                nodesForColor.forEach(n -> newList.add(new Node(n.id, n.longitude, n.latitude * (-1) + maxLatitude, n.elevation)));
 
             });
 
-            lineSegments.forEach((a, b) -> {
-                b.forEach(e -> {
-                    e.p0.y *= -1;
-                    e.p1.y *= -1;
-                });
-            });
+            lineSegments.entrySet()
+                        .forEach(e -> e.setValue(e.getValue()
+                                                  .stream()
+                                                  .map(ls -> createInversedLS(ls, maxLatitude))
+                                                  .collect(Collectors.toList())));
+        }
+
+        public LineSegment createInversedLS(final LineSegment ls, final double maxY) {
+            return new LineSegment(ls.p0.x, ls.p0.y * -1 + maxY, ls.p1.x, ls.p1.y * -1 + maxY);
         }
 
         public void addGraph(final Color color, final RoadGraph graph) {
