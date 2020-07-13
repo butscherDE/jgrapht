@@ -1,5 +1,8 @@
 package evalutation.imaging;
 
+import data.Edge;
+import data.Node;
+import data.RoadGraph;
 import evalutation.Config;
 import evalutation.DataInstance;
 import evalutation.polygonGenerator.VisualizePolygons;
@@ -50,19 +53,62 @@ public class SimplificationSteps {
         final Polygon polygon = new GeometryFactory().createPolygon(polygonCoordinates);
         final List<Polygon> steps = simplifier.simplify(polygon);
 
+        final RoadGraph subGraph = getSubGraph(mocker, polygon);
+
         int i = 0;
         for (final Polygon step : steps) {
             final GeometryVisualizer.GeometryDrawCollection drawCol = new GeometryVisualizer.GeometryDrawCollection();
-            drawCol.addGraph(Color.BLACK, mocker.graph);
+            drawCol.addGraph(Color.BLACK, subGraph);
             drawCol.addPolygon(Color.RED, step);
 
             final GeometryVisualizer visualizer = new GeometryVisualizer(drawCol);
             visualizer.visualizeGraph(0);
             visualizer.save(Config.SIMPLIFICATION_STEPS + "mocker_" + i++ + ".jpg");
-
-//            System.exit(-1);
         }
 
         System.out.println("Exported " + steps.size() + " steps.");
+        System.exit(0);
+    }
+
+    public static RoadGraph getSubGraph(final PolygonRoutingTestGraph mocker, final Polygon polygon) {
+        final RoadGraph subGraph = new RoadGraph(Edge.class);
+        addSubNodes(mocker, polygon, subGraph);
+        addSupEdges(mocker, polygon, subGraph);
+        return subGraph;
+    }
+
+    public static void addSubNodes(final PolygonRoutingTestGraph mocker, final Polygon polygon,
+                                   final RoadGraph subGraph) {
+        mocker.graph.vertexSet().stream().filter(v -> {
+            if (polygon.contains(v.getPoint())) {
+                return true;
+            } else {
+                final long numberOfNeighborsInPolygon = mocker.graph
+                        .outgoingEdgesOf(v)
+                        .stream()
+                        .filter(e -> polygon.contains(mocker.graph.getEdgeTarget(e).getPoint()))
+                        .count();
+//                if (v.id == 54) {
+//                    System.out.println("lala: " + numberOfNeighborsInPolygon);
+//                }
+
+                return numberOfNeighborsInPolygon > 0;
+            }
+        }).forEach(v -> subGraph.addVertex(v));
+    }
+
+    public static void addSupEdges(final PolygonRoutingTestGraph mocker, final Polygon polygon,
+                                   final RoadGraph subGraph) {
+        mocker.graph.edgeSet().stream().filter(e -> {
+            final Node source = mocker.graph.getEdgeSource(e);
+            final Node target = mocker.graph.getEdgeTarget(e);
+
+            return polygon.contains(source.getPoint()) || polygon.contains(target.getPoint());
+        }).forEach(e -> {
+            final Node source = mocker.graph.getEdgeSource(e);
+            final Node target = mocker.graph.getEdgeTarget(e);
+
+            subGraph.addEdge(source, target);
+        });
     }
 }
