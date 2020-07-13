@@ -4,8 +4,6 @@ import data.Edge;
 import data.Node;
 import data.RoadGraph;
 import evalutation.Config;
-import evalutation.DataInstance;
-import evalutation.polygonGenerator.VisualizePolygons;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
@@ -14,7 +12,6 @@ import util.PolygonRoutingTestGraph;
 import visualizations.GeometryVisualizer;
 
 import java.awt.*;
-import java.util.Collections;
 import java.util.List;
 
 public class SimplificationSteps {
@@ -22,6 +19,18 @@ public class SimplificationSteps {
         final PolygonRoutingTestGraph mocker = new PolygonRoutingTestGraph();
         final PolygonSimplifierFullGreedyExporting simplifier = new PolygonSimplifierFullGreedyExporting(
                 mocker.gridIndex);
+        final Polygon polygon = createPolygon();
+        final List<Polygon> steps = simplifier.simplify(polygon);
+
+        final RoadGraph subGraph = getPolygonAndEENodeSubgraph(mocker, polygon);
+
+        writeImages(steps, subGraph);
+
+        System.out.println("Exported " + steps.size() + " steps.");
+        System.exit(0);
+    }
+
+    public static Polygon createPolygon() {
         final Coordinate[] polygonCoordinates = new Coordinate[] {
                 new Coordinate(13, 9),
                 new Coordinate(12, 10),
@@ -50,27 +59,10 @@ public class SimplificationSteps {
                 new Coordinate(20, 7),
                 new Coordinate(13, 9),
                 };
-        final Polygon polygon = new GeometryFactory().createPolygon(polygonCoordinates);
-        final List<Polygon> steps = simplifier.simplify(polygon);
-
-        final RoadGraph subGraph = getSubGraph(mocker, polygon);
-
-        int i = 0;
-        for (final Polygon step : steps) {
-            final GeometryVisualizer.GeometryDrawCollection drawCol = new GeometryVisualizer.GeometryDrawCollection();
-            drawCol.addGraph(Color.BLACK, subGraph);
-            drawCol.addPolygon(Color.RED, step);
-
-            final GeometryVisualizer visualizer = new GeometryVisualizer(drawCol);
-            visualizer.visualizeGraph(0);
-            visualizer.save(Config.SIMPLIFICATION_STEPS + "mocker_" + i++ + ".jpg");
-        }
-
-        System.out.println("Exported " + steps.size() + " steps.");
-        System.exit(0);
+        return new GeometryFactory().createPolygon(polygonCoordinates);
     }
 
-    public static RoadGraph getSubGraph(final PolygonRoutingTestGraph mocker, final Polygon polygon) {
+    public static RoadGraph getPolygonAndEENodeSubgraph(final PolygonRoutingTestGraph mocker, final Polygon polygon) {
         final RoadGraph subGraph = new RoadGraph(Edge.class);
         addSubNodes(mocker, polygon, subGraph);
         addSupEdges(mocker, polygon, subGraph);
@@ -110,5 +102,18 @@ public class SimplificationSteps {
 
             subGraph.addEdge(source, target);
         });
+    }
+
+    public static void writeImages(final List<Polygon> steps, final RoadGraph subGraph) {
+        int i = 0;
+        for (final Polygon step : steps) {
+            final GeometryVisualizer.GeometryDrawCollection drawCol = new GeometryVisualizer.GeometryDrawCollection();
+            drawCol.addGraph(Color.BLACK, subGraph);
+            drawCol.addPolygon(Color.RED, step);
+
+            final GeometryVisualizer visualizer = new GeometryVisualizer(drawCol);
+            visualizer.visualizeGraph(0);
+            visualizer.save(Config.SIMPLIFICATION_STEPS + "mocker_" + i++ + ".jpg");
+        }
     }
 }
