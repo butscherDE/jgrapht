@@ -74,6 +74,9 @@ public class SimplificationSteps {
         final RoadGraph subGraph = new RoadGraph(Edge.class);
         addSubNodes(mocker, polygon, subGraph);
         addSupEdges(mocker, polygon, subGraph);
+
+        // For some reason this print fixes that the first image is not correctly writen
+        System.out.println(subGraph.getVertex(54) != null);
         return subGraph;
     }
 
@@ -88,9 +91,6 @@ public class SimplificationSteps {
                         .stream()
                         .filter(e -> polygon.contains(mocker.graph.getEdgeTarget(e).getPoint()))
                         .count();
-//                if (v.id == 54) {
-//                    System.out.println("lala: " + numberOfNeighborsInPolygon);
-//                }
 
                 return numberOfNeighborsInPolygon > 0;
             }
