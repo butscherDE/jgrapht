@@ -24,7 +24,7 @@ public class PolygonSimplifierFullGreedy extends PolygonSimplifier {
             for (int i = 0; i < polygon.getNumPoints(); i++) {
                 int[] contractionSetSize = cSetBuilder.getContractionSetSize(i);
 
-                if (contractionSetSize[0] + contractionSetSize[1] > 0) {
+                if (contractionSetSize[0] + contractionSetSize[1] > maxSetSize[0] + maxSetSize[1]) {
                     maxSetSize = contractionSetSize;
                     maxSetIndex = i;
                 }
