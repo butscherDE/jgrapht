@@ -10,9 +10,11 @@ public class PolygonSimplifierExtendedGreedy extends PolygonSimplifier {
     private final GridIndex gridIndex;
     private final Random random = new Random();
     private SimplerPolygonContractionSetBuilder cSetBuilder;
-    private int optimalIndex;
-    private int[] optimalContractionSetSize;
     private Polygon polygon;
+    private int[] maxSetSize;
+    private int maxIndex;
+    private int enlargedForward;
+    private boolean simplified;
 
     public PolygonSimplifierExtendedGreedy(GridIndex gridIndex) {
         this.gridIndex = gridIndex;
@@ -21,57 +23,59 @@ public class PolygonSimplifierExtendedGreedy extends PolygonSimplifier {
     @Override
     public Polygon simplify(Polygon polygon) {
         this.polygon = polygon;
-        boolean simplified = true;
+        simplified = true;
 
-        while (simplified == true) {
+        while (simplified) {
             cSetBuilder = new SimplerPolygonContractionSetBuilder(gridIndex, this.polygon);
-            optimalIndex = -1;
-            optimalContractionSetSize = new int[] {-1, -1};
+            final int startIndex = random.nextInt(this.polygon.getNumPoints());
+            final int[] startSetSize = cSetBuilder.getContractionSetSize(startIndex);
 
-            recurseAroundPolygon(random.nextInt(this.polygon.getNumPoints()), new int[] {-1, -1}, new int[] {0, 0});
+            enlarge(startIndex, startSetSize, 0);
+            final int[] forwardMaxSetSize = Arrays.copyOf(maxSetSize, 2);
+            final int forwardMaxIndex = maxIndex;
 
-            simplified = getContractionSize(optimalContractionSetSize) > 0;
-            if (simplified) {
-                this.polygon = new PolygonLineContractor(this.polygon, optimalIndex).getPolygon(optimalContractionSetSize[0], optimalContractionSetSize[1]);
-                contractions++;
-            }
+            enlarge(startIndex, startSetSize, 1);
+            final int[] backwardMaxSetSize = Arrays.copyOf(maxSetSize, 2);
+            final int backwardMaxIndex = maxIndex;
+
+            updatePolygon(forwardMaxSetSize, forwardMaxIndex, backwardMaxSetSize, backwardMaxIndex);
         }
 
         return this.polygon;
     }
 
-    private void recurseAroundPolygon(final int index, final int[] contractionSize, final int[] expanded) {
-        if (getContractionSize(expanded) > polygon.getNumPoints()) {
-            return;
-        }
+    public void enlarge(final int startIndex, final int[] startSetSize, final int backward) {
+        int index = startIndex;
+        maxSetSize = startSetSize;
+        maxIndex = startIndex;
+        int[] newSetSize = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE};
+        while (getSetSize(newSetSize) > getSetSize(maxSetSize) && getSetSize(
+                startSetSize) + enlargedForward < this.polygon.getNumPoints()) {
+            index = Math.floorMod(index + maxSetSize[backward], this.polygon.getNumPoints());
+            newSetSize = cSetBuilder.getContractionSetSize(index);
 
-        final int[] newContractionSize = descent(index, contractionSize, expanded);
-
-        updateOptimalResult(index, newContractionSize);
-    }
-
-    private int[] descent(int index, int[] contractionSize, int[] expanded) {
-        final int[] newContractionSize = cSetBuilder.getContractionSetSize(index);
-
-        if (getContractionSize(newContractionSize) > getContractionSize(contractionSize)) {
-            expanded[0] += newContractionSize[0];
-            expanded[1] += newContractionSize[1];
-            final int nextForwardIndex = (index + newContractionSize[0]) % polygon.getNumPoints();
-            final int nextBackwardIndex = Math.floorMod((index - newContractionSize[1]), polygon.getNumPoints());
-            recurseAroundPolygon(nextForwardIndex, newContractionSize, expanded);
-            recurseAroundPolygon(nextBackwardIndex, newContractionSize,expanded);
-        }
-        return newContractionSize;
-    }
-
-    private void updateOptimalResult(int index, int[] newContractionSize) {
-        if (getContractionSize(newContractionSize) > getContractionSize(optimalContractionSetSize)) {
-            optimalIndex = index;
-            optimalContractionSetSize = newContractionSize;
+            if (getSetSize(newSetSize) > getSetSize(maxSetSize)) {
+                enlargedForward += newSetSize[backward];
+                maxSetSize = newSetSize;
+                maxIndex = index;
+            }
         }
     }
 
-    private int getContractionSize(int[] newContractionSize) {
+    public void updatePolygon(final int[] forwardMaxSetSize, final int forwardMaxIndex,
+                              final int[] backwardMaxSetSize, final int backwardMaxIndex) {
+        if (getSetSize(forwardMaxSetSize) + getSetSize(backwardMaxSetSize) <= 0) {
+            simplified = false;
+        } else if (getSetSize(forwardMaxSetSize) > getSetSize(backwardMaxSetSize)) {
+            this.polygon = new PolygonLineContractor(this.polygon, forwardMaxIndex).getPolygon(forwardMaxSetSize[0], forwardMaxSetSize[1]);
+            contractions++;
+        } else {
+            this.polygon = new PolygonLineContractor(this.polygon, backwardMaxIndex).getPolygon(backwardMaxSetSize[0], backwardMaxSetSize[1]);
+            contractions++;
+        }
+    }
+
+    private int getSetSize(int[] newContractionSize) {
         return newContractionSize[0] + newContractionSize[1];
     }
 }

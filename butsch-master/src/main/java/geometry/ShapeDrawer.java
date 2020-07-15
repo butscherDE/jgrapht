@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.stream.Collectors;
 
 public class ShapeDrawer extends JPanel {
     private static JFrame f;
@@ -96,7 +95,6 @@ static int j = 0;
             // TODO Auto-generated catch block
             System.out.println("error");
         }
-
     }
 
     public void repaint(final Polygon polygon) {

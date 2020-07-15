@@ -3,17 +3,19 @@ package routing.regionAware.util;
 import index.GridIndex;
 import org.locationtech.jts.geom.Polygon;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class PolygonSimplifierFullGreedy extends PolygonSimplifier {
+public class PolygonSimplifierFullGreedyExporting {
     private final GridIndex gridIndex;
 
-    public PolygonSimplifierFullGreedy(GridIndex gridIndex) {
+    public PolygonSimplifierFullGreedyExporting(GridIndex gridIndex) {
         this.gridIndex = gridIndex;
     }
 
-    @Override
-    public Polygon simplify(Polygon polygon) {
+    public List<Polygon> simplify(Polygon polygon) {
+        final List<Polygon> polygons = new ArrayList<>(Collections.singletonList(polygon));
         boolean simplified = true;
 
         while (simplified == true) {
@@ -24,7 +26,7 @@ public class PolygonSimplifierFullGreedy extends PolygonSimplifier {
             for (int i = 0; i < polygon.getNumPoints(); i++) {
                 int[] contractionSetSize = cSetBuilder.getContractionSetSize(i);
 
-                if (contractionSetSize[0] + contractionSetSize[1] > maxSetSize[0] + maxSetSize[1]) {
+                if (contractionSetSize[0] + contractionSetSize[1] > 0) {
                     maxSetSize = contractionSetSize;
                     maxSetIndex = i;
                 }
@@ -33,10 +35,10 @@ public class PolygonSimplifierFullGreedy extends PolygonSimplifier {
             simplified = maxSetSize[0] + maxSetSize[1] > 0;
             if (simplified) {
                 polygon = new PolygonLineContractor(polygon, maxSetIndex).getPolygon(maxSetSize[0], maxSetSize[1]);
-                contractions++;
+                polygons.add(polygon);
             }
         }
 
-        return polygon;
+        return polygons;
     }
 }
