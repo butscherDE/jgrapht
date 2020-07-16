@@ -86,7 +86,7 @@ public class LOTNodeExtractionSpeed {
     }
 
     public static double toSeconds(final long nano) {
-        return nano / 1e-9;
+        return nano / 1e+9;
     }
 
     public static void addResult(final TestRegion testRegion, final Set<Node> entryExitPoints, final double durationNaive,
