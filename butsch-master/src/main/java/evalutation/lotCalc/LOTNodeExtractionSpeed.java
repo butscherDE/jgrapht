@@ -27,7 +27,7 @@ public class LOTNodeExtractionSpeed {
     private final static int numPolygonsEachSource = 1000;
     private final static Random random = new Random(1337);
 
-    private final static String[] DUMP_HEADER = new String[]{"relationId", "numEENodes", "numNodes", "naiveTime", "rphastTime"};
+    private final static String[] DUMP_HEADER = new String[]{"relationId", "numEENodes", "numNodes", "naiveTime", "rphastTime", "intermediateTime"};
     private final static String RESULT_PATH = Config.LOT + LocalDateTime.now().toString().replaceAll(":", "_") + ".csv";
     private final static char DELIMITER = ',';
 
@@ -68,7 +68,8 @@ public class LOTNodeExtractionSpeed {
     public static void measure(final TestRegion testRegion, final Set<Node> entryExitPoints, final int subGraphSize) {
         final double durationNaive = getDurationNaive(entryExitPoints);
         final double durationRphast = getDurationRphast(entryExitPoints);
-        addResult(testRegion, entryExitPoints, durationNaive, durationRphast, subGraphSize);
+        final double durationIntermediate = getDurationIntermediate(entryExitPoints);
+        addResult(testRegion, entryExitPoints, durationNaive, durationRphast, durationIntermediate, subGraphSize);
     }
 
     public static double getDurationNaive(final Set<Node> entryExitPoints) {
@@ -85,17 +86,25 @@ public class LOTNodeExtractionSpeed {
         return toSeconds(rphastNanos1 - rphastNanos0);
     }
 
+    public static double getDurationIntermediate(final Set<Node> entryExitPoints) {
+        final long intermediateNanos0 = System.nanoTime();
+        getAllPathsIntermediate(entryExitPoints);
+        final long intermediateNanos1 = System.nanoTime();
+        return toSeconds(intermediateNanos1 - intermediateNanos0);
+    }
+
     public static double toSeconds(final long nano) {
-        return nano / 1e-9;
+        return nano / 1e+9;
     }
 
     public static void addResult(final TestRegion testRegion, final Set<Node> entryExitPoints, final double durationNaive,
-                                 final double durationRphast, final int subGraphSize) {
+                                 final double durationRphast, final double durationIntermediate, final int subGraphSize) {
         results.get(0).add(testRegion.id);
         results.get(1).add(entryExitPoints.size());
         results.get(2).add(subGraphSize);
         results.get(3).add(durationNaive);
         results.get(4).add(durationRphast);
+        results.get(5).add(durationIntermediate);
     }
 
     private static void dump() {
@@ -194,5 +203,19 @@ public class LOTNodeExtractionSpeed {
 
         final RPHAST rphast = (RPHAST) rphastFactory.createRoutingAlgorithm();
         return rphast.findPathsAsMap(rphastSources, rphastTargets);
+    }
+
+    private static Map<Pair<Node, Node>, Path> getAllPathsIntermediate(final Set<Node> entryExitNodes) {
+        final Set<Node> rphastSources = sources;
+        final Set<Node> rphastTargets = entryExitNodes;
+        final Set<Node> chSources = entryExitNodes;
+        final Set<Node> chTargets = targets;
+        final RPHAST rphast = (RPHAST) rphastFactory.createRoutingAlgorithm();
+        final RoutingAlgorithm chDijkstra = dijkstraCHFactory.createRoutingAlgorithm();
+
+        final Map<Pair<Node, Node>, Path> allPaths = rphast.findPathsAsMap(rphastSources, rphastTargets);
+        putAllCrossProductPaths(chDijkstra, allPaths, chSources, chTargets);
+
+        return allPaths;
     }
 }
