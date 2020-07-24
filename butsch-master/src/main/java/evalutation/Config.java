@@ -41,4 +41,5 @@ public class Config {
     public final static String HEAPMAX = RESULTS + "heapmax\\";
     public final static String LOT = RESULTS + "lot\\";
     public final static String SIMPLIFICATION_STEPS = RESULTS + "simplificationSteps\\";
+    public final static String ROI_TIME = RESULTS + "roiTime\\";
 }

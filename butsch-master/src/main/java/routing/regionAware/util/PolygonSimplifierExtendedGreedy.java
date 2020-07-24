@@ -13,7 +13,7 @@ public class PolygonSimplifierExtendedGreedy extends PolygonSimplifier {
     private Polygon polygon;
     private int[] maxSetSize;
     private int maxIndex;
-    private int enlargedForward;
+    private int enlarged;
     private boolean simplified;
 
     public PolygonSimplifierExtendedGreedy(GridIndex gridIndex) {
@@ -50,12 +50,12 @@ public class PolygonSimplifierExtendedGreedy extends PolygonSimplifier {
         maxIndex = startIndex;
         int[] newSetSize = new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE};
         while (getSetSize(newSetSize) > getSetSize(maxSetSize) && getSetSize(
-                startSetSize) + enlargedForward < this.polygon.getNumPoints()) {
+                startSetSize) + enlarged < this.polygon.getNumPoints()) {
             index = Math.floorMod(index + maxSetSize[backward], this.polygon.getNumPoints());
             newSetSize = cSetBuilder.getContractionSetSize(index);
 
             if (getSetSize(newSetSize) > getSetSize(maxSetSize)) {
-                enlargedForward += newSetSize[backward];
+                enlarged += newSetSize[backward];
                 maxSetSize = newSetSize;
                 maxIndex = index;
             }
