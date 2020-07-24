@@ -30,24 +30,7 @@ public class RoiTimeDistribution {
 
     public static void main(String[] args) {
         init();
-
-        int i = 0;
-        for (final NodeRelation relation : instance.relations) {
-            System.out.println(LocalDateTime.now() + ": " + ++i + " / " + instance.relations.size());
-            final EntryExitPointExtractor eeEx = new EntryExitPointExtractor(
-                    new RegionOfInterest(relation.toPolygon()), instance.index);
-            final Set<Node> entryExitPoints = eeEx.extract();
-
-            final RPHAST rphast = (RPHAST) rphastFactory.createRoutingAlgorithm();
-            final List<Path> paths = rphast.findPaths(entryExitPoints, entryExitPoints);
-
-            results.get(0).addAll(Collections.nCopies(paths.size(), relation.id));
-            results.get(1).addAll(Collections.nCopies(paths.size(), entryExitPoints.size()));
-            paths.stream().map(p -> p.getStartVertex().id).collect(Collectors.toCollection(() -> results.get(2)));
-            paths.stream().map(p -> p.getEndVertex().id).collect(Collectors.toCollection(() -> results.get(3)));
-            paths.stream().map(p -> p.getWeight()).collect(Collectors.toCollection(() -> results.get(4)));
-        }
-
+        measure();
         dump();
     }
 
@@ -58,6 +41,40 @@ public class RoiTimeDistribution {
         for (int i = 0; i < DUMP_HEADER.length; i++) {
             results.add(new ArrayList<>(instance.relations.size()));
         }
+    }
+
+    public static void measure() {
+        int i = 0;
+        for (final NodeRelation relation : instance.relations) {
+            System.out.println(LocalDateTime.now() + ": " + ++i + " / " + instance.relations.size());
+            processRelation(relation);
+        }
+    }
+
+    public static void processRelation(final NodeRelation relation) {
+        final Set<Node> entryExitPoints = getEEPoints(relation);
+        final List<Path> paths = calcTimes(entryExitPoints);
+        addResults(relation, entryExitPoints, paths);
+    }
+
+    public static Set<Node> getEEPoints(final NodeRelation relation) {
+        final EntryExitPointExtractor eeEx = new EntryExitPointExtractor(
+                new RegionOfInterest(relation.toPolygon()), instance.index);
+        return eeEx.extract();
+    }
+
+    public static List<Path> calcTimes(final Set<Node> entryExitPoints) {
+        final RPHAST rphast = (RPHAST) rphastFactory.createRoutingAlgorithm();
+        return rphast.findPaths(entryExitPoints, entryExitPoints);
+    }
+
+    public static void addResults(final NodeRelation relation, final Set<Node> entryExitPoints,
+                                  final List<Path> paths) {
+        results.get(0).addAll(Collections.nCopies(paths.size(), relation.id));
+        results.get(1).addAll(Collections.nCopies(paths.size(), entryExitPoints.size()));
+        paths.stream().map(p -> p.getStartVertex().id).collect(Collectors.toCollection(() -> results.get(2)));
+        paths.stream().map(p -> p.getEndVertex().id).collect(Collectors.toCollection(() -> results.get(3)));
+        paths.stream().map(p -> p.getWeight()).collect(Collectors.toCollection(() -> results.get(4)));
     }
 
     private static void dump() {
