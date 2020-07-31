@@ -23,6 +23,14 @@ public class RegionThroughTest extends AbstractRegionTest {
         final long[] actualNodeIds = getNodeIdsFrom(pathForCoordinates);
 
 
+        visualize(pathForCoordinates);
+
+        System.out.println(Arrays.toString(actualNodeIds));
+
+        assertArrayEquals(expectedNodeIds, actualNodeIds);
+    }
+
+    public void visualize(final Path pathForCoordinates) {
         final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
         final RoadGraph graph = PolygonRoutingTestGraph.DEFAULT_INSTANCE.graph;
         col.addGraph(Color.BLACK, graph);
@@ -31,10 +39,6 @@ public class RegionThroughTest extends AbstractRegionTest {
         final GeometryVisualizer geometryVisualizer = new GeometryVisualizer(col);
         geometryVisualizer.visualizeGraph(1000);
         geometryVisualizer.save(Config.PBF_FILES + "standardExample.jpg");
-
-        System.out.println(Arrays.toString(actualNodeIds));
-
-        assertArrayEquals(expectedNodeIds, actualNodeIds);
     }
 
     private Path getPathForCoordinates(final int startLongitude, final int startLatitude, final int endLongitude,
