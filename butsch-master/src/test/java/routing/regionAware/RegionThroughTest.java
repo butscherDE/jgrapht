@@ -1,9 +1,13 @@
 package routing.regionAware;
 
 import data.*;
+import evalutation.Config;
 import index.GridIndex;
 import org.junit.jupiter.api.Test;
+import util.PolygonRoutingTestGraph;
+import visualizations.GeometryVisualizer;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.Iterator;
 
@@ -17,6 +21,16 @@ public class RegionThroughTest extends AbstractRegionTest {
         final long[] expectedNodeIds = new long[] {0L, 7L, 44L, 46L, 47L, 48L, 31L, 9L, 4L, 5L, 6L};
         final Path pathForCoordinates = getPathForCoordinates(0, 25, 46, 25);
         final long[] actualNodeIds = getNodeIdsFrom(pathForCoordinates);
+
+
+        final GeometryVisualizer.GeometryDrawCollection col = new GeometryVisualizer.GeometryDrawCollection();
+        final RoadGraph graph = PolygonRoutingTestGraph.DEFAULT_INSTANCE.graph;
+        col.addGraph(Color.BLACK, graph);
+        pathForCoordinates.getEdgeList().forEach(e -> col.addEdge(Color.RED, e, graph));
+        col.addPolygon(Color.BLUE, PolygonRoutingTestGraph.DEFAULT_INSTANCE.polygon);
+        final GeometryVisualizer geometryVisualizer = new GeometryVisualizer(col);
+        geometryVisualizer.visualizeGraph(1000);
+        geometryVisualizer.save(Config.PBF_FILES + "standardExample.jpg");
 
         System.out.println(Arrays.toString(actualNodeIds));
 
