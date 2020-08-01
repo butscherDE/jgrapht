@@ -24,6 +24,7 @@ public class Config {
     public static final String PBF_LUXEMBOURG_STATS = PBF_FILES + "luxembourgstats.csv";
     public static final String PBF_BAWU = PBF_FILES + "baden-wuerttemberg-latest.osm.pbf";
     public static final String PBF_GERMANY = PBF_FILES + "germany-latest.osm.pbf";
+    public static final String PBF_SWITZERLAND = PBF_FILES + "switzerland-latest.osm.pbf";
 
     // Preproc files
     public static final String PREPROC = PBF_FILES + "preproc\\";
