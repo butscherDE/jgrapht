@@ -22,7 +22,6 @@ public class RegionThroughTest extends AbstractRegionTest {
         final Path pathForCoordinates = getPathForCoordinates(0, 25, 46, 25);
         final long[] actualNodeIds = getNodeIdsFrom(pathForCoordinates);
 
-
         visualize(pathForCoordinates);
 
         System.out.println(Arrays.toString(actualNodeIds));
