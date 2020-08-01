@@ -99,6 +99,10 @@ public class ConvexLayers {
         return getLineSegments(layer);
     }
 
+    public int size() {
+        return layers.length;
+    }
+
     public static List<LineSegment> getLineSegments(final Collection<Coordinate> coordinates) {
         final Coordinate[] coordinatesArr = coordinates.toArray(new Coordinate[coordinates.size() + 1]);
         coordinatesArr[coordinatesArr.length - 1] = coordinatesArr[0];

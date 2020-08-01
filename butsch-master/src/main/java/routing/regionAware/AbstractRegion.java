@@ -2,8 +2,10 @@ package routing.regionAware;
 
 import data.*;
 import index.GridIndex;
+import index.vc.ReflectiveEdge;
 import org.jgrapht.alg.util.Pair;
 import routing.DijkstraCH;
+import routing.DijkstraCHFactory;
 import routing.RPHAST;
 import routing.RoutingAlgorithm;
 import routing.regionAware.util.EntryExitPointExtractor;
@@ -12,6 +14,7 @@ import routing.regionAware.util.RouteCandidate;
 import routing.regionAware.util.RouteCandidateList;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractRegion implements RoutingAlgorithm {
     final RoadGraph globalGraph;

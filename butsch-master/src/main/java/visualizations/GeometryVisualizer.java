@@ -173,9 +173,13 @@ public class GeometryVisualizer {
     }
 
     public void save(final String path) {
+        save(path, 1000, 1000);
+    }
+
+    public void save(final String path, final int width, final int height) {
         try
         {
-            BufferedImage image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics2D = image.createGraphics();
             frame.paint(graphics2D);
             ImageIO.write(image,"jpeg", new File(path));
