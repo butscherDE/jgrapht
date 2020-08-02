@@ -35,20 +35,20 @@ public class RelationFinder {
 //
 //        System.exit(-1);
 
-        final ImportPBF freiburg = new ImportPBF(Config.PBF_FREIBURG);
+        final ImportPBF freiburg = new ImportPBF(Config.PBF_TUEBINGEN);
         try {
             freiburg.createGraph();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         final List<NodeRelation> nodeRelations = freiburg.getNodeRelations();
-        final NodeRelation bodensee = nodeRelations.stream().filter(r -> r.id == 1156846L).findFirst().orElse(null);
-        final NodeRelation obersee = nodeRelations.stream().filter(r -> r.id == 1150296).findFirst().orElse(null);
-        final NodeRelation hegau = nodeRelations.stream().filter(r -> r.id == 642847654).findFirst().orElse(null);
+        final NodeRelation bodensee = nodeRelations.stream().filter(r -> r.id == 1156846 ).findFirst().orElse(null);
+        final NodeRelation federnsee = nodeRelations.stream().filter(r -> r.id == 8387767).findFirst().orElse(null);
+        final NodeRelation neckarAlb = nodeRelations.stream().filter(r -> r.id == 2799137).findFirst().orElse(null);
 
         System.out.println(bodensee.description);
-        System.out.println(obersee.description);
-        System.out.println(hegau.description);
+        System.out.println(federnsee.description);
+        System.out.println(neckarAlb.description);
 
 
     }
