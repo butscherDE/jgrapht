@@ -63,7 +63,7 @@ public class RelationFinder {
         System.out.println(sigmaringen);
         System.out.println(ulm);
 
-        final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = new ContractionHierarchyPrecomputation<Node, Edge>(
+        final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = new ContractionHierarchyPrecomputation<>(
                 instance.graph).computeContractionHierarchy();
         final RoadCH roadCh = new RoadCH(ch);
 
