@@ -1,9 +1,11 @@
 package evalutation;
 
-import data.Node;
-import data.NodeRelation;
+import data.*;
 import geometry.ConvexLayers;
+import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
 import org.locationtech.jts.geom.*;
+import routing.DijkstraCHFactory;
+import storage.GeoJsonExporter;
 import storage.ImportPBF;
 
 import java.io.FileNotFoundException;
@@ -14,6 +16,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class RelationFinder {
+    private final static GeometryFactory gf = new GeometryFactory();
+
     public static void main(String[] args) {
 //        final int numPoints = 20;
 //        final GeometryFactory gf = new GeometryFactory();
@@ -43,12 +47,12 @@ public class RelationFinder {
         final NodeRelation federnsee = nodeRelations.stream().filter(r -> r.id == 8387767).findFirst().orElse(null);
         final NodeRelation neckarAlb = nodeRelations.stream().filter(r -> r.id == 2799137).findFirst().orElse(null);
 
-        final Node ueberlingen = instance.index.getClosestNode(47.766256, 9.170290);
-        final Node ravensburg = instance.index.getClosestNode(47.777967, 9.612264);
-        final Node badSaulgau = instance.index.getClosestNode(48.014345, 9.498933);
-        final Node riedlingen = instance.index.getClosestNode(48.160181, 9.469365);
-        final Node sigmaringen = instance.index.getClosestNode(48.091957, 9.228290);
-        final Node ulm = instance.index.getClosestNode(48.401491, 9.988786);
+        final Node ueberlingen = instance.index.getClosestNode(9.170290, 47.766256);
+        final Node ravensburg = instance.index.getClosestNode(9.612264, 47.777967);
+        final Node badSaulgau = instance.index.getClosestNode(9.498933, 48.014345);
+        final Node riedlingen = instance.index.getClosestNode(9.469365, 48.160181);
+        final Node sigmaringen = instance.index.getClosestNode(9.228290, 48.091957);
+        final Node ulm = instance.index.getClosestNode(9.988786, 48.401491);
 
         System.out.println(ueberlingen);
         System.out.println(ravensburg);
@@ -56,5 +60,31 @@ public class RelationFinder {
         System.out.println(riedlingen);
         System.out.println(sigmaringen);
         System.out.println(ulm);
+
+        final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = new ContractionHierarchyPrecomputation<Node, Edge>(
+                instance.graph).computeContractionHierarchy();
+        final RoadCH roadCh = new RoadCH(ch);
+
+        final DijkstraCHFactory chFactory = new DijkstraCHFactory(roadCh, true);
+        final Path uberRave = chFactory.createRoutingAlgorithm().findPath(ueberlingen, ravensburg);
+        final Path badRied = chFactory.createRoutingAlgorithm().findPath(badSaulgau, riedlingen);
+        final Path sigUlm = chFactory.createRoutingAlgorithm().findPath(sigmaringen, ulm);
+
+        final GeoJsonExporter exp = new GeoJsonExporter("lala");
+        exp.addLineString(toLineString(uberRave));
+        exp.addLineString(toLineString(badRied));
+        exp.addLineString(toLineString(sigUlm));
+
+        exp.writeJson();
+    }
+
+    private static LineString toLineString(final Path path) {
+        final Coordinate[] coordinates = path
+                .getVertexList()
+                .stream()
+                .map(v -> v.getPoint().getCoordinate())
+                .collect(Collectors.toList())
+                .toArray(new Coordinate[path.getLength()]);
+        return gf.createLineString(coordinates);
     }
 }
