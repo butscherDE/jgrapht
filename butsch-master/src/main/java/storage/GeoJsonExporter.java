@@ -48,12 +48,6 @@ public class GeoJsonExporter {
         final List<JSONObject> jsonLineStringFeatures = getJsonLineStrings();
         final List<JSONObject> jsonPolygonFeatures = getJsonPolygons();
 
-        final JSONArray jsonArray = new JSONArray();
-        jsonPointFeatures.forEach(f -> jsonArray.add(f));
-        jsonLineStringFeatures.forEach(f -> jsonArray.add(f));
-        jsonPolygonFeatures.forEach(f -> jsonArray.add(f));
-        System.out.println(jsonArray.toJSONString());
-
         final JSONArray features = new JSONArray();
         jsonPointFeatures.forEach(p -> features.add(p));
         jsonLineStringFeatures.forEach(ls -> features.add(ls));
@@ -63,6 +57,7 @@ public class GeoJsonExporter {
         featureCollection.put("features", features);
         featureCollection.put("type", "FeatureCollection");
 
+        System.err.println("Not printing to file only to console");
         System.out.println(featureCollection.toJSONString());
     }
 
