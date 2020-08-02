@@ -2,7 +2,7 @@ package evalutation;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class Config {
-    public final static boolean VERBOSE = false;
+    public final static boolean VERBOSE = true;
 
     public final static String PBF_FILES = "C:\\pbffiles\\";
     // ERP style data

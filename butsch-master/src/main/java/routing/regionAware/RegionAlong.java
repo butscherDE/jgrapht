@@ -26,8 +26,12 @@ public class RegionAlong extends AbstractRegion {
     @Override
     RoadCH getRegionCH() {
         final Set<VisibilityCell> intersectedCells = getIntersectingCells();
+        System.out.println("Number of intersected cells: " + intersectedCells.size());
+        System.out.println("found intersected cells");
         final RoadGraph regionGraph = prepareGraph(intersectedCells);
+        System.out.println("found region graph");
         final RoadCH regionCH = prepCh(regionGraph);
+        System.out.println("preped region ch");
 
         return regionCH;
     }

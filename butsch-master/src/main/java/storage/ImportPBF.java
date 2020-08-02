@@ -366,6 +366,8 @@ public class ImportPBF implements GraphImporter {
             } catch (NullPointerException | NoSuchElementException e) {
                 final long invalidRelationId = relationEntry.getValue().getId();
                 invalidRelations.add(invalidRelationId);
+            } catch (IndexOutOfBoundsException e) {
+                System.err.println("invalid relation. only inners?");
             }
         }
 

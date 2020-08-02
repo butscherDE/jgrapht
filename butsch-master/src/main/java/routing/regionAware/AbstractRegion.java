@@ -34,8 +34,11 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
         this.region = region;
 
         this.entryExitNodes = new EntryExitPointExtractor(region, globalIndex).extract();
+        System.out.println("found ee");
         this.regionCH = getValidatedRegionCH();
+        System.out.println("found region ch");
         this.allPathsNonBacktracked.putAll(getRegionInternalPaths(entryExitNodes, entryExitNodes, regionCH));
+        System.out.println("found all paths non backtracked");
     }
 
     public RoadCH getValidatedRegionCH() {
@@ -136,6 +139,7 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
 
     private Map<Pair<Node, Node>, Path> getRegionInternalPaths(final Set<Node> entryNodes, final Set<Node> exitNodes,
                                                                final RoadCH regionCH) {
+        System.out.println("entry nodes size:" + entryNodes.size());
         final RPHAST rphastLocal = new RPHAST(regionCH, false);
         return rphastLocal.findPathsAsMap(entryNodes, exitNodes);
     }

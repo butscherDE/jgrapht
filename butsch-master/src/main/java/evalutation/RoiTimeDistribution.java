@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class RoiTimeDistribution {
-    private final static String PBF = Config.PBF_ANDORRA;
+    private final static String PBF = Config.PBF_TUEBINGEN;
     private final static Random random = new Random(1337);
 
     private final static String[] DUMP_HEADER = new String[]{"relationId", "numEENodes", "startNode", "endNode", "timeInRoi"};

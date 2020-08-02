@@ -73,19 +73,20 @@ public class RelationFinder {
         final Path badRiedDirect = chFactory.createRoutingAlgorithm().findPath(badSaulgau, riedlingen);
         final Path sigUlmDirect = chFactory.createRoutingAlgorithm().findPath(sigmaringen, ulm);
 
-        System.out.println("#################\nFedernsee:");
-        final StopWatchVerbose sw2 = new StopWatchVerbose("federnsee pathcalc");
-        final RegionAlong federnseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
-                                                           new RegionOfInterest(federnsee.toPolygon()));
-        final Path badRiedAlong = federnseeAlong.findPath(badSaulgau, riedlingen);
-        sw2.printTimingIfVerbose();
-
         System.out.println("#################\nBodensee:");
         final StopWatchVerbose sw1 = new StopWatchVerbose("bodensee pathcalc");
         final RegionAlong bodenseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
                                                         new RegionOfInterest(bodensee.toPolygon()));
         final Path uberRaveAlong = bodenseeAlong.findPath(ueberlingen, ravensburg);
         sw1.printTimingIfVerbose();
+
+        System.out.println("#################\nFedernsee:");
+        final StopWatchVerbose sw2 = new StopWatchVerbose("federnsee pathcalc");
+        final RegionAlong federnseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
+                new RegionOfInterest(federnsee.toPolygon()));
+        System.out.println("instance created");
+        final Path badRiedAlong = federnseeAlong.findPath(badSaulgau, riedlingen);
+        sw2.printTimingIfVerbose();
 
         System.out.println("#################\nNeckar Alb:");
         final StopWatchVerbose sw3 = new StopWatchVerbose("neckar alb path calc");
