@@ -5,9 +5,11 @@ import geometry.ConvexLayers;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
 import org.locationtech.jts.geom.*;
 import routing.DijkstraCHFactory;
+import routing.regionAware.RegionAlong;
 import storage.GeoJsonExporter;
 import storage.ImportPBF;
 
+import javax.swing.plaf.synth.Region;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Random;
@@ -66,16 +68,34 @@ public class RelationFinder {
         final RoadCH roadCh = new RoadCH(ch);
 
         final DijkstraCHFactory chFactory = new DijkstraCHFactory(roadCh, true);
-        final Path uberRave = chFactory.createRoutingAlgorithm().findPath(ueberlingen, ravensburg);
-        final Path badRied = chFactory.createRoutingAlgorithm().findPath(badSaulgau, riedlingen);
-        final Path sigUlm = chFactory.createRoutingAlgorithm().findPath(sigmaringen, ulm);
+        final Path uberRaveDirect = chFactory.createRoutingAlgorithm().findPath(ueberlingen, ravensburg);
+        final Path badRiedDirect = chFactory.createRoutingAlgorithm().findPath(badSaulgau, riedlingen);
+        final Path sigUlmDirect = chFactory.createRoutingAlgorithm().findPath(sigmaringen, ulm);
 
-        final GeoJsonExporter exp = new GeoJsonExporter("lala");
-        exp.addLineString(toLineString(uberRave));
-        exp.addLineString(toLineString(badRied));
-        exp.addLineString(toLineString(sigUlm));
+        final RegionAlong bodenseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
+                                                        new RegionOfInterest(bodensee.toPolygon()));
+        final Path uberRaveAlong = bodenseeAlong.findPath(ueberlingen, ravensburg);
+        final Path badRiedAlong = bodenseeAlong.findPath(badSaulgau, riedlingen);
+        final Path sigUlmThrough = bodenseeAlong.findPath(sigmaringen, ulm);
 
-        exp.writeJson();
+        final GeoJsonExporter expUberRave = new GeoJsonExporter("lala");
+        expUberRave.addLineString(toLineString(uberRaveDirect));
+        expUberRave.addLineString(toLineString(uberRaveAlong));
+        expUberRave.addPolygon(bodensee.toPolygon());
+
+        final GeoJsonExporter expBadRied = new GeoJsonExporter("lala");
+        expBadRied.addLineString(toLineString(badRiedDirect));
+        expBadRied.addLineString(toLineString(badRiedAlong));
+        expBadRied.addPolygon(federnsee.toPolygon());
+
+        final GeoJsonExporter expSigUlm = new GeoJsonExporter("lala");
+        expSigUlm.addLineString(toLineString(sigUlmDirect));
+        expSigUlm.addLineString(toLineString(sigUlmThrough));
+        expSigUlm.addPolygon(neckarAlb.toPolygon());
+
+        expUberRave.writeJson();
+        expBadRied.writeJson();
+        expSigUlm.writeJson();
     }
 
     private static LineString toLineString(final Path path) {
