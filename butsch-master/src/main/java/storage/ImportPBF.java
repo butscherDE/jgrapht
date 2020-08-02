@@ -211,6 +211,10 @@ public class ImportPBF implements GraphImporter {
             isRoad.put("centre_line", false);
             isRoad.put("path/cycleway", false);
             isRoad.put("fuel", false);
+            isRoad.put("private", false);
+            isRoad.put("ohm:military:Trench", false);
+            isRoad.put("disused:path", false);
+            isRoad.put("bus", false);
         }
 
         @Override
