@@ -1,5 +1,6 @@
 package evalutation;
 
+import data.Node;
 import data.NodeRelation;
 import geometry.ConvexLayers;
 import org.locationtech.jts.geom.*;
@@ -35,21 +36,25 @@ public class RelationFinder {
 //
 //        System.exit(-1);
 
-        final ImportPBF freiburg = new ImportPBF(Config.PBF_FREIBURG);
-        try {
-            freiburg.createGraph();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        final List<NodeRelation> nodeRelations = freiburg.getNodeRelations();
-        final NodeRelation bodensee = nodeRelations.stream().filter(r -> r.id == 1156846L).findFirst().orElse(null);
-        final NodeRelation obersee = nodeRelations.stream().filter(r -> r.id == 1150296).findFirst().orElse(null);
-        final NodeRelation hegau = nodeRelations.stream().filter(r -> r.id == 642847654).findFirst().orElse(null);
+        final DataInstance instance = DataInstance.createFromImporter(new ImportPBF(Config.PBF_TUEBINGEN));
 
-        System.out.println(bodensee.description);
-        System.out.println(obersee.description);
-        System.out.println(hegau.description);
+        final List<NodeRelation> nodeRelations = instance.relations;
+        final NodeRelation bodensee = nodeRelations.stream().filter(r -> r.id == 1156846 ).findFirst().orElse(null);
+        final NodeRelation federnsee = nodeRelations.stream().filter(r -> r.id == 8387767).findFirst().orElse(null);
+        final NodeRelation neckarAlb = nodeRelations.stream().filter(r -> r.id == 2799137).findFirst().orElse(null);
 
+        final Node ueberlingen = instance.index.getClosestNode(47.766256, 9.170290);
+        final Node ravensburg = instance.index.getClosestNode(47.777967, 9.612264);
+        final Node badSaulgau = instance.index.getClosestNode(48.014345, 9.498933);
+        final Node riedlingen = instance.index.getClosestNode(48.160181, 9.469365);
+        final Node sigmaringen = instance.index.getClosestNode(48.091957, 9.228290);
+        final Node ulm = instance.index.getClosestNode(48.401491, 9.988786);
 
+        System.out.println(ueberlingen);
+        System.out.println(ravensburg);
+        System.out.println(badSaulgau);
+        System.out.println(riedlingen);
+        System.out.println(sigmaringen);
+        System.out.println(ulm);
     }
 }
