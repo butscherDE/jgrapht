@@ -18,6 +18,7 @@ public class RouteCandidateList<T extends RouteCandidate> {
     }
 
     public List<RouteCandidate> getFirstN(final int numberOfFirstElements) {
+        System.out.println("Number of Route Candidates: " + candidates.size());
         final List<RouteCandidate> paths = new ArrayList<>(numberOfFirstElements);
 
         final int endOfCandidates = this.candidates.size() - 1;

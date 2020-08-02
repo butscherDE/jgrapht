@@ -6,6 +6,7 @@ import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
 import org.locationtech.jts.geom.*;
 import routing.DijkstraCHFactory;
 import routing.regionAware.RegionAlong;
+import routing.regionAware.RegionThrough;
 import storage.GeoJsonExporter;
 import storage.ImportPBF;
 
@@ -63,7 +64,7 @@ public class RelationFinder {
         System.out.println(sigmaringen);
         System.out.println(ulm);
 
-        final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = new ContractionHierarchyPrecomputation<Node, Edge>(
+        final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = new ContractionHierarchyPrecomputation<>(
                 instance.graph).computeContractionHierarchy();
         final RoadCH roadCh = new RoadCH(ch);
 
@@ -72,11 +73,27 @@ public class RelationFinder {
         final Path badRiedDirect = chFactory.createRoutingAlgorithm().findPath(badSaulgau, riedlingen);
         final Path sigUlmDirect = chFactory.createRoutingAlgorithm().findPath(sigmaringen, ulm);
 
+        System.out.println("#################\nFedernsee:");
+        final StopWatchVerbose sw2 = new StopWatchVerbose("federnsee pathcalc");
+        final RegionAlong federnseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
+                                                           new RegionOfInterest(federnsee.toPolygon()));
+        final Path badRiedAlong = federnseeAlong.findPath(badSaulgau, riedlingen);
+        sw2.printTimingIfVerbose();
+
+        System.out.println("#################\nBodensee:");
+        final StopWatchVerbose sw1 = new StopWatchVerbose("bodensee pathcalc");
         final RegionAlong bodenseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
                                                         new RegionOfInterest(bodensee.toPolygon()));
         final Path uberRaveAlong = bodenseeAlong.findPath(ueberlingen, ravensburg);
-        final Path badRiedAlong = bodenseeAlong.findPath(badSaulgau, riedlingen);
-        final Path sigUlmThrough = bodenseeAlong.findPath(sigmaringen, ulm);
+        sw1.printTimingIfVerbose();
+
+        System.out.println("#################\nNeckar Alb:");
+        final StopWatchVerbose sw3 = new StopWatchVerbose("neckar alb path calc");
+        final RegionThrough neckarAlbThrough = new RegionThrough(instance.graph, roadCh, instance.index,
+                                                                 new RegionOfInterest(neckarAlb.toPolygon()));
+        final Path sigUlmThrough = neckarAlbThrough.findPath(sigmaringen, ulm);
+        sw3.printTimingIfVerbose();
+
 
         final GeoJsonExporter expUberRave = new GeoJsonExporter("lala");
         expUberRave.addLineString(toLineString(uberRaveDirect));

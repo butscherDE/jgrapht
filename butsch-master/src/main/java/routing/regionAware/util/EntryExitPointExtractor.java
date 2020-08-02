@@ -4,6 +4,7 @@ import data.Edge;
 import data.Node;
 import data.RegionOfInterest;
 import data.RoadGraph;
+import evalutation.StopWatchVerbose;
 import geometry.BoundingBox;
 import geometry.PolygonContainsChecker;
 import index.GridIndex;
@@ -25,11 +26,15 @@ public class EntryExitPointExtractor {
     }
 
     public Set<Node> extract() {
+        final StopWatchVerbose sw = new StopWatchVerbose("Entry- / Exit-Point extraction");
         final EntryExitNodeVisitor entryExitNodeVisitor = new EntryExitNodeVisitor(graph, region.getPolygon());
         final BoundingBox boundingBox = BoundingBox.createFrom(region.getPolygon());
         gridIndex.queryEdges(boundingBox, entryExitNodeVisitor);
 
-        return entryExitNodeVisitor.getEntryExitNodes();
+        final Set<Node> entryExitNodes = entryExitNodeVisitor.getEntryExitNodes();
+        sw.printTimingIfVerbose();
+        System.out.println("Number of Entry- / Exit-Points: " + entryExitNodes.size());
+        return entryExitNodes;
     }
 
     private static class EntryExitNodeVisitor implements Index.IndexVisitor<Edge> {
