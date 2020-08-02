@@ -388,6 +388,10 @@ public class ImportPBF implements GraphImporter {
                 final Long memberId = member.getId();
                 final RelationMember.Type type = member.getType();
 
+                if (member.getRole().equals("inner")) {
+                    continue;
+                }
+
                 if (type == RelationMember.Type.RELATION) {
                     nodeIds.addAll(recurseToFindNodes(relations.get(memberId)));
                 } else if (type == RelationMember.Type.NODE) {
