@@ -135,8 +135,6 @@ public class RegionAlong extends AbstractRegion {
         int i = 0;
         @Override
         public void accept(VisibilityCell entity) {
-            System.out.println(i++ + "th vc intersection");
-            StopWatchVerbose sw = new StopWatchVerbose("vc intersection calculated");
             if (!intersectedCells.contains(entity) && !nonIntersectingCells.contains(entity)) {
                 final List<LineSegment> blueSegments = entity.lineSegments;
                 final SegmentIntersectionAlgorithm intersectionAlgo = factory.createInstance(redSegments, blueSegments);
@@ -147,7 +145,6 @@ public class RegionAlong extends AbstractRegion {
                     nonIntersectingCells.add(entity);
                 }
             }
-            sw.printTimingIfVerbose();
         }
     }
 }
