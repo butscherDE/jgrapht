@@ -33,11 +33,8 @@ public class RegionAlong extends AbstractRegion {
 
     private Set<VisibilityCell> getIntersectingCells() {
         final BoundingBox limiter = BoundingBox.createFrom(region.getPolygon());
-        System.out.println("Built bbox");
         final VCLogger vcLogger = new VCLogger(region);
-        System.out.println("initialized logger");
         index.queryVisibilityCells(limiter, vcLogger);
-        System.out.println("queried vcs");
         return vcLogger.intersectedCells;
     }
 
