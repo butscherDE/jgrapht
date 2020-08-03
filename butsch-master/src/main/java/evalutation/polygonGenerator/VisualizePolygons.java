@@ -34,37 +34,15 @@ public class VisualizePolygons {
         final NodeRelation nodeRelation = nodeRelations.stream().filter(r -> r.id == 2799137).findFirst().orElse(null);
         pbfPolygons.add(nodeRelation.toPolygon());
 
-        checkPolygons(twoOptPolygons, starPolygons, clPolygons, pbfPolygons);
-
-        System.out.println("1");
         savePolygons(twoOptPolygons, "twoOpt");
-        System.out.println("2");
         savePolygons(starPolygons, "star");
-        System.out.println("3");
         savePolygons(clPolygons, "cl");
-        System.out.println("4");
         savePolygons(pbfPolygons, "import");
-    }
-
-    private static void checkPolygons(final List<Polygon> twoOptPolygons, final List<Polygon> starPolygons, final List<Polygon> clPolygons, final List<Polygon> pbfPolygons) {
-        twoOptPolygons.forEach(p -> checkPolygon(p));
-        starPolygons.forEach(p -> checkPolygon(p));
-        clPolygons.forEach(p -> checkPolygon(p));
-        pbfPolygons.forEach(p -> checkPolygon(p));
-    }
-
-    private static void checkPolygon(final Polygon polygon) {
-        final Coordinate[] coordinates = polygon.getCoordinates();
-//        if (!coordinates[0].equals(coordinates[coordinates.length - 1])) {
-        if (coordinates[0].x != coordinates[coordinates.length-1].x || coordinates[0].y != coordinates[coordinates.length - 1].y) {
-            throw new IllegalStateException("??????");
-        }
     }
 
     public static void savePolygons(final Collection<Polygon> polygons, final String name) {
         int c = 0;
         for (Polygon polygon : polygons) {
-            System.out.println("c: " + c);
             try {
                 saveImg(polygon, name + "_" + c++);
             } catch (Exception e) {
