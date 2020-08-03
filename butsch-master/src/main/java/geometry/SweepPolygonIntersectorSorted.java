@@ -26,35 +26,38 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
     }
 
     public LinkedList<LSEntity> prepareSweepQueue(final List<LineSegment> redSegments, final List<LineSegment> blueSegments) {
-        final ArrayList<LSEntity> entities = new ArrayList<>(2 * (redSegments.size() + blueSegments.size()));
-        addAllEntities();
+        final ArrayList<LSEntity> entities = addAllEntities();
         Collections.sort(entities);
 
         return new LinkedList<>(entities);
     }
 
-    public void addAllEntities() {
-        addRedEntities();
-        addBlueEntities();
+    public ArrayList<LSEntity> addAllEntities() {
+        final ArrayList<LSEntity> entities = new ArrayList<>(2 * (redSegments.size() + blueSegments.size()));
+
+        addRedEntities(entities);
+        addBlueEntities(entities);
+
+        return entities;
     }
 
-    public void addRedEntities() {
+    public void addRedEntities(final ArrayList<LSEntity> entities) {
         for (final LineSegment redSegment : redSegments) {
             final LSEntity first = new LSEntity(redSegment.p0.x, false, null, redSegment);
             final LSEntity second = new LSEntity(redSegment.p1.x, false, first, redSegment);
 
-            sweepQueue.add(first);
-            sweepQueue.add(second);
+            entities.add(first);
+            entities.add(second);
         }
     }
 
-    public void addBlueEntities() {
+    public void addBlueEntities(final ArrayList<LSEntity> entities) {
         for (final LineSegment blueSegment : blueSegments) {
             final LSEntity first = new LSEntity(blueSegment.p0.x, true, null, blueSegment);
             final LSEntity second =  new LSEntity(blueSegment.p1.x, true, first, blueSegment);
 
-            sweepQueue.add(first);
-            sweepQueue.add(second);
+            entities.add(first);
+            entities.add(second);
         }
     }
 
