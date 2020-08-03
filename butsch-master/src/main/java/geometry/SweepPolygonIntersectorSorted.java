@@ -60,20 +60,36 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
 
     @Override
     public boolean isIntersectionPresent() {
-        throw new NotImplementedException("");
+        while (hasQueueNext()) {
+            if (nextSweepStep().size() > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
     public int getIntersectionCount() {
-        throw new NotImplementedException("");
+        return getIntersections().size();
     }
 
     @Override
     public List<Coordinate> getIntersections() {
-        throw new NotImplementedException("");
+        final List<Coordinate> intersections = new LinkedList<>();
+
+        while (hasQueueNext()) {
+            intersections.addAll(nextSweepStep());
+        }
+
+        return intersections;
     }
 
-    private List<Coordinate> nextSweep() {
+    private boolean hasQueueNext() {
+        return this.sweepQueue.size() > 0;
+    }
+
+    private List<Coordinate> nextSweepStep() {
         final List<Coordinate> intersections;
         final LSEntity popped = sweepQueue.removeFirst();
 
