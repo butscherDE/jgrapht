@@ -1,6 +1,7 @@
 package routing.regionAware;
 
 import data.*;
+import evalutation.StopWatchVerbose;
 import index.GridIndex;
 import index.vc.ReflectiveEdge;
 import org.jgrapht.alg.util.Pair;
@@ -42,7 +43,9 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
     }
 
     public RoadCH getValidatedRegionCH() {
+        StopWatchVerbose sw = new StopWatchVerbose("Created region ch");
         final RoadCH regionCH = getRegionCH();
+        sw.printTimingIfVerbose();
 
         if (regionCH.getGraph().vertexSet().size() <= 1) {
             throw new IllegalArgumentException("Empty region");
@@ -120,7 +123,11 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
         final RPHAST rphastGlobal = new RPHAST(globalCH, false);
         final Set<Node> allSources = getGlobalSources(source);
         final Set<Node> allTargets = getGlobalTargets(target);
-        return rphastGlobal.findPathsAsMap(allSources, allTargets);
+
+        final StopWatchVerbose sw = new StopWatchVerbose("global paths (start/end vs lot");
+        Map<Pair<Node, Node>, Path> globalPaths = rphastGlobal.findPathsAsMap(allSources, allTargets);
+        sw.printTimingIfVerbose();
+        return globalPaths;
     }
 
     private Set<Node> getGlobalSources(final Set<Node> source) {
@@ -141,7 +148,11 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
                                                                final RoadCH regionCH) {
         System.out.println("entry nodes size:" + entryNodes.size());
         final RPHAST rphastLocal = new RPHAST(regionCH, false);
-        return rphastLocal.findPathsAsMap(entryNodes, exitNodes);
+
+        final StopWatchVerbose sw = new StopWatchVerbose("local paths (roi internal)");
+        Map<Pair<Node, Node>, Path> localPaths = rphastLocal.findPathsAsMap(entryNodes, exitNodes);
+        sw.printTimingIfVerbose();
+        return localPaths;
     }
 
 

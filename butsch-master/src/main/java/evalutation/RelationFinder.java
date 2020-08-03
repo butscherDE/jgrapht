@@ -49,6 +49,9 @@ public class RelationFinder {
         final NodeRelation bodensee = nodeRelations.stream().filter(r -> r.id == 1156846 ).findFirst().orElse(null);
         final NodeRelation federnsee = nodeRelations.stream().filter(r -> r.id == 8387767).findFirst().orElse(null);
         final NodeRelation neckarAlb = nodeRelations.stream().filter(r -> r.id == 2799137).findFirst().orElse(null);
+        System.out.println(bodensee.description);
+        System.out.println(federnsee.description);
+        System.out.println(neckarAlb.description);
 
         final Node ueberlingen = instance.index.getClosestNode(9.170290, 47.766256);
         final Node ravensburg = instance.index.getClosestNode(9.612264, 47.777967);
@@ -80,13 +83,13 @@ public class RelationFinder {
         final Path uberRaveAlong = bodenseeAlong.findPath(ueberlingen, ravensburg);
         sw1.printTimingIfVerbose();
 
-        System.out.println("#################\nFedernsee:");
-        final StopWatchVerbose sw2 = new StopWatchVerbose("federnsee pathcalc");
-        final RegionAlong federnseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
-                new RegionOfInterest(federnsee.toPolygon()));
-        System.out.println("instance created");
-        final Path badRiedAlong = federnseeAlong.findPath(badSaulgau, riedlingen);
-        sw2.printTimingIfVerbose();
+//        System.out.println("#################\nFedernsee:");
+//        final StopWatchVerbose sw2 = new StopWatchVerbose("federnsee pathcalc");
+//        final RegionAlong federnseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
+//                new RegionOfInterest(federnsee.toPolygon()));
+//        System.out.println("instance created");
+//        final Path badRiedAlong = federnseeAlong.findPath(badSaulgau, riedlingen);
+//        sw2.printTimingIfVerbose();
 
         System.out.println("#################\nNeckar Alb:");
         final StopWatchVerbose sw3 = new StopWatchVerbose("neckar alb path calc");
@@ -101,10 +104,10 @@ public class RelationFinder {
         expUberRave.addLineString(toLineString(uberRaveAlong));
         expUberRave.addPolygon(bodensee.toPolygon());
 
-        final GeoJsonExporter expBadRied = new GeoJsonExporter("lala");
-        expBadRied.addLineString(toLineString(badRiedDirect));
-        expBadRied.addLineString(toLineString(badRiedAlong));
-        expBadRied.addPolygon(federnsee.toPolygon());
+//        final GeoJsonExporter expBadRied = new GeoJsonExporter("lala");
+//        expBadRied.addLineString(toLineString(badRiedDirect));
+//        expBadRied.addLineString(toLineString(badRiedAlong));
+//        expBadRied.addPolygon(federnsee.toPolygon());
 
         final GeoJsonExporter expSigUlm = new GeoJsonExporter("lala");
         expSigUlm.addLineString(toLineString(sigUlmDirect));
@@ -112,7 +115,7 @@ public class RelationFinder {
         expSigUlm.addPolygon(neckarAlb.toPolygon());
 
         expUberRave.writeJson();
-        expBadRied.writeJson();
+//        expBadRied.writeJson();
         expSigUlm.writeJson();
     }
 

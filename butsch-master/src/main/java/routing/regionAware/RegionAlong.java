@@ -1,6 +1,7 @@
 package routing.regionAware;
 
 import data.*;
+import evalutation.StopWatchVerbose;
 import geometry.BoundingBox;
 import geometry.RedBlueSegmentIntersectionCrossProductFactory;
 import geometry.SegmentIntersectionAlgorithm;
@@ -38,8 +39,11 @@ public class RegionAlong extends AbstractRegion {
 
     private Set<VisibilityCell> getIntersectingCells() {
         final BoundingBox limiter = BoundingBox.createFrom(region.getPolygon());
+        System.out.println("Built bbox");
         final VCLogger vcLogger = new VCLogger(region);
+        System.out.println("initialized logger");
         index.queryVisibilityCells(limiter, vcLogger);
+        System.out.println("queried vcs");
         return vcLogger.intersectedCells;
     }
 
@@ -129,8 +133,11 @@ public class RegionAlong extends AbstractRegion {
             accept(entity);
         }
 
+        int i = 0;
         @Override
         public void accept(VisibilityCell entity) {
+            System.out.println(i++ + "th vc intersection");
+            StopWatchVerbose sw = new StopWatchVerbose("vc intersection calculated");
             if (!intersectedCells.contains(entity) && !nonIntersectingCells.contains(entity)) {
                 final List<LineSegment> blueSegments = entity.lineSegments;
                 final SegmentIntersectionAlgorithm intersectionAlgo = factory.createInstance(redSegments, blueSegments);
@@ -141,6 +148,7 @@ public class RegionAlong extends AbstractRegion {
                     nonIntersectingCells.add(entity);
                 }
             }
+            sw.printTimingIfVerbose();
         }
     }
 }
