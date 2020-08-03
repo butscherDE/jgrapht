@@ -43,7 +43,7 @@ public abstract class AbstractRegion implements RoutingAlgorithm {
     }
 
     public RoadCH getValidatedRegionCH() {
-        StopWatchVerbose sw = new StopWatchVerbose("Created region ch");
+        StopWatchVerbose sw = new StopWatchVerbose("Created region ch with intersection of vcs");
         final RoadCH regionCH = getRegionCH();
         sw.printTimingIfVerbose();
 

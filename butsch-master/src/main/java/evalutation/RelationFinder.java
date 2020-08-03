@@ -49,9 +49,9 @@ public class RelationFinder {
         final NodeRelation bodensee = nodeRelations.stream().filter(r -> r.id == 1156846 ).findFirst().orElse(null);
         final NodeRelation federnsee = nodeRelations.stream().filter(r -> r.id == 8387767).findFirst().orElse(null);
         final NodeRelation neckarAlb = nodeRelations.stream().filter(r -> r.id == 2799137).findFirst().orElse(null);
-        System.out.println(bodensee.description);
-        System.out.println(federnsee.description);
-        System.out.println(neckarAlb.description);
+        System.out.println(bodensee.coordinates.length);
+        System.out.println(federnsee.coordinates.length);
+        System.out.println(neckarAlb.coordinates.length);
 
         final Node ueberlingen = instance.index.getClosestNode(9.170290, 47.766256);
         final Node ravensburg = instance.index.getClosestNode(9.612264, 47.777967);
