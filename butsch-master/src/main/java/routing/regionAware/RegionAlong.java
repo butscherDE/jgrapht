@@ -2,9 +2,7 @@ package routing.regionAware;
 
 import data.*;
 import evalutation.StopWatchVerbose;
-import geometry.BoundingBox;
-import geometry.RedBlueSegmentIntersectionCrossProductFactory;
-import geometry.SegmentIntersectionAlgorithm;
+import geometry.*;
 import index.GridIndex;
 import index.vc.ReflectiveEdge;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
@@ -122,7 +120,8 @@ public class RegionAlong extends AbstractRegion {
         final Set<VisibilityCell> intersectedCells = new LinkedHashSet<>();
         final Set<VisibilityCell> nonIntersectingCells = new LinkedHashSet<>();
         private final List<LineSegment> redSegments;
-        private final RedBlueSegmentIntersectionCrossProductFactory factory = new RedBlueSegmentIntersectionCrossProductFactory();
+//        private final RedBlueSegmentIntersectionCrossProductFactory factory = new RedBlueSegmentIntersectionCrossProductFactory();
+        private final RedBlueSegmentIntersectionFactory factory = new SweepShapeIntersectionFactory();
 
         public VCLogger(final RegionOfInterest roi) {
             this.redSegments = roi.getSortedLineSegments();

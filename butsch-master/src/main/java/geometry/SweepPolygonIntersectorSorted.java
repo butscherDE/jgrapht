@@ -4,20 +4,17 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorithm {
-    private final List<LineSegment> redSegments;
-    private final List<LineSegment> blueSegments;
+    private final Collection<LineSegment> redSegments;
+    private final Collection<LineSegment> blueSegments;
 
     private final LinkedList<LSEntity> sweepQueue;
     private final List<LSEntity> redHeap;
     private final List<LSEntity> blueHeap;
 
-    public SweepPolygonIntersectorSorted(final List<LineSegment> redSegments, final List<LineSegment> blueSegments) {
+    public SweepPolygonIntersectorSorted(final Collection<LineSegment> redSegments, final Collection<LineSegment> blueSegments) {
         this.redSegments = redSegments;
         this.blueSegments = blueSegments;
         this.sweepQueue = prepareSweepQueue(redSegments, blueSegments);
@@ -25,7 +22,7 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
         this.blueHeap = new LinkedList<>();
     }
 
-    public LinkedList<LSEntity> prepareSweepQueue(final List<LineSegment> redSegments, final List<LineSegment> blueSegments) {
+    public LinkedList<LSEntity> prepareSweepQueue(final Collection<LineSegment> redSegments, final Collection<LineSegment> blueSegments) {
         final ArrayList<LSEntity> entities = addAllEntities();
         Collections.sort(entities);
 
