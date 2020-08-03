@@ -8,6 +8,8 @@ import data.NodeRelation;
 import data.RoadGraph;
 import evalutation.StopWatchVerbose;
 import org.jgrapht.alg.util.Pair;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Point;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,6 +17,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class ImportPBF implements GraphImporter {
     private final RoadGraph graph = new RoadGraph(Edge.class);
@@ -382,32 +385,87 @@ public class ImportPBF implements GraphImporter {
                                                   onNodes.nodes);
         }
 
-        private List<Long> recurseToFindNodes(final Relation relation) {
-            final List<Long> nodeIds = new LinkedList<>();
+        private LinkedList<Long> recurseToFindNodes(final Relation relation) {
+            final ArrayList<LinkedList<Long>> nodeIds = new ArrayList<>();
 
             final List<RelationMember> members = relation.getMembers();
             for (final RelationMember member : members) {
                 final Long memberId = member.getId();
                 final RelationMember.Type type = member.getType();
-
                 if (member.getRole().equals("inner")) {
                     continue;
                 }
 
                 if (type == RelationMember.Type.RELATION) {
-                    nodeIds.addAll(recurseToFindNodes(relations.get(memberId)));
+                    nodeIds.add(recurseToFindNodes(relations.get(memberId)));
                 } else if (type == RelationMember.Type.NODE) {
-                    nodeIds.add(memberId);
+                    nodeIds.add(new LinkedList<>(Collections.singletonList(memberId)));
                 } else if (type == RelationMember.Type.WAY) {
-                    nodeIds.addAll(recurseToFindNodes(onWays.ways.get(memberId)));
+                    nodeIds.add(recurseToFindNodes(onWays.ways.get(memberId)));
                 }
             }
 
-            return nodeIds;
+            final LinkedList<Long> puzzledNodeIds = puzzle(nodeIds);
+
+            return puzzledNodeIds;
         }
 
-        private List<Long> recurseToFindNodes(final Way way) {
-            return way.getNodes();
+        private LinkedList<Long> puzzle(final ArrayList<LinkedList<Long>> nodeIds) {
+            final ArrayList<Long> startNodeIds = (ArrayList) nodeIds.stream().map(ids -> ids.getFirst()).collect(Collectors.toList());
+            final ArrayList<Long> endNodeIds = (ArrayList) nodeIds.stream().map(ids -> ids.getLast()).collect(Collectors.toList());
+            final List<Point> startPoints = startNodeIds.stream().map(id -> toPoint(id)).collect(Collectors.toList());
+            final List<Point> endPoints = endNodeIds.stream().map(id -> toPoint(id)).collect(Collectors.toList());
+
+            final LinkedList<Long> puzzled = new LinkedList<>();
+            puzzled.addAll(nodeIds.get(0));
+            for (int i = 1; i < nodeIds.size(); i++) {
+
+                final long lastAddedNode = puzzled.getLast();
+                final int startNodesIndex = startNodeIds.subList(i, startNodeIds.size()).indexOf(lastAddedNode);
+                if (startNodesIndex >= 0) {
+                    puzzled.addAll(nodeIds.get(i + startNodesIndex));
+                    continue;
+                }
+                final int endNodesIndex = endNodeIds.subList(i, endNodeIds.size()).indexOf(lastAddedNode);
+                if (endNodesIndex >= 0) {
+                    final LinkedList<Long> subWay = nodeIds.get(i + endNodesIndex);
+                    Collections.reverse(subWay);
+                    puzzled.addAll(subWay);
+                    continue;
+                }
+
+                final Point lastAddedPoint = toPoint(lastAddedNode);
+                final List<Double> startDistances = startPoints
+                        .subList(i, startPoints.size())
+                        .stream()
+                        .map(p -> lastAddedPoint.distance(p))
+                        .collect(Collectors.toList());
+                final List<Double> endDistances = endPoints
+                        .subList(i, startPoints.size())
+                        .stream()
+                        .map(p -> lastAddedPoint.distance(p))
+                        .collect(Collectors.toList());
+
+                final Double startMin = Collections.min(startDistances);
+                final Double endMin = Collections.min(endDistances);
+                if (startMin <= endMin) {
+                    puzzled.addAll(nodeIds.get(i + startDistances.indexOf(startMin)));
+                } else {
+                    final LinkedList<Long> subWay = nodeIds.get(i + endDistances.indexOf(endMin));
+                    Collections.reverse(subWay);
+                    puzzled.addAll(subWay);
+                }
+            }
+
+            return puzzled;
+        }
+
+        private Point toPoint(final long nodeId) {
+            return onNodes.nodes.get(nodeId).getPoint();
+        }
+
+        private LinkedList<Long> recurseToFindNodes(final Way way) {
+            return new LinkedList<>(way.getNodes());
         }
     }
 

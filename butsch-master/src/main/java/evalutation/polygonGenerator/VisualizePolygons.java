@@ -1,10 +1,14 @@
 package evalutation.polygonGenerator;
 
+import data.NodeRelation;
 import evalutation.Config;
 import evalutation.polygonGenerator.utils.PolyognGeneratorHelpers;
 import geometry.*;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Polygon;
+import storage.ImportPBF;
 
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,6 +26,14 @@ public class VisualizePolygons {
         final List<Polygon> clPolygons = PolyognGeneratorHelpers.generateCL(NUM_POLY, POLY_SIZE);
         final List<Polygon> pbfPolygons = PolyognGeneratorHelpers.read(PBF_PATH, NUM_POLY, POLY_SIZE);
 
+        final ImportPBF importPBF = new ImportPBF(Config.PBF_TUEBINGEN);
+        try {
+            importPBF.createGraph();
+        } catch (FileNotFoundException e) {}
+        final List<NodeRelation> nodeRelations = importPBF.getNodeRelations();
+        final NodeRelation nodeRelation = nodeRelations.stream().filter(r -> r.id == 2799137).findFirst().orElse(null);
+        pbfPolygons.add(nodeRelation.toPolygon());
+
         savePolygons(twoOptPolygons, "twoOpt");
         savePolygons(starPolygons, "star");
         savePolygons(clPolygons, "cl");
@@ -31,7 +43,11 @@ public class VisualizePolygons {
     public static void savePolygons(final Collection<Polygon> polygons, final String name) {
         int c = 0;
         for (Polygon polygon : polygons) {
-            saveImg(polygon, name + "_" + c++);
+            try {
+                saveImg(polygon, name + "_" + c++);
+            } catch (Exception e) {
+                System.err.println("failed");
+            }
         }
     }
 
