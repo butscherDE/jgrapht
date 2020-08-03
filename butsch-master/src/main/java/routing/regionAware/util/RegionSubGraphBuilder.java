@@ -4,10 +4,8 @@ import data.Edge;
 import data.Node;
 import data.RegionOfInterest;
 import data.RoadGraph;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Polygon;
+import geometry.PolygonContainsChecker;
+import org.locationtech.jts.geom.*;
 import util.BinaryHashFunction;
 
 import java.util.Collection;
@@ -20,6 +18,8 @@ public class RegionSubGraphBuilder {
     private RegionOfInterest whiteRegion;
     private Polygon blackRegion;
     private Collection<Node> whitelist;
+    private PolygonContainsChecker whiteContainsChecker;
+    private PolygonContainsChecker blackContainsChecker;
 
     public RoadGraph getSubGraph(final RoadGraph graph, final RegionOfInterest whiteRegion,
                                  final Collection<Node> whitelist) {
@@ -27,6 +27,7 @@ public class RegionSubGraphBuilder {
         this.subGraph = new RoadGraph(Edge.class);
         this.whiteRegion = whiteRegion;
         this.whitelist = whitelist;
+        this.whiteContainsChecker = new PolygonContainsChecker(whiteRegion.getPolygon());
 
         addWhitelistNodes();
         addNodesWhite();
@@ -42,6 +43,8 @@ public class RegionSubGraphBuilder {
         this.whiteRegion = whiteRegion;
         this.blackRegion = blackRegion;
         this.whitelist = whitelist;
+        this.whiteContainsChecker = new PolygonContainsChecker(whiteRegion.getPolygon());
+        this.blackContainsChecker = new PolygonContainsChecker(blackRegion);
 
         addWhitelistNodes();
         addNodesWhiteBlack();
@@ -60,8 +63,9 @@ public class RegionSubGraphBuilder {
 
     private void addNodesWhite() {
         for (final Node node : graph.vertexSet()) {
-            final Geometry point = toPoint(node);
-            if (whiteRegion.getPolygon().contains(point)) {
+            final Point point = node.getPoint();
+//            if (whiteRegion.getPolygon().contains(point)) {
+            if (whiteContainsChecker.contains(point)) {
                 addNode(node);
             }
         }
@@ -69,10 +73,12 @@ public class RegionSubGraphBuilder {
 
     private void addNodesWhiteBlack() {
         for (final Node node : graph.vertexSet()) {
-            final Geometry point = toPoint(node);
+            final Point point = node.getPoint();
 
-            final boolean isWhiteContainingPoint = whiteRegion.getPolygon().contains(point);
-            final boolean isBlackContainingPoint = blackRegion.contains(point);
+//            final boolean isWhiteContainingPoint = whiteRegion.getPolygon().contains(point);
+//            final boolean isBlackContainingPoint = blackRegion.contains(point);
+            final boolean isWhiteContainingPoint = whiteContainsChecker.contains(point);
+            final boolean isBlackContainingPoint = blackContainsChecker.contains(point);
             if (isWhiteContainingPoint && !isBlackContainingPoint) {
                 addNode(node);
             }
@@ -94,10 +100,5 @@ public class RegionSubGraphBuilder {
                 subGraph.setEdgeWeight(newEdge, graph.getEdgeWeight(edge));
             }
         }
-    }
-
-    private Geometry toPoint(final Node node) {
-        final Coordinate coordinate = new Coordinate(node.longitude, node.latitude, node.elevation);
-        return geometryFactory.createPoint(coordinate);
     }
 }

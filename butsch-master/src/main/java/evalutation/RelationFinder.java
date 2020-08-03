@@ -76,12 +76,12 @@ public class RelationFinder {
         final Path badRiedDirect = chFactory.createRoutingAlgorithm().findPath(badSaulgau, riedlingen);
         final Path sigUlmDirect = chFactory.createRoutingAlgorithm().findPath(sigmaringen, ulm);
 
-        System.out.println("#################\nBodensee:");
-        final StopWatchVerbose sw1 = new StopWatchVerbose("bodensee pathcalc");
-        final RegionAlong bodenseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
-                                                        new RegionOfInterest(bodensee.toPolygon()));
-        final Path uberRaveAlong = bodenseeAlong.findPath(ueberlingen, ravensburg);
-        sw1.printTimingIfVerbose();
+//        System.out.println("#################\nBodensee:");
+//        final StopWatchVerbose sw1 = new StopWatchVerbose("bodensee pathcalc");
+//        final RegionAlong bodenseeAlong = new RegionAlong(instance.graph, roadCh, instance.index,
+//                                                        new RegionOfInterest(bodensee.toPolygon()));
+//        final Path uberRaveAlong = bodenseeAlong.findPath(ueberlingen, ravensburg);
+//        sw1.printTimingIfVerbose();
 
 //        System.out.println("#################\nFedernsee:");
 //        final StopWatchVerbose sw2 = new StopWatchVerbose("federnsee pathcalc");
@@ -99,10 +99,10 @@ public class RelationFinder {
         sw3.printTimingIfVerbose();
 
 
-        final GeoJsonExporter expUberRave = new GeoJsonExporter("lala");
-        expUberRave.addLineString(toLineString(uberRaveDirect));
-        expUberRave.addLineString(toLineString(uberRaveAlong));
-        expUberRave.addPolygon(bodensee.toPolygon());
+//        final GeoJsonExporter expUberRave = new GeoJsonExporter("lala");
+//        expUberRave.addLineString(toLineString(uberRaveDirect));
+//        expUberRave.addLineString(toLineString(uberRaveAlong));
+//        expUberRave.addPolygon(bodensee.toPolygon());
 
 //        final GeoJsonExporter expBadRied = new GeoJsonExporter("lala");
 //        expBadRied.addLineString(toLineString(badRiedDirect));
@@ -114,7 +114,7 @@ public class RelationFinder {
         expSigUlm.addLineString(toLineString(sigUlmThrough));
         expSigUlm.addPolygon(neckarAlb.toPolygon());
 
-        expUberRave.writeJson();
+//        expUberRave.writeJson();
 //        expBadRied.writeJson();
         expSigUlm.writeJson();
     }
