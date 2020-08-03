@@ -32,7 +32,6 @@ public class ShapeDrawer extends JPanel {
         return comp;
     }
 
-static int j = 0;
     public static Polygon reshapePolygon(final Polygon polygon, final double factor) {
         final Coordinate[] coordinates = polygon.getCoordinates();
         final double minX = Arrays.stream(coordinates)
