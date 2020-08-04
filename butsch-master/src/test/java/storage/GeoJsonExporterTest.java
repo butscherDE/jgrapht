@@ -8,7 +8,7 @@ import org.locationtech.jts.geom.Point;
 public class GeoJsonExporterTest {
     @Test
     public void lala() {
-        final GeoJsonExporter exp = new GeoJsonExporter("lala");
+        final GeoJsonExporter exp = new GeoJsonExporter(null);
         final GeometryFactory gf = new GeometryFactory();
 
         exp.addPoint(gf.createPoint(new Coordinate(-1, 1)));

@@ -99,17 +99,17 @@ public class RelationFinder {
         sw3.printTimingIfVerbose();
 
 
-//        final GeoJsonExporter expUberRave = new GeoJsonExporter("lala");
+//        final GeoJsonExporter expUberRave = new GeoJsonExporter(null);
 //        expUberRave.addLineString(toLineString(uberRaveDirect));
 //        expUberRave.addLineString(toLineString(uberRaveAlong));
 //        expUberRave.addPolygon(bodensee.toPolygon());
 
-//        final GeoJsonExporter expBadRied = new GeoJsonExporter("lala");
+//        final GeoJsonExporter expBadRied = new GeoJsonExporter(null);
 //        expBadRied.addLineString(toLineString(badRiedDirect));
 //        expBadRied.addLineString(toLineString(badRiedAlong));
 //        expBadRied.addPolygon(federnsee.toPolygon());
 
-        final GeoJsonExporter expSigUlm = new GeoJsonExporter("lala");
+        final GeoJsonExporter expSigUlm = new GeoJsonExporter(null);
         expSigUlm.addLineString(toLineString(sigUlmDirect));
         expSigUlm.addLineString(toLineString(sigUlmThrough));
         expSigUlm.addPolygon(neckarAlb.toPolygon());
