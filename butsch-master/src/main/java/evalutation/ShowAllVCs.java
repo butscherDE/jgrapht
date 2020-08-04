@@ -12,18 +12,17 @@ import java.util.List;
 public class ShowAllVCs {
     public static void main(String[] args) {
         final DataInstance instance = DataInstance.createFromImporter(new ImportPBF(Config.PBF_TUEBINGEN));
-        final BoundingBox limiter = new BoundingBox(-200, 200, -100, 100);
+        System.out.println("instance created");
+        final BoundingBox limiter = new BoundingBox(0, 20, 40, 60);
         final AllVCLogger visitor = new AllVCLogger();
         instance.index.queryVisibilityCells(limiter, visitor);
-
-        final GeoJsonExporter exp = new GeoJsonExporter(Config.RESULTS + "allVcsTuebingen.geojson");
-        visitor.vcs.forEach(vc -> exp.addPolygon(vc.getPolygon()));
-
-        exp.writeJson();
+        visitor.exp.writeJson();
     }
 
     private static class AllVCLogger implements GridIndex.GridIndexVisitor {
-        public final List<VisibilityCell> vcs = new LinkedList<>();
+        final GeoJsonExporter exp = new GeoJsonExporter(Config.RESULTS + "allVcsTuebingen.geojson");
+        int i = 0;
+
         @Override
         public void accept(Object entity, BoundingBox cell) {
             accept(entity);
@@ -31,7 +30,10 @@ public class ShowAllVCs {
 
         @Override
         public void accept(Object entity) {
-            vcs.add((VisibilityCell) entity);
+            VisibilityCell vc = (VisibilityCell) entity;
+
+            exp.addPolygon(vc.getPolygon());
+            System.out.println(i++ + "th vc added");
         }
     }
 }

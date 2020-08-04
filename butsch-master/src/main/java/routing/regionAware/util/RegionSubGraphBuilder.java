@@ -64,8 +64,8 @@ public class RegionSubGraphBuilder {
     private void addNodesWhite() {
         for (final Node node : graph.vertexSet()) {
             final Point point = node.getPoint();
-//            if (whiteRegion.getPolygon().contains(point)) {
-            if (whiteContainsChecker.contains(point)) {
+            if (whiteRegion.getPolygon().contains(point)) {
+//            if (whiteContainsChecker.contains(point)) {
                 addNode(node);
             }
         }
@@ -75,10 +75,10 @@ public class RegionSubGraphBuilder {
         for (final Node node : graph.vertexSet()) {
             final Point point = node.getPoint();
 
-//            final boolean isWhiteContainingPoint = whiteRegion.getPolygon().contains(point);
-//            final boolean isBlackContainingPoint = blackRegion.contains(point);
-            final boolean isWhiteContainingPoint = whiteContainsChecker.contains(point);
-            final boolean isBlackContainingPoint = blackContainsChecker.contains(point);
+            final boolean isWhiteContainingPoint = whiteRegion.getPolygon().contains(point);
+            final boolean isBlackContainingPoint = blackRegion.contains(point);
+//            final boolean isWhiteContainingPoint = whiteContainsChecker.contains(point);
+//            final boolean isBlackContainingPoint = blackContainsChecker.contains(point);
             if (isWhiteContainingPoint && !isBlackContainingPoint) {
                 addNode(node);
             }
