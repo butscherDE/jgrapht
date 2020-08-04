@@ -1,5 +1,7 @@
 package storage;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import org.json.simple.JSONArray;
@@ -44,6 +46,31 @@ public class GeoJsonExporter {
     }
 
     public void writeJson() {
+        final JSONObject featureCollection = prepareGeoJsonString();
+
+
+        if (path != null) {
+            writeToFile(featureCollection);
+        } else {
+            writeToConsole(featureCollection);
+        }
+    }
+
+    private void writeToFile(JSONObject featureCollection) {
+        try {
+            final FileWriter fileWriter = new FileWriter(path);
+            featureCollection.writeJSONString(fileWriter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeToConsole(JSONObject featureCollection) {
+        System.err.println("Not printing to file only to console");
+        System.out.println(featureCollection.toJSONString());
+    }
+
+    private JSONObject prepareGeoJsonString() {
         final List<JSONObject> jsonPointFeatures = getJsonPoints();
         final List<JSONObject> jsonLineStringFeatures = getJsonLineStrings();
         final List<JSONObject> jsonPolygonFeatures = getJsonPolygons();
@@ -56,9 +83,7 @@ public class GeoJsonExporter {
         final JSONObject featureCollection = new JSONObject();
         featureCollection.put("features", features);
         featureCollection.put("type", "FeatureCollection");
-
-        System.err.println("Not printing to file only to console");
-        System.out.println(featureCollection.toJSONString());
+        return featureCollection;
     }
 
     private List<JSONObject> getJsonPoints() {
