@@ -112,9 +112,20 @@ public class BoundingBox extends Polygon {
     public boolean contains(final Geometry g) {
         if (g instanceof Point) {
             return containsPoint(g);
+        } else if (g instanceof BoundingBox) {
+            return containsBoundingBox((BoundingBox) g);
         } else {
             return super.contains(g);
         }
+    }
+
+    private boolean containsBoundingBox(BoundingBox b) {
+        final boolean minLongInRange = this.minLongitude <= b.minLongitude;
+        final boolean maxLongInRange = this.maxLongitude >= b.maxLongitude;
+        final boolean minLatInRange = this.minLatitude <= b.minLatitude;
+        final boolean maxLatInRange = this.maxLatitude >= b.maxLatitude;
+
+        return minLongInRange && maxLongInRange && minLatInRange && maxLatInRange;
     }
 
     public boolean containsPoint(final Geometry g) {

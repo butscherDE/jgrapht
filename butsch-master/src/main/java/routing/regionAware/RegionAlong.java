@@ -6,12 +6,11 @@ import geometry.*;
 import index.GridIndex;
 import index.vc.ReflectiveEdge;
 import org.jgrapht.alg.shortestpath.ContractionHierarchyPrecomputation;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,7 +34,35 @@ public class RegionAlong extends AbstractRegion {
         final BoundingBox limiter = BoundingBox.createFrom(region.getPolygon());
         final VCLogger vcLogger = new VCLogger(region);
         index.queryVisibilityCells(limiter, vcLogger);
-        return vcLogger.intersectedCells;
+        final Set<VisibilityCell> intersectedCells = vcLogger.intersectedCells;
+
+        if (intersectedCells.size() > 0) {
+            return intersectedCells;
+        } else {
+            return getContainingCell(vcLogger);
+        }
+    }
+
+    private Set<VisibilityCell> getContainingCell(final VCLogger vcLogger) {
+        final GeometryFactory gf = new GeometryFactory();
+        final BoundingBox regionBB = BoundingBox.createFrom(region.getPolygon());
+        for (VisibilityCell vc : vcLogger.nonIntersectingCells) {
+            final BoundingBox vcBB = BoundingBox.createFrom(vc);
+            if (vcBB.contains(regionBB)) {
+                final PolygonContainsChecker polygonContainsChecker = new PolygonContainsChecker(vc.getPolygon());
+                final Coordinate[] regionCoordinates = region.getPolygon()
+                        .getCoordinates();
+                final int numContainedPointsOfRegion = Arrays.stream(regionCoordinates)
+                        .map(c -> gf.createPoint(c))
+                        .mapToInt(p -> polygonContainsChecker.contains(p) ? 1 : 0)
+                        .sum();
+                if (numContainedPointsOfRegion == regionCoordinates.length) {
+                    return Collections.singleton(vc);
+                }
+            }
+        }
+
+        return Collections.emptySet();
     }
 
     private RoadGraph prepareGraph(Set<VisibilityCell> intersectedCells) {
@@ -125,7 +152,6 @@ public class RegionAlong extends AbstractRegion {
             accept(entity);
         }
 
-        int i = 0;
         @Override
         public void accept(VisibilityCell entity) {
             if (!intersectedCells.contains(entity) && !nonIntersectingCells.contains(entity)) {
