@@ -16,7 +16,7 @@ public class ShowAllVCs {
         final AllVCLogger visitor = new AllVCLogger();
         instance.index.queryVisibilityCells(limiter, visitor);
 
-        final GeoJsonExporter exp = new GeoJsonExporter("exp");
+        final GeoJsonExporter exp = new GeoJsonExporter(Config.RESULTS + "allVcsTuebingen.geojson");
         visitor.vcs.forEach(vc -> exp.addPolygon(vc.getPolygon()));
 
         exp.writeJson();
