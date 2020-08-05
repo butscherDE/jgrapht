@@ -1,10 +1,11 @@
 package geometry;
 
-import org.apache.commons.lang3.NotImplementedException;
+import org.jgrapht.alg.util.Pair;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorithm {
     private final Collection<LineSegment> redSegments;
@@ -39,9 +40,11 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
     }
 
     public void addRedEntities(final ArrayList<LSEntity> entities) {
-        for (final LineSegment redSegment : redSegments) {
-            final LSEntity first = new LSEntity(redSegment.p0.x, false, null, redSegment);
-            final LSEntity second = new LSEntity(redSegment.p1.x, false, first, redSegment);
+        final Iterator<LineSegment> redIterator = redSegments.iterator();
+        for (int i = 0; redIterator.hasNext(); i++) {
+            final LineSegment redSegment = redIterator.next();
+            final LSEntity first = new LSEntity(redSegment.p0.x, false, null, redSegment, i);
+            final LSEntity second = new LSEntity(redSegment.p1.x, false, first, redSegment, i);
 
             entities.add(first);
             entities.add(second);
@@ -49,9 +52,11 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
     }
 
     public void addBlueEntities(final ArrayList<LSEntity> entities) {
-        for (final LineSegment blueSegment : blueSegments) {
-            final LSEntity first = new LSEntity(blueSegment.p0.x, true, null, blueSegment);
-            final LSEntity second =  new LSEntity(blueSegment.p1.x, true, first, blueSegment);
+        final Iterator<LineSegment> blueIterator = blueSegments.iterator();
+        for (int i = 0; blueIterator.hasNext(); i++) {
+            final LineSegment blueSegment = blueIterator.next();
+            final LSEntity first = new LSEntity(blueSegment.p0.x, true, null, blueSegment, i);
+            final LSEntity second =  new LSEntity(blueSegment.p1.x, true, first, blueSegment, i);
 
             entities.add(first);
             entities.add(second);
@@ -76,21 +81,30 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
 
     @Override
     public List<Coordinate> getIntersections() {
-        final List<Coordinate> intersections = new LinkedList<>();
+        return getIntersectionInfos().stream().map(is -> is.intersection).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Pair<Integer, Integer>> getIntersectionIndices() {
+        return getIntersectionInfos().stream().map(is -> new Pair<>(is.redIndex, is.blueIndex)).collect(Collectors.toList());
+    }
+
+    public List<SweepIntersection> getIntersectionInfos() {
+        final List<SweepIntersection> intersectionInfos = new LinkedList<>();
 
         while (hasQueueNext()) {
-            intersections.addAll(nextSweepStep());
+            intersectionInfos.addAll(nextSweepStep());
         }
 
-        return intersections;
+        return intersectionInfos;
     }
 
     private boolean hasQueueNext() {
         return this.sweepQueue.size() > 0;
     }
 
-    private List<Coordinate> nextSweepStep() {
-        final List<Coordinate> intersections;
+    private List<SweepIntersection> nextSweepStep() {
+        final List<SweepIntersection> intersections;
         final LSEntity popped = sweepQueue.removeFirst();
 
         if (!popped.isEndPoint()) {
@@ -102,21 +116,34 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
         return intersections;
     }
 
-    private List<Coordinate> addToHeapAndIntersect(final LSEntity popped) {
-        final List<Coordinate> intersections;
+    private List<SweepIntersection> addToHeapAndIntersect(final LSEntity popped) {
+        final List<SweepIntersection> intersections  = new LinkedList<>();
+
         if (popped.isRedOrigin()) {
             redHeap.add(popped);
 
-            intersections = getIntersectWithOtherHeap(popped, blueHeap);
+            for (final LSEntity other : blueHeap) {
+                final Coordinate intersection = popped.segment.intersection(other.segment);
+                if (intersection != null) {
+                    final SweepIntersection intersectionInfo = new SweepIntersection(intersection, popped.index, other.index);
+                    intersections.add(intersectionInfo);
+                }
+            }
         } else {
             blueHeap.add(popped);
 
-            intersections = getIntersectWithOtherHeap(popped, redHeap);
+            for (final LSEntity other : redHeap) {
+                final Coordinate intersection = popped.segment.intersection(other.segment);
+                if (intersection != null) {
+                    final SweepIntersection intersectionInfo = new SweepIntersection(intersection, other.index, popped.index);
+                    intersections.add(intersectionInfo);
+                }
+            }
         }
         return intersections;
     }
 
-    private List<Coordinate> removeFromHeap(final LSEntity popped) {
+    private List<SweepIntersection> removeFromHeap(final LSEntity popped) {
         if (popped.isRedOrigin()) {
             redHeap.remove(popped.startPoint);
         } else {
@@ -126,29 +153,19 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
         return new LinkedList<>();
     }
 
-    private List<Coordinate> getIntersectWithOtherHeap(final LSEntity popped, final List<LSEntity> otherColorHeap) {
-        final List<Coordinate> intersections = new LinkedList<>();
-        for (final LSEntity other : otherColorHeap) {
-            final Coordinate intersection = popped.segment.intersection(other.segment);
-            if (intersection != null) {
-                intersections.add(intersection);
-            }
-        }
-
-        return intersections;
-    }
-
     private class LSEntity implements Comparable {
         private final double x; // x position of segment
         private final boolean origin; //0 = red, 1 = blue
         private final LSEntity startPoint; // null if this is endpoint, pointer to endpoint if start point
         private final LineSegment segment; //segment from which this point was drawn
+        private final int index;
 
-        public LSEntity(final double x, final boolean origin, final LSEntity startPoint, final LineSegment segment) {
+        public LSEntity(final double x, final boolean origin, final LSEntity startPoint, final LineSegment segment, int index) {
             this.x = x;
             this.origin = origin;
             this.startPoint = startPoint;
             this.segment = segment;
+            this.index = index;
         }
 
         @Override
@@ -163,6 +180,18 @@ public class SweepPolygonIntersectorSorted implements SegmentIntersectionAlgorit
 
         public boolean isRedOrigin() {
             return !origin;
+        }
+    }
+
+    private class SweepIntersection {
+        private final Coordinate intersection;
+        private final int redIndex;
+        private final int blueIndex;
+
+        public SweepIntersection(Coordinate intersection, int redIndex, int blueIndex) {
+            this.intersection = intersection;
+            this.redIndex = redIndex;
+            this.blueIndex = blueIndex;
         }
     }
 }

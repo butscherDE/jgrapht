@@ -1,13 +1,17 @@
 package geometry;
 
+import org.jgrapht.alg.util.Pair;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PolygonContainsCheckerBatched {
     private final List<LineSegment> polygon;
@@ -33,9 +37,28 @@ public class PolygonContainsCheckerBatched {
 
     public List<Boolean> contains(final List<Point> points) {
         final SegmentIntersectionAlgorithm intersector = intersectionFactory.createInstance(polygon, toLineSegments(points));
-        final List<Coordinate> intersections = intersector.getIntersections();
+        final List<Pair<Integer, Integer>> intersectionIndices = intersector.getIntersectionIndices();
+        intersectionIndices.sort(Comparator.comparingInt(a -> a.getSecond()));
 
+        final Boolean[] isIntersected = new Boolean[points.size()];
+        IntStream.range(0, isIntersected.length).forEach(i -> isIntersected[i] = false);
 
+        int currentPoint = intersectionIndices.get(0).getSecond();
+        int currentPointIntersectionCount = 0;
+        for (Pair<Integer, Integer> intersectionIndex : intersectionIndices) {
+            final Integer nextPoint = intersectionIndex.getSecond();
+            if (currentPoint == nextPoint) {
+                currentPointIntersectionCount++;
+            } else {
+                isIntersected[currentPoint] = currentPointIntersectionCount % 2 == 1;
+                currentPointIntersectionCount = 1;
+                currentPoint = nextPoint;
+            }
+        }
+
+        // TODO Tests failing
+
+        return Arrays.asList(isIntersected);
     }
 
     private List<LineSegment> toLineSegments(final List<Point> points) {
