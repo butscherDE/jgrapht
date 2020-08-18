@@ -22,27 +22,6 @@ public class RelationFinder {
     private final static GeometryFactory gf = new GeometryFactory();
 
     public static void main(String[] args) {
-//        final int numPoints = 20;
-//        final GeometryFactory gf = new GeometryFactory();
-//        final Random random = new Random(46);
-//        final List<Point> points = IntStream
-//                .rangeClosed(1, numPoints)
-//                .mapToObj(i -> new Coordinate(random.nextInt(20), random.nextInt(20)))
-//                .map(c -> gf.createPoint(c))
-//                .collect(Collectors.toList());
-//        final MultiPoint multiPoint = gf.createMultiPoint(points.toArray(new Point[numPoints]));
-//        final ConvexLayers cl = new ConvexLayers(multiPoint);
-//
-//        IntStream
-//                .range(0, cl.size())
-//                .mapToObj(i -> cl.getLayerAsLineSegments(i))
-//                .flatMap(layer -> layer.stream())
-//                .forEach(ls -> System.out.println("\\draw [black] (" + (int) ls.p0.x + "," + (int) ls.p0.y + ") to (" + (int) ls.p1.x + "," + (int) ls.p1.y + ");"));
-//        points.forEach(p -> System.out.println("\\filldraw [black] (" + (int) p.getX() + "," + (int) p.getY() + ") circle(6pt);"));
-//
-//
-//        System.exit(-1);
-
         final DataInstance instance = DataInstance.createFromImporter(new ImportPBF(Config.PBF_TUEBINGEN));
 
         final List<NodeRelation> nodeRelations = instance.relations;
@@ -53,9 +32,6 @@ public class RelationFinder {
         final NodeRelation r1 = nodeRelations.stream().filter(r -> r.id == 9919238).findFirst().orElse(null);
         final NodeRelation r2 = nodeRelations.stream().filter(r -> r.id == 8408).findFirst().orElse(null);
         final NodeRelation r3 = nodeRelations.stream().filter(r -> r.id == 2799137).findFirst().orElse(null);
-        System.out.println(r1.coordinates.length);
-        System.out.println(r2.coordinates.length);
-        System.out.println(r3.coordinates.length);
 
         final Node s1 = instance.index.getClosestNode(9.2546, 47.9228);
         final Node t1 = instance.index.getClosestNode(9.3998356, 48.494732);
@@ -63,13 +39,6 @@ public class RelationFinder {
         final Node t2 = t1; //instance.index.getClosestNode(9.469365, 48.160181);
         final Node s3 = instance.index.getClosestNode(9.228290, 48.091957);
         final Node t3 = instance.index.getClosestNode(9.988786, 48.401491);
-
-        System.out.println(s1);
-        System.out.println(t1);
-        System.out.println(s2);
-        System.out.println(t2);
-        System.out.println(s3);
-        System.out.println(t3);
 
         final ContractionHierarchyPrecomputation.ContractionHierarchy<Node, Edge> ch = new ContractionHierarchyPrecomputation<>(
                 instance.graph).computeContractionHierarchy();
@@ -91,7 +60,6 @@ public class RelationFinder {
         final StopWatchVerbose sw2 = new StopWatchVerbose("Tübinger pathcalc");
         final RegionAlong r2Along = new RegionAlong(instance.graph, roadCh, instance.index,
                 new RegionOfInterest(r2.toPolygon()));
-        System.out.println("instance created");
         final Path p2Along = r2Along.findPath(s2, t2);
         sw2.printTimingIfVerbose();
 
@@ -101,7 +69,6 @@ public class RelationFinder {
                                                                  new RegionOfInterest(r3.toPolygon()));
         final Path p3Through = r3Through.findPath(s3, t3);
         sw3.printTimingIfVerbose();
-
 
         final GeoJsonExporter expWaldseeWangen = new GeoJsonExporter(null);
         expWaldseeWangen.addLineString(toLineString(p1Direct));

@@ -37,10 +37,8 @@ public class RegionAlong extends AbstractRegion {
         final Set<VisibilityCell> intersectedCells = vcLogger.intersectedCells;
 
         if (intersectedCells.size() > 0) {
-            System.out.println("found intersecting cells");
             return intersectedCells;
         } else {
-            System.out.println("found overlapping cells");
             return getContainingCell(vcLogger);
         }
     }

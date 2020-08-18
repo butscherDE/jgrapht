@@ -4,6 +4,7 @@ import data.Edge;
 import data.Node;
 import data.RegionOfInterest;
 import data.RoadGraph;
+import evalutation.Config;
 import evalutation.StopWatchVerbose;
 import geometry.BoundingBox;
 import geometry.PolygonContainsChecker;
@@ -33,7 +34,9 @@ public class EntryExitPointExtractor {
 
         final Set<Node> entryExitNodes = entryExitNodeVisitor.getEntryExitNodes();
         sw.printTimingIfVerbose();
-        System.out.println("Number of Entry- / Exit-Points: " + entryExitNodes.size());
+        if (Config.VERBOSE) {
+            System.out.println("Number of Entry- / Exit-Points: " + entryExitNodes.size());
+        }
         return entryExitNodes;
     }
 

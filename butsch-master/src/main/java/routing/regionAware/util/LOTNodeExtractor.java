@@ -4,6 +4,7 @@ import data.Edge;
 import data.Node;
 import data.Path;
 import data.RoadGraph;
+import evalutation.Config;
 import evalutation.StopWatchVerbose;
 import org.jgrapht.alg.util.Pair;
 
@@ -30,7 +31,9 @@ public class LOTNodeExtractor {
         final StopWatchVerbose sw = new StopWatchVerbose("LOT node extraction");
         findLotNodes();
         sw.printTimingIfVerbose();
-        System.out.println("Number of lot nodes: " + viaPointToLOTNodes.values().stream().mapToInt(l -> l.size()).sum());
+        if (Config.VERBOSE) {
+            System.out.println("Number of lot nodes: " + viaPointToLOTNodes.values().stream().mapToInt(l -> l.size()).sum());
+        }
     }
 
     private void findLotNodes() {

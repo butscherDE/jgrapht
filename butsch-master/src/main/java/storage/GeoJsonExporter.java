@@ -60,6 +60,8 @@ public class GeoJsonExporter {
         try {
             final FileWriter fileWriter = new FileWriter(path);
             featureCollection.writeJSONString(fileWriter);
+            fileWriter.flush();
+            fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

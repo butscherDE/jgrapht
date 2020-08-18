@@ -2,7 +2,7 @@ package evalutation;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class Config {
-    public final static boolean VERBOSE = true;
+    public final static boolean VERBOSE = false;
 
     public final static String PBF_FILES = "C:\\pbffiles\\";
     // ERP style data
@@ -43,4 +43,5 @@ public class Config {
     public final static String LOT = RESULTS + "lot\\";
     public final static String SIMPLIFICATION_STEPS = RESULTS + "simplificationSteps\\";
     public final static String ROI_TIME = RESULTS + "roiTime\\";
+    public final static String ROUTE_EXAMPLES = RESULTS + "routeExamples\\";
 }

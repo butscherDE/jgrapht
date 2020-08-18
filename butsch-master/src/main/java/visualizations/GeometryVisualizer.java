@@ -2,6 +2,7 @@ package visualizations;
 
 import data.Edge;
 import data.Node;
+import data.Path;
 import data.RoadGraph;
 import geometry.BoundingBox;
 import org.locationtech.jts.awt.ShapeWriter;
@@ -92,6 +93,14 @@ public class GeometryVisualizer {
             e.printStackTrace();
         }
         this.geometryDrawCollection.inverseY();
+    }
+
+    public void show() {
+        frame.setVisible(true);
+    }
+
+    public void hide() {
+        frame.setVisible(false);
     }
 
     private void drawCoordinates() {
@@ -336,6 +345,14 @@ public class GeometryVisualizer {
             final LineSegment lineSegment = new LineSegment(sourceCoordinate, targetCoordinate);
 
             addLineSegment(color, lineSegment);
+        }
+
+        public void addPath(final Color color, final Path path, final RoadGraph graph) {
+            final List<Edge> edges = path.getEdgeList();
+            edges.forEach(e -> addEdge(color, e, graph));
+
+            final List<Node> vertices = path.getVertexList();
+            vertices.forEach(v -> addNode(color, v));
         }
 
         private Collection<LineSegment> coordinatesToLineSegments(final Collection<Coordinate> coordinates) {
