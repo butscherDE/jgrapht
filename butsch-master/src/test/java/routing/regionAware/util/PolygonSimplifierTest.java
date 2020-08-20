@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import routing.regionAware.RegionAlong;
 import routing.regionAware.RegionThrough;
+import storage.GeoJsonExporter;
 import storage.ImportPBF;
 import util.PolygonRoutingTestGraph;
 
@@ -33,6 +34,7 @@ public abstract class PolygonSimplifierTest {
     private static List<NodeRelation> nodeRelations;
     private static GridIndex gridIndex;
     private static RoadCH roadCH;
+    private static int debugCounter = 0;
 
     @BeforeAll
     public static void initPbfTest() {
@@ -146,7 +148,27 @@ public abstract class PolygonSimplifierTest {
         final RegionAlong raSimple = new RegionAlong(graph, roadCH, gridIndex, simpleRoi);
         final Path greaterPath = ra.findPath(source, target);
         final Path smallerPath = raSimple.findPath(source, target);
+
+
+        if (greaterPath.getWeight() != smallerPath.getWeight()) {
+            System.err.println("Not same path costs");
+            writeDebugGeoJson(roi, simpleRoi, greaterPath, smallerPath);
+        }
+
         assertEquals(greaterPath, smallerPath);
+    }
+
+    private void writeDebugGeoJson(final RegionOfInterest roi, final RegionOfInterest simpleRoi, final Path greaterPath,
+                                   final Path smallerPath) {
+        final GeoJsonExporter exp = new GeoJsonExporter(Config.RESULTS + "debug" + debugCounter + ".geojson");
+        exp.addGraph(graph);
+        exp.addPath(greaterPath);
+        exp.addPath(smallerPath);
+        exp.addPolygon(roi.getPolygon());
+        exp.addPolygon(simpleRoi.getPolygon());
+        exp.writeJson();
+
+        System.err.println("Wrote debug " + debugCounter++ + " geojson");
     }
 
     private int checkEmptyRegion(int skipped, RegionOfInterest roi, RegionOfInterest simpleRoi, IllegalArgumentException e) {

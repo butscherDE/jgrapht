@@ -4,12 +4,17 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
+import data.Edge;
+import data.Node;
+import data.Path;
+import data.RoadGraph;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.locationtech.jts.geom.*;
 import util.PolygonRoutingTestGraph;
 
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class GeoJsonExporter {
@@ -43,6 +48,34 @@ public class GeoJsonExporter {
 
     public void addPolygon(final Polygon polygon) {
         polygons.add(polygon);
+    }
+
+    public void addGraph(final RoadGraph graph) {
+        addVertices(graph.vertexSet());
+        addEdges(graph, graph.edgeSet());
+    }
+
+    private void addVertices(final Set<Node> vertexSet) {
+        vertexSet.stream().map(v -> v.getPoint()).forEach(p -> addPoint(p));
+    }
+
+    private void addEdges(final RoadGraph graph, final Set<Edge> edgeSet) {
+        edgeSet.stream().map(e -> {
+            final Coordinate startCoordinate = graph.getEdgeSource(e).getPoint().getCoordinate();
+            final Coordinate endCoordinate = graph.getEdgeTarget(e).getPoint().getCoordinate();
+            final Coordinate[] coordinates = {startCoordinate, endCoordinate};
+            return gf.createLineString(coordinates);
+        }).forEach(ls -> addLineString(ls));
+    }
+
+    public void addPath(final Path path) {
+        final Coordinate[] coordinates = path
+                .getVertexList()
+                .stream()
+                .map(v -> v.getPoint().getCoordinate())
+                .collect(Collectors.toList())
+                .toArray(new Coordinate[path.getLength()]);
+        addLineString(gf.createLineString(coordinates));
     }
 
     public void writeJson() {
